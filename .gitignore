@@ -1,0 +1,47 @@
+# Global: Node and Dart dependencies
+build/
+.dart_tool/
+.flutter-plugins
+.packages
+.env
+.idea/
+.vscode/
+
+# IDE-specific
+.idea/
+.vscode/
+
+# Firebase Service Account Key (if used in frontend)
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+lib/firebase_options.dart
+
+# Frontend: Flutter/Dart
+doc/api/
+ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+build/
+env_config.dart 
+
+# Android Studio (for Flutter/Android projects)
+android/app/debug/
+android/app/profile/
+android/app/release/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Node
+node_modules/
+
+# Environment Files
+.env
+.env.local
+.env.*.local

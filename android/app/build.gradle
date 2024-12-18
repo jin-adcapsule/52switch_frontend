@@ -1,0 +1,58 @@
+plugins {
+    id "com.android.application"
+    // START: FlutterFire Configuration
+    id 'com.google.gms.google-services'
+    // END: FlutterFire Configuration
+    id "kotlin-android"
+    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+android {
+    namespace = "com.adcapsule.app52switch"
+    compileSdkVersion 34  // Firebase requires a minimum of API level 33flutter.compileSdkVersion
+    ndkVersion "25.2.9519653" // Replace with the installed NDK version//ndkVersion = flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'//JavaVersion.VERSION_17
+    }
+
+    defaultConfig {
+        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        applicationId = "com.adcapsule.app52switch"
+        // You can update the following values to match your application needs.
+        // For more information, see: https://flutter.dev/to/review-gradle-config.
+        minSdkVersion 23//minSdk = 23//flutter.minSdkVersion
+        targetSdkVersion 34//targetSdk = flutter.targetSdkVersion
+        versionCode 1//versionCode = flutter.versionCode
+        versionName "1.0"//versionName = flutter.versionName
+    }
+
+    buildTypes {
+        release {
+            // TODO: Add your own signing config for the release build.
+            // Signing with the debug keys for now, so `flutter run --release` works.
+            signingConfig = signingConfigs.debug
+        }
+    }
+
+    // Add this for Java compiler options
+    tasks.withType(JavaCompile).configureEach {
+        options.compilerArgs.add("-Xlint:deprecation")
+    }
+}
+dependencies {
+    implementation platform('com.google.firebase:firebase-bom:33.6.0') // Use the latest BOM version
+    implementation 'com.google.firebase:firebase-auth' // Ensure this is present
+    implementation 'com.google.firebase:firebase-messaging'
+    
+}
+flutter {
+    source = "../.."
+}

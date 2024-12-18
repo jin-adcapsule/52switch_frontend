@@ -1,0 +1,9 @@
+//-ignored credential or environment dependant data
+
+class EnvConfig {
+  static const String apiUrl = //apiurl from ipv4 address 
+  static const bool useEmulator = // Set to true to use emulator
+  static const String emulatorHostIOS = // iOS uses localhost
+  static const String emulatorHostAndroid =// Android uses e.g. 10.0.2.2
+  static const int emulatorPort =// Auth Emulator Port
+}
