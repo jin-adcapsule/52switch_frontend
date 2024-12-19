@@ -42,9 +42,9 @@ jobs:
         --dart-define=USE_EMULATOR=true \
         --dart-define=EMULATOR_PORT=9099 \
         --dart-define=FIREBASE_OPTIONS_DART_DEV=${{ secrets.FIREBASE_OPTIONS_DART_DEV_IOS }} \
-        --dart-define=GOOGLE_SERVICE_INFO_PLIST_DEV=${{ secrets.GOOGLESERVICE_INFO_PLIST_DEV }}
+        --dart-define=GOOGLESERVICE_INFO_PLIST_DEV=${{ secrets.GOOGLESERVICE_INFO_PLIST_DEV }}
       env:
-        GOOGLE_SERVICE_INFO_PLIST_DEV: ${{ secrets.GOOGLESERVICE_INFO_PLIST_DEV }}
+        GOOGLESERVICE_INFO_PLIST_DEV: ${{ secrets.GOOGLESERVICE_INFO_PLIST_DEV }}
         FIREBASE_OPTIONS_DART_DEV: ${{ secrets.FIREBASE_OPTIONS_DART_DEV_IOS }}
 
 

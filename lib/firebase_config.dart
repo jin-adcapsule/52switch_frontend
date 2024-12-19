@@ -74,7 +74,7 @@ class FirebaseConfig {
   // Load `GoogleService-Info.plist` for iOS from environment variable
   static Future<void> _loadGoogleServiceInfoPlistFromEnv() async {
     // Retrieve the Google Service Info plist content from environment variable
-    String googleServiceInfoPlist = const String.fromEnvironment('GOOGLE_SERVICE_INFO_PLIST_DEV');
+    String googleServiceInfoPlist = const String.fromEnvironment('GOOGLESERVICE_INFO_PLIST_DEV');
     if (googleServiceInfoPlist.isNotEmpty) {
       print('Using GOOGLE_SERVICE_INFO_PLIST from environment variable for Firebase configuration.');
       // The Plist file is an XML format, so if needed, you can parse it here

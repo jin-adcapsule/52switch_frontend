@@ -1,5 +1,4 @@
 //navigate to MyInfoScreen after a successful login. You can use the Navigator.pushReplacement to change the screen.
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'screens/login_screen.dart';
@@ -7,10 +6,7 @@ import 'services/auth_service.dart';
 import 'services/local_notification_service.dart';
 import 'services/notification_handler.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'env_config.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'dart:io';
+
 //import 'firebase_options.dart';
 import "firebase_config.dart";
 
