@@ -1,0 +1,51 @@
+name: Flutter CI
+
+on:
+  push:
+    branches:
+      - main
+      - feature/*  # Specify your feature branches
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: macos-latest  # For iOS build, use macOS runners
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: 'stable'  # You can specify a version if needed
+
+    - name: Install dependencies
+      run: flutter pub get
+
+    - name: Run tests
+      run: flutter test
+
+    - name: Build Android APK
+      run: flutter build apk --release
+      env:
+        GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+
+    - name: Build iOS App
+      run: flutter build ios --release
+      env:
+        GOOGLE_SERVICE_INFO_PLIST: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
+
+    - name: Upload build artifacts (APK)
+      uses: actions/upload-artifact@v2
+      with:
+        name: android-apk
+        path: build/app/outputs/flutter-apk/app-release.apk
+
+    - name: Upload build artifacts (iOS)
+      uses: actions/upload-artifact@v2
+      with:
+        name: ios-app
+        path: build/ios/iphoneos/Runner.app
