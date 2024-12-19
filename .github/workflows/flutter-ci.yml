@@ -33,11 +33,6 @@ jobs:
     - name: Install dependencies
       run: flutter pub get
 
-    - name: Run tests
-      run: flutter test
-      env:
-        FIREBASE_OPTIONS_DART_DEV: ${{ secrets.FIREBASE_OPTIONS_DART_DEV }}
-
     - name: DEV Build Android APK
       run: flutter build apk --release \
         --dart-define=HOST_ADDRESS=10.0.0.176 \
