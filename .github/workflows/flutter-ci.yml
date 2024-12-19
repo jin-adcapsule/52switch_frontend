@@ -16,6 +16,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Install jq (required by flutter-action)
+      run: |
+        brew install jq
+        
     - name: Set up Flutter
       uses: subosito/flutter-action@v2
       with:
