@@ -21,10 +21,15 @@ jobs:
         brew install jq
 
     - name: Set up Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.5.4'  # You can specify a version if needed
-
+      run: |
+        # Install Flutter manually to ensure we get the correct version
+        git clone https://github.com/flutter/flutter.git -b stable --depth 1
+        export PATH="$PATH:`pwd`/flutter/bin"
+        flutter doctor
+        flutter --version
+      env:
+        flutter-version: '3.5.4'
+  
     - name: Install dependencies
       run: flutter pub get
 
