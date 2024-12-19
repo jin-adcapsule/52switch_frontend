@@ -54,13 +54,13 @@ jobs:
         FIREBASE_OPTIONS_DART_DEV: ${{ secrets.FIREBASE_OPTIONS_DART_DEV_IOS }}
 
     - name: Upload build artifacts (APK)
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: android-apk
         path: build/app/outputs/flutter-apk/app-release.apk
 
     - name: Upload build artifacts (iOS)
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: ios-app
         path: build/ios/iphoneos/Runner.app
