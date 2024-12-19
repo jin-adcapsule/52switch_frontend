@@ -40,9 +40,8 @@ jobs:
         --dart-define=HOST_ADDRESS=10.0.0.176 \
         --dart-define=PORT=8080 \
         --dart-define=USE_EMULATOR=true \
-        --dart-define=EMULATOR_PORT=9099 \
-        --dart-define=FIREBASE_OPTIONS_DART_DEV=${{ secrets.FIREBASE_OPTIONS_DART_DEV_IOS }} \
-        --dart-define=GOOGLESERVICE_INFO_PLIST_DEV=${{ secrets.GOOGLESERVICE_INFO_PLIST_DEV }}
+        --dart-define=EMULATOR_PORT=9099 
+
       env:
         GOOGLESERVICE_INFO_PLIST_DEV: ${{ secrets.GOOGLESERVICE_INFO_PLIST_DEV }}
         FIREBASE_OPTIONS_DART_DEV: ${{ secrets.FIREBASE_OPTIONS_DART_DEV_IOS }}
@@ -86,9 +85,8 @@ jobs:
         --dart-define=HOST_ADDRESS=10.0.0.176 \
         --dart-define=PORT=8080 \
         --dart-define=USE_EMULATOR=true \
-        --dart-define=EMULATOR_PORT=9099 \
-        --dart-define=FIREBASE_OPTIONS_DART_DEV=${{ secrets.FIREBASE_OPTIONS_DART_DEV_ANDROID }} \
-        --dart-define=GOOGLE_SERVICES_JSON_DEV=${{ secrets.GOOGLE_SERVICES_JSON_DEV }}
+        --dart-define=EMULATOR_PORT=9099 
+
       env:
         GOOGLE_SERVICES_JSON_DEV: ${{ secrets.GOOGLE_SERVICES_JSON_DEV }}
         FIREBASE_OPTIONS_DART_DEV: ${{ secrets.FIREBASE_OPTIONS_DART_DEV_ANDROID }}
