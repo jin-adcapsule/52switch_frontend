@@ -31,12 +31,12 @@ jobs:
     - name: Build Android APK
       run: flutter build apk --release
       env:
-        GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON_DEV }}
 
     - name: Build iOS App
       run: flutter build ios --release
       env:
-        GOOGLE_SERVICE_INFO_PLIST: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
+        GOOGLE_SERVICE_INFO_PLIST: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST_DEV }}
 
     - name: Upload build artifacts (APK)
       uses: actions/upload-artifact@v2
