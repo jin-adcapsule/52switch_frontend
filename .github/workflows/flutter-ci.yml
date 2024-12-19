@@ -3,15 +3,14 @@ name: Flutter CI
 on:
   push:
     branches:
-      - main
-      - feature/*  # Specify your feature branches
+      - dev
   pull_request:
     branches:
-      - main
+      - dev
 
 jobs:
   build:
-    runs-on: macos-latest  # For iOS build, use macOS runners
+    runs-on: [self-hosted, macos] # For iOS, use your self-hosted macOS runner
 
     steps:
     - name: Checkout code
