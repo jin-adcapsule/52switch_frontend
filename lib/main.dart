@@ -11,18 +11,23 @@ import 'env_config.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'dart:io';
+//import 'firebase_options.dart';
+import "firebase_config.dart";
 
 void main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
   // Initialize Firebase
-  await Firebase.initializeApp();
-
+  //await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform,);
+  FirebaseConfig.loadFirebaseConfig();
+  /*
   if (EnvConfig.useEmulator) {
     final String host = Platform.isIOS
         ? EnvConfig.emulatorHostIOS
         : EnvConfig.emulatorHostAndroid;
     FirebaseAuth.instance.useAuthEmulator(host, EnvConfig.emulatorPort);
   }
+  */
   // Initialize Local Notifications
   LocalNotificationService.initialize();
   // Listen for foreground & background notifications with requesting permission

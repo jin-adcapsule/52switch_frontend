@@ -1,0 +1,67 @@
+name: Flutter CI
+
+on:
+  push:
+    branches:
+      - main
+      - feature/*  # Specify your feature branches
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: macos-latest  # For iOS build, use macOS runners
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: 'stable'  # You can specify a version if needed
+
+    - name: Install dependencies
+      run: flutter pub get
+
+    - name: Run tests
+      run: flutter test
+      env:
+        FIREBASE_OPTIONS_DART_DEV: ${{ secrets.FIREBASE_OPTIONS_DART_DEV }}
+
+    - name: DEV Build Android APK
+      run: flutter build apk --release \
+        --dart-define=HOST_ADDRESS=10.0.0.176 \
+        --dart-define=PORT=8080 \
+        --dart-define=USE_EMULATOR=true \
+        --dart-define=EMULATOR_PORT=9099
+        --dart-define=FIREBASE_OPTIONS_DART_DEV=${{ secrets.FIREBASE_OPTIONS_DART_DEV_ANDROID }} \
+        --dart-define=GOOGLE_SERVICES_JSON_DEV=${{ secrets.GOOGLE_SERVICES_JSON_DEV }}
+      env:
+        GOOGLE_SERVICES_JSON_DEV: ${{ secrets.GOOGLE_SERVICES_JSON_DEV }}
+        FIREBASE_OPTIONS_DART_DEV: ${{ secrets.FIREBASE_OPTIONS_DART_DEV_ANDROID }}
+
+    - name: DEV Build iOS App 
+      run: flutter build ios --release \
+        --dart-define=HOST_ADDRESS=10.0.0.176 \
+        --dart-define=PORT=8080 \
+        --dart-define=USE_EMULATOR=true \
+        --dart-define=EMULATOR_PORT=9099
+        --dart-define=FIREBASE_OPTIONS_DART_DEV=${{ secrets.FIREBASE_OPTIONS_DART_DEV_IOS }} \
+        --dart-define=GOOGLE_SERVICE_INFO_PLIST_DEV=${{ secrets.GOOGLE_SERVICE_INFO_PLIST_DEV }}
+      env:
+        GOOGLE_SERVICE_INFO_PLIST_DEV: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST_DEV }}
+        FIREBASE_OPTIONS_DART_DEV: ${{ secrets.FIREBASE_OPTIONS_DART_DEV_IOS }}
+
+    - name: Upload build artifacts (APK)
+      uses: actions/upload-artifact@v2
+      with:
+        name: android-apk
+        path: build/app/outputs/flutter-apk/app-release.apk
+
+    - name: Upload build artifacts (iOS)
+      uses: actions/upload-artifact@v2
+      with:
+        name: ios-app
+        path: build/ios/iphoneos/Runner.app

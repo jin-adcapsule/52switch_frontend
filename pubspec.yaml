@@ -34,6 +34,7 @@ dependencies:
     sdk: flutter
   fixnum: ^1.0.0
   http: ^0.13.6
+  flutter_dotenv: ^5.0.2  # Add this line to your dependencies
   flutter_switch: ^0.3.2  # Add this line
   graphql_flutter: ^5.2.0-beta.3
   firebase_core: ^3.7.0
