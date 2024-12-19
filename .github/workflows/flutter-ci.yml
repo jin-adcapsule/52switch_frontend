@@ -38,10 +38,9 @@ jobs:
     - name: DEV Build iOS App 
       run: flutter build ios --release \
         --dart-define=HOST_ADDRESS=10.0.0.176 \
-        --dart-define=PORT=8080 \
+        --dart-define=SERVER_PORT=8080 \
         --dart-define=USE_EMULATOR=true \
-        --dart-define=EMULATOR_PORT=9099 
-
+        --dart-define=EMULATOR_PORT=9099
       env:
         GOOGLESERVICE_INFO_PLIST_DEV: ${{ secrets.GOOGLESERVICE_INFO_PLIST_DEV }}
         FIREBASE_OPTIONS_DART_DEV: ${{ secrets.FIREBASE_OPTIONS_DART_DEV_IOS }}
@@ -54,7 +53,7 @@ jobs:
         path: build/ios/iphoneos/Runner.app
 
   build_android:
-    runs-on: [self-hosted, X64]
+    runs-on: [X64]
 
     
     steps:
@@ -83,10 +82,9 @@ jobs:
       run: |
         flutter build apk --release \
         --dart-define=HOST_ADDRESS=10.0.0.176 \
-        --dart-define=PORT=8080 \
+        --dart-define=SERVER_PORT=8080 \
         --dart-define=USE_EMULATOR=true \
-        --dart-define=EMULATOR_PORT=9099 
-
+        --dart-define=EMULATOR_PORT=9099
       env:
         GOOGLE_SERVICES_JSON_DEV: ${{ secrets.GOOGLE_SERVICES_JSON_DEV }}
         FIREBASE_OPTIONS_DART_DEV: ${{ secrets.FIREBASE_OPTIONS_DART_DEV_ANDROID }}
