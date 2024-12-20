@@ -48,12 +48,13 @@ jobs:
       run: |
         # Write Firebase options to a Dart file (firebase_options.dart)
         echo "${{ secrets.FIREBASE_OPTIONS_DART_DEV}}" > lib/firebase_options.dart
-
+        dart analyze lib/firebase_options.dart
+        
         # Write the GOOGLESERVICE_INFO_PLIST_DEV secret to a file
         echo "${{ secrets.GOOGLESERVICE_INFO_PLIST_DEV }}" > ios/Runner/GoogleService-Info.plist
       
         flutter build ios --release --dart-define=HOST_ADDRESS=10.0.0.176 --dart-define=SERVER_PORT=8080 --dart-define=USE_EMULATOR=true --dart-define=EMULATOR_PORT=9099
-
+      shell: bash
 
     - name: Upload build artifacts (iOS)
       uses: actions/upload-artifact@v3
