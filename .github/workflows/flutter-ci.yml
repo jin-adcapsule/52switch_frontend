@@ -10,35 +10,47 @@ on:
 
 jobs:
   build_ios:
-    runs-on: [self-hosted, macos]
+    runs-on: [macos-latest]
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
     - name: Install jq (required by flutter-action)
       run: |
-        brew install jq
+        if ! command -v jq &> /dev/null; then
+          echo "jq not found, installing..."
+          brew install jq
+        else
+          echo "jq is already installed"
+        fi
 
     - name: Set up Flutter
       run: |
-        # Install Flutter manually to ensure we get the correct version
-        git clone https://github.com/flutter/flutter.git -b stable --depth 1
-        export PATH="$PATH:`pwd`/flutter/bin"
-        flutter doctor
-        flutter --version
+        if ! command -v flutter &> /dev/null; then
+          echo "Flutter not found, installing..."
+          # Install Flutter manually to ensure we get the correct version
+          git clone https://github.com/flutter/flutter.git -b stable --depth 1
+          export PATH="$PATH:`pwd`/flutter/bin"
+          flutter doctor
+          flutter --version
+        else
+          echo "Flutter is already installed"
+        fi
       env:
         flutter-version: '3.5.4'
   
     - name: Install dependencies
       run: flutter pub get
 
-
-
     - name: DEV Build iOS App 
-      run: flutter build ios --release --dart-define=HOST_ADDRESS=10.0.0.176 --dart-define=SERVER_PORT=8080 --dart-define=USE_EMULATOR=true --dart-define=EMULATOR_PORT=9099
-      env:
-        GOOGLESERVICE_INFO_PLIST_DEV: ${{ secrets.GOOGLESERVICE_INFO_PLIST_DEV }}
-        FIREBASE_OPTIONS_DART_DEV: ${{ secrets.FIREBASE_OPTIONS_DART_DEV_IOS }}
+      run: |
+        # Write Firebase options to a Dart file (firebase_options.dart)
+        echo "${{ secrets.FIREBASE_OPTIONS_DART_DEV}}" > lib/firebase_options.dart
+
+        # Write the GOOGLESERVICE_INFO_PLIST_DEV secret to a file
+        echo "${{ secrets.GOOGLESERVICE_INFO_PLIST_DEV }}" > ios/Runner/GoogleService-Info.plist
+      
+        flutter build ios --release --dart-define=HOST_ADDRESS=10.0.0.176 --dart-define=SERVER_PORT=8080 --dart-define=USE_EMULATOR=true --dart-define=EMULATOR_PORT=9099
 
 
     - name: Upload build artifacts (iOS)
