@@ -10,7 +10,7 @@ on:
 
 jobs:
   build_ios:
-    runs-on: [macos-latest]
+    runs-on: [self-hosted, macos]
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
@@ -29,15 +29,17 @@ jobs:
         if ! command -v flutter &> /dev/null; then
           echo "Flutter not found, installing..."
           # Install Flutter manually to ensure we get the correct version
-          git clone https://github.com/flutter/flutter.git -b stable --depth 1
-          export PATH="$PATH:`pwd`/flutter/bin"
+          git clone https://github.com/flutter/flutter.git --depth 1
+          cd flutter
+          git fetch -- tags
+          git checkout 3.5.4
+          export PATH="$PATH:`pwd`/bin"
           flutter doctor
           flutter --version
         else
           echo "Flutter is already installed"
+          flutter --version
         fi
-      env:
-        flutter-version: '3.5.4'
   
     - name: Install dependencies
       run: flutter pub get
@@ -60,7 +62,7 @@ jobs:
         path: build/ios/iphoneos/Runner.app
 
   build_android:
-    runs-on: [self-hosted, windows-latest]
+    runs-on: [self-hosted, windows]
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
