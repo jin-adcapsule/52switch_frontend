@@ -2,8 +2,14 @@
 
 **52Switch** is a comprehensive attendance and day-off management application designed to streamline employee attendance tracking and day-off requests/approvals. The project is built using **Flutter** for the frontend, **Spring Boot** with **GraphQL** for the backend, and **MongoDB** as the database.
 
-[52SWITCH Project Documentation](https://gilded-brush-9bc.notion.site/Mid-Review-52SWITCH-App-Clone-151fbe5a819680a38f17c3785889ef3b?pvs=4)  
-[52SWITCH Project Documentation KR](https://gilded-brush-9bc.notion.site/52SWITCH-151fbe5a819680628769e0db7e4aace6?pvs=4)
+[Software Specification Doc](docs/software_spec_doc.md)  
+[Software Design Technical Doc](docs/software_design_tech_doc.md)
+[Screen Definition Doc](docs/screen_def_doc.md)
+[Functional Definition Doc](docs/func_def_doc.md)
+[Database Table Definition Doc](docs/db_table_def_doc.md)
+[Database Table relationship Doc](docs/db_table_rel_def_doc.md)
+
+
 
 ## Features
 - **Real-Time Attendance Tracking:** Employees can check in and out seamlessly.
@@ -14,9 +20,14 @@
 - **Real-Time Updates:** Leverages GraphQL subscriptions for dynamic updates.
 
 ---
+## Continuous Integration
+
+Every push or pull request to the `dev` branch automatically triggers a build for either Android or iOS, depending on the self-hosted CI runner’s OS. The generated artifacts (APK for Android or APP for iOS) are available for download from the CI workflow's artifact section.
+
+---
 
 ## Prerequisites
-- **Frontend**: Flutter, Dart
+- **Frontend**: Flutter, Dart ver.5.3.4
 - **Authentication**: Firebase(depends on server)
 
 ## Setup Instructions
