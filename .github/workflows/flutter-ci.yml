@@ -11,6 +11,7 @@ on:
 jobs:
   build_ios:
     runs-on: [self-hosted, macos]
+    if: runner.os == 'MacOS' 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
@@ -49,7 +50,7 @@ jobs:
         # Write Firebase options to a Dart file (firebase_options.dart)
         echo "${{ secrets.FIREBASE_OPTIONS_DART_DEV}}" > lib/firebase_options.dart
         dart analyze lib/firebase_options.dart
-        
+
         # Write the GOOGLESERVICE_INFO_PLIST_DEV secret to a file
         echo "${{ secrets.GOOGLESERVICE_INFO_PLIST_DEV }}" > ios/Runner/GoogleService-Info.plist
       
@@ -64,6 +65,7 @@ jobs:
 
   build_android:
     runs-on: [self-hosted, windows]
+    if: runner.os == 'Windows'  # Ensure the job runs only on Windows
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
