@@ -11,11 +11,17 @@ on:
 jobs:
   build_ios:
     runs-on: [self-hosted, macos]
-    if: runner.os == 'MacOS' 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Check OS for iOS Build
+      run: |
+        if [[ $(uname) != "Darwin" ]]; then
+          echo "Not macOS. This job is only for iOS on macOS runners."
+          exit 0  # Exit successfully without proceeding
+        fi
+        
     - name: Install jq (required by flutter-action)
       run: |
         if ! command -v jq &> /dev/null; then
@@ -65,11 +71,16 @@ jobs:
 
   build_android:
     runs-on: [self-hosted, windows]
-    if: runner.os == 'Windows'  # Ensure the job runs only on Windows
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Check OS for Android Build
+      run: |
+        if [[ $(uname) == "Darwin" ]]; then
+          echo "This job is only for Android on non-macOS runners."
+          exit 0  # Exit successfully without proceeding
+        fi
     - name: Install jq (required by flutter-action)
       run: |
         brew install jq
