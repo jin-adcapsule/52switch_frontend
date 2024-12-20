@@ -52,7 +52,7 @@ class FirebaseConfig {
         print('GoogleService-Info.plist not found.');
       }
     } catch (e) {
-      print('Error loading GoogleService-Info.plist: $e');
+      print('Error loading GoogleService-Info.plist : $e');
     }
   }
 }
