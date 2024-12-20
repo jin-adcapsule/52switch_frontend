@@ -2,12 +2,12 @@
 
 **52Switch** is a comprehensive attendance and day-off management application designed to streamline employee attendance tracking and day-off requests/approvals. The project is built using **Flutter** for the frontend, **Spring Boot** with **GraphQL** for the backend, and **MongoDB** as the database.
 
-[Software Specification Doc](docs/software_spec_doc.md)  
-[Software Design Technical Doc](docs/software_design_tech_doc.md)
-[Screen Definition Doc](docs/screen_def_doc.md)
-[Functional Definition Doc](docs/func_def_doc.md)
-[Database Table Definition Doc](docs/db_table_def_doc.md)
-[Database Table relationship Doc](docs/db_table_rel_def_doc.md)
+[Software Specification Doc](docs/software_spec_doc.md) \
+[Software Design Technical Doc](docs/software_design_tech_doc.md) \
+[Screen Definition Doc](docs/screen_def_doc.md) \
+[Functional Definition Doc](docs/func_def_doc.md) \
+[Database Table Definition Doc](docs/db_table_def_doc.md) \
+[Database Table relationship Doc](docs/db_table_rel_def_doc.md) \
 
 
 
