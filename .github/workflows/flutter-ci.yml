@@ -17,12 +17,18 @@ jobs:
 
     - name: Check OS for iOS Build
       run: |
-        if [[ $(uname) != "Darwin" ]]; then
-          echo "Not macOS. This job is only for iOS on macOS runners."
-          exit 0  # Exit successfully without proceeding
+        if [[ $(uname) == "Darwin" ]]; then
+          echo "RUNNER_OS=macOS" >> $GITHUB_ENV
+        elif [[ "$(uname)" == "CYGWIN"* || "$(uname)" == "MINGW"* ]]; then
+          echo "Self Host OS is Windows. IOS job will be skipped..."
+          echo "RUNNER_OS=Windows" >> $GITHUB_ENV
+        else
+          echo "Self Host OS is Linux. IOS job will be skipped..."
+          echo "RUNNER_OS=Linux" >> $GITHUB_ENV
         fi
         
     - name: Install jq (required by flutter-action)
+      if: ${{ env.RUNNER_OS == 'macOS' }}
       run: |
         if ! command -v jq &> /dev/null; then
           echo "jq not found, installing..."
@@ -32,6 +38,7 @@ jobs:
         fi
 
     - name: Set up Flutter
+      if: ${{ env.RUNNER_OS == 'macOS' }}
       run: |
         if ! command -v flutter &> /dev/null; then
           echo "Flutter not found, installing..."
@@ -49,9 +56,11 @@ jobs:
         fi
   
     - name: Install dependencies
+      if: ${{ env.RUNNER_OS == 'macOS' }}
       run: flutter pub get
 
     - name: DEV Build iOS App 
+      if: ${{ env.RUNNER_OS == 'macOS' }}
       run: |
         # Write Firebase options to a Dart file (firebase_options.dart)
         echo "${{ secrets.FIREBASE_OPTIONS_DART_DEV}}" > lib/firebase_options.dart
@@ -61,10 +70,14 @@ jobs:
         echo "${{ secrets.GOOGLESERVICE_INFO_PLIST_DEV }}" > ios/Runner/GoogleService-Info.plist
       
         flutter build ios --release --dart-define=HOST_ADDRESS=10.0.0.176 --dart-define=SERVER_PORT=8080 --dart-define=USE_EMULATOR=true --dart-define=EMULATOR_PORT=9099
+        # Cleanup: Delete sensitive files after build
+        rm -f lib/firebase_options.dart
+        rm -f ios/Runner/GoogleService-Info.plist
       shell: bash
 
     - name: Upload build artifacts (iOS)
-      uses: actions/upload-artifact@v3
+      if: ${{ env.RUNNER_OS == 'macOS' }}
+      uses: actions/upload-artifact@v4
       with:
         name: ios-app
         path: build/ios/iphoneos/Runner.app
@@ -74,44 +87,68 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-
-    - name: Check OS for Android Build
+    - name: Check OS for Windows Build
       run: |
         if [[ $(uname) == "Darwin" ]]; then
-          echo "This job is only for Android on non-macOS runners."
-          exit 0  # Exit successfully without proceeding
+          echo "Self Host OS is IOS. Windows job will be skipped..."
+          echo "RUNNER_OS=macOS" >> $GITHUB_ENV
+        elif [[ "$(uname)" == "CYGWIN"* || "$(uname)" == "MINGW"* ]]; then
+          echo "RUNNER_OS=Windows" >> $GITHUB_ENV
+        else
+          echo "Self Host OS is Linux. Windows job will be skipped..."
+          echo "RUNNER_OS=Linux" >> $GITHUB_ENV
         fi
     - name: Install jq (required by flutter-action)
+      if: ${{ env.RUNNER_OS == 'Windows' }}
       run: |
-        brew install jq
+        if ! command -v jq &> /dev/null; then
+          echo "jq not found, installing..."
+          brew install jq
+        else
+          echo "jq is already installed"
+        fi
 
     - name: Set up Flutter
+      if: ${{ env.RUNNER_OS == 'Windows' }}
       run: |
-        # Install Flutter manually to ensure we get the correct version
-        git clone https://github.com/flutter/flutter.git -b stable --depth 1
-        export PATH="$PATH:`pwd`/flutter/bin"
-        flutter doctor
-        flutter --version
-        env:
-        flutter-version: '3.5.4'
+        if ! command -v flutter &> /dev/null; then
+          echo "Flutter not found, installing..."
+          # Install Flutter manually to ensure we get the correct version
+          git clone https://github.com/flutter/flutter.git --depth 1
+          cd flutter
+          git fetch -- tags
+          git checkout 3.5.4
+          export PATH="$PATH:`pwd`/bin"
+          flutter doctor
+          flutter --version
+        else
+          echo "Flutter is already installed"
+          flutter --version
+        fi
     
     - name: Install dependencies
+      if: ${{ env.RUNNER_OS == 'Windows' }}
       run: flutter pub get
     
 
     - name: DEV Build Android APK
+      if: ${{ env.RUNNER_OS == 'Windows' }}
       run: |
-        flutter build apk --release \
-        --dart-define=HOST_ADDRESS=10.0.0.176 \
-        --dart-define=SERVER_PORT=8080 \
-        --dart-define=USE_EMULATOR=true \
-        --dart-define=EMULATOR_PORT=9099
-      env:
-        GOOGLE_SERVICES_JSON_DEV: ${{ secrets.GOOGLE_SERVICES_JSON_DEV }}
-        FIREBASE_OPTIONS_DART_DEV: ${{ secrets.FIREBASE_OPTIONS_DART_DEV_ANDROID }}
+        # Write Firebase options to a Dart file (firebase_options.dart)
+        echo "${{ secrets.FIREBASE_OPTIONS_DART_DEV}}" > lib/firebase_options.dart
+        dart analyze lib/firebase_options.dart
+
+        # Write the GOOGLESERVICE_INFO_PLIST_DEV secret to a file
+        echo "${{ secrets.GOOGLESERVICE_INFO_PLIST_DEV }}" > ios/Runner/GoogleService-Info.plist
+      
+        flutter build apk --release --dart-define=HOST_ADDRESS=10.0.0.176 --dart-define=SERVER_PORT=8080 --dart-define=USE_EMULATOR=true --dart-define=EMULATOR_PORT=9099
+        # Cleanup: Delete sensitive files after build
+        rm -f lib/firebase_options.dart
+        rm -f ios/Runner/GoogleService-Info.plist
 
     - name: Upload build artifacts (APK)
-      uses: actions/upload-artifact@v3
+      if: ${{ env.RUNNER_OS == 'Windows' }}
+      uses: actions/upload-artifact@v4
       with:
         name: android-apk
         path: build/app/outputs/flutter-apk/app-release.apk
