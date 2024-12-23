@@ -18,11 +18,13 @@ class FirebaseConfig {
       FirebaseAuth.instance.useAuthEmulator(EnvConfig.hostAddress, EnvConfig.emulatorPort);
       }
     // Check if Firebase config for Android or iOS is available through environment variables
+    /*
     if (Platform.isAndroid) {
       await _loadGoogleServicesJsonFromEnv();
     } else if (Platform.isIOS) {
       await _loadGoogleServiceInfoPlist();
     }
+    */
   }
 
   // Load `google-services.json` for Android from environment variable
