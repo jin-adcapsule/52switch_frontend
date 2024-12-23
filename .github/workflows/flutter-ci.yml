@@ -49,10 +49,10 @@ jobs:
           git checkout 3.5.4
           export PATH="$PATH:`pwd`/bin"
           flutter doctor
-          flutter --version
         else
           echo "Flutter is already installed"
-          flutter --version
+        flutter --version
+        flutter clean
         fi
   
     - name: Install dependencies

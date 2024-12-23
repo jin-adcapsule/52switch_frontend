@@ -10,8 +10,7 @@ import UIKit
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
 
-    // Initialize Firebase for googleservice-info.plist
-    FirebaseApp.configure()
+
 
     // Register Flutter plugins
     GeneratedPluginRegistrant.register(with: self)
