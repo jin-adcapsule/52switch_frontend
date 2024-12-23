@@ -1,8 +1,8 @@
 // lib/firebase_config.dart
 
 import 'package:firebase_core/firebase_core.dart';
-import 'dart:io';
-import 'dart:convert'; // For JSON parsing
+//import 'dart:io';
+//import 'dart:convert'; // For JSON parsing
 import 'env_config.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart'; // The dynamically generated file
@@ -26,7 +26,7 @@ class FirebaseConfig {
     }
     */
   }
-
+/*
   // Load `google-services.json` for Android from environment variable
   static Future<void> _loadGoogleServicesJsonFromEnv() async {
     // Retrieve the Google Services JSON content from environment variable
@@ -57,4 +57,5 @@ class FirebaseConfig {
       LoggerConfig().logger.e('Error loading GoogleService-Info.plist : $e');
     }
   }
+  */
 }

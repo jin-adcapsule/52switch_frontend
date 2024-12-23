@@ -18,7 +18,7 @@ Widget createMyInfoScreen(String objectId) {
 class _MyInfoScreen extends StatefulWidget {
   final String? objectId;// Accept objectId as a parameter
 
-  const _MyInfoScreen({super.key, required this.objectId});
+  const _MyInfoScreen({required this.objectId});
 
   @override
   _MyInfoScreenState createState() => _MyInfoScreenState();
@@ -80,23 +80,27 @@ class _MyInfoScreenState extends State<_MyInfoScreen> {
 
 
 
-  void _showMyinfo(BuildContext context,
-      Future<Employee?> employeeFuture) async {
-      final employee = await employeeFuture;
-
-      if (employee != null) {
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          builder: (BuildContext context) {
-            return ShowMyInfoWidget(employee: employee);
-          },
-        );
-      } else {
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          builder: (BuildContext context) {
+  void _showMyinfo(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    builder: (BuildContext context) {
+      return FutureBuilder<Employee?>(
+        future: _employeeFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Container(
+              height: 100,
+              padding: const EdgeInsets.all(16.0),
+              child: Center(
+                child: Text('Error: ${snapshot.error}'),
+              ),
+            );
+          } else if (snapshot.hasData && snapshot.data != null) {
+            return ShowMyInfoWidget(employee: snapshot.data!);
+          } else {
             return Container(
               height: 100,
               padding: const EdgeInsets.all(16.0),
@@ -104,9 +108,11 @@ class _MyInfoScreenState extends State<_MyInfoScreen> {
                 child: Text('Employee data not available or not found.'),
               ),
             );
-         },
-        );
-      }
+          }
+        },
+      );
+    },
+  );
   }
 
   ///get a response for search from service
@@ -179,7 +185,7 @@ class _MyInfoScreenState extends State<_MyInfoScreen> {
                     icon: const Icon(Icons.account_circle),
                     color: AppConfig.getColor(ColorType.text),
                     onPressed: () {
-                      _showMyinfo(context, _employeeFuture);
+                      _showMyinfo(context);
                     },
                   ),
                 ],

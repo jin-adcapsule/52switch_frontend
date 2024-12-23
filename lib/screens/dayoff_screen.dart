@@ -12,7 +12,7 @@ Widget createDayoffScreen(String objectId) {
 class _DayoffScreen extends StatefulWidget {
   final String? objectId;
 
-  const _DayoffScreen({super.key, required this.objectId});
+  const _DayoffScreen({required this.objectId});
 
   @override
   _DayoffScreenState createState() => _DayoffScreenState();

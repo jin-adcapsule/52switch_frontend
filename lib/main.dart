@@ -6,16 +6,18 @@ import 'services/auth_service.dart';
 import 'services/local_notification_service.dart';
 import 'services/notification_handler.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-//import 'package:logger/logger.dart';
-//import 'firebase_options.dart';
+
+
 import "firebase_config.dart";
 
 void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
+
+  
   // Initialize Firebase
   //await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform,);
-  FirebaseConfig.loadFirebaseConfig();
+  await FirebaseConfig.loadFirebaseConfig();
   /*
   if (EnvConfig.useEmulator) {
     final String host = Platform.isIOS

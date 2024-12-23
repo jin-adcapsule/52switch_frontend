@@ -14,7 +14,7 @@ Widget createAttendanceScreen(bool isAttendanceMarked) {
 
 class _AttendanceScreen extends StatefulWidget {
   final bool isAttendanceMarked;//Make AttendanceScreen receive the isAttendanceMarked value and update its background color
-  const _AttendanceScreen({super.key, required this.isAttendanceMarked});
+  const _AttendanceScreen({required this.isAttendanceMarked});
   @override
   _AttendanceScreenState createState() => _AttendanceScreenState();
 }

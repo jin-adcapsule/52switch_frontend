@@ -16,7 +16,7 @@ Widget createSupervisorScreen(String objectId) {
 class _SupervisorScreen extends StatefulWidget {
   final String? objectId;
 
-  const _SupervisorScreen({super.key, required this.objectId});
+  const _SupervisorScreen({ required this.objectId});
 
   @override
   _SupervisorScreenState createState() => _SupervisorScreenState();
@@ -30,12 +30,12 @@ class _SupervisorScreenState extends State<_SupervisorScreen> with SingleTickerP
   // Filter State
 
   static const String statusAll="전체";
-  static const List<String> default_requestStatusList=["대기중","승인","반려"];
+  static const List<String> defaultRequestStatusList=["대기중","승인","반려"];
   // Create a Map<String, bool> with all keys having a value of true
-  static Map<String, bool> default_requestStatusSelection = {
-    for (String status in [statusAll, ...default_requestStatusList]) status: true,
+  static Map<String, bool> defaultRequestStatusSelection = {
+    for (String status in [statusAll, ...defaultRequestStatusList]) status: true,
   };
-  Map<String,bool> _requestStatusSelection = Map<String, bool>.from(default_requestStatusSelection); // make mutable Map
+  Map<String,bool> _requestStatusSelection = Map<String, bool>.from(defaultRequestStatusSelection); // make mutable Map
 
   DateTime _startDate = DateTime.now().subtract(const Duration(days: 30));
   DateTime _endDate = DateTime.now();
@@ -48,7 +48,7 @@ class _SupervisorScreenState extends State<_SupervisorScreen> with SingleTickerP
     try {
       List<String> requestStatusList=[
         for (var entry in _requestStatusSelection.entries)
-          if (entry.value && default_requestStatusList.contains(entry.key))
+          if (entry.value && defaultRequestStatusList.contains(entry.key))
             entry.key
       ];
       final requestHistoryData = await _supervisorService.fetchRequestHistory(
