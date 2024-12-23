@@ -113,9 +113,9 @@ class _MyinfoFilterPopupState extends State<MyinfoFilterPopup> {
     setState(() {
       if (status == workTypeAll) {
         // Update all statuses based on "Toggle All"
-        _tempWorkTypeSelection.keys.forEach((key) {
+        for (var key in _tempWorkTypeSelection.keys) {
           _tempWorkTypeSelection[key] = value ?? false;
-        });
+        }
       } else {
         // Update individual status
         _tempWorkTypeSelection[status] = value ?? false;
@@ -134,15 +134,15 @@ class _MyinfoFilterPopupState extends State<MyinfoFilterPopup> {
   }) {
     return TextButton(
       onPressed: () async {
-        DateTime _firstdate;
-        DateTime _lastdate;
-        if (firstdate == null) {_firstdate=DateTime(2000);}else{_firstdate=firstdate;};
-        if (lastdate == null) {_lastdate=DateTime.now();}else{_lastdate=lastdate;};
+        DateTime firstdate0;
+        DateTime lastdate0;
+        if (firstdate == null) {firstdate0=DateTime(2000);}else{firstdate0=firstdate;}
+        if (lastdate == null) {lastdate0=DateTime.now();}else{lastdate0=lastdate;}
         DateTime? picked = await showDatePicker(
           context: context,
           initialDate: date,
-          firstDate: _firstdate,
-          lastDate: _lastdate,
+          firstDate: firstdate0,
+          lastDate: lastdate0,
         );
         if (picked != null) {
           setState(() {

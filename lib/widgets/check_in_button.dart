@@ -5,7 +5,7 @@ import '../screens/config_screen.dart';
 class CheckInButton extends StatefulWidget {
   final String? objectId;
 
-  const CheckInButton({Key? key, required this.objectId}) : super(key: key);
+  const CheckInButton({super.key, required this.objectId});
 
   @override
   _CheckInButtonState createState() => _CheckInButtonState();
