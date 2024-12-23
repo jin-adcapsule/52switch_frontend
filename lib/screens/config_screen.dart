@@ -19,7 +19,7 @@ class AppConfig {
   //static int? employeeId; // Example: This can be loaded from an environment variable or a secure storage
   static late String objectId; // Nullable until assigned after successful login
   static late String employeeName; // Nullable until assigned after successful login
-  static late bool is_supervisor; // by position == '사원'
+  static late bool isSupervisor; // by position == '사원'
   static const String appName = "52SWITCH";
   static const String noDataFoundMessage = "No data found.";
   static const String attendanceMarkedMessage = "Attendance marked successfully";

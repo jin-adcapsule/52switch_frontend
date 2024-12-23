@@ -5,16 +5,20 @@ import 'config_screen.dart'; // Import AppConfig
 import '../services/dayoff_service.dart';
 import '../models/dayoff.dart';
 import '../widgets/dayoff_history_filter.dart';
-class DayoffScreen extends StatefulWidget {
+// Public create function
+Widget createDayoffScreen(String objectId) {
+  return _DayoffScreen(objectId: objectId);
+}
+class _DayoffScreen extends StatefulWidget {
   final String? objectId;
 
-  const DayoffScreen({Key? key, required this.objectId}) : super(key: key);
+  const _DayoffScreen({super.key, required this.objectId});
 
   @override
   _DayoffScreenState createState() => _DayoffScreenState();
 }
 
-class _DayoffScreenState extends State<DayoffScreen> with SingleTickerProviderStateMixin {
+class _DayoffScreenState extends State<_DayoffScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final DayoffService _dayoffService = DayoffService();
 
@@ -23,12 +27,12 @@ class _DayoffScreenState extends State<DayoffScreen> with SingleTickerProviderSt
   DateTime _startDate = DateTime.now().subtract(const Duration(days: 30));
   DateTime _endDate = DateTime.now();
   static const String statusAll="전체";
-  static const List<String> default_requestStatusList=["대기중","승인","반려"];
+  static const List<String> defaultRequestStatusList=["대기중","승인","반려"];
   // Create a Map<String, bool> with all keys having a value of true
-  static Map<String, bool> default_requestStatusSelection = {
-    for (String status in [statusAll, ...default_requestStatusList]) status: true,
+  static Map<String, bool> defaultRequestStatusSelection = {
+    for (String status in [statusAll, ...defaultRequestStatusList]) status: true,
   };
-  Map<String,bool> _requestStatusSelection = Map<String, bool>.from(default_requestStatusSelection); // make mutable Map
+  Map<String,bool> _requestStatusSelection = Map<String, bool>.from(defaultRequestStatusSelection); // make mutable Map
 
 
   ///get a response for search from service
@@ -37,7 +41,7 @@ class _DayoffScreenState extends State<DayoffScreen> with SingleTickerProviderSt
       List<String>  requestStatusList =
         [
           for (var entry in _requestStatusSelection.entries)
-            if (entry.value && default_requestStatusList.contains(entry.key))
+            if (entry.value && defaultRequestStatusList.contains(entry.key))
               entry.key
         ];
 
@@ -228,7 +232,7 @@ class _DayoffScreenState extends State<DayoffScreen> with SingleTickerProviderSt
                                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                     ),
                                     subtitle: Text(
-                                      "${dayoff.requestDate}", // Display the applyDate here
+                                      dayoff.requestDate, // Display the applyDate here
                                       style: TextStyle(
                                         fontSize: 14,
                                         color: Colors.grey, // Optional: change the color for better visual hierarchy
@@ -252,14 +256,14 @@ class _DayoffScreenState extends State<DayoffScreen> with SingleTickerProviderSt
                                       ListTile(
                                         title: const Text('기간'),
                                         trailing: Text(
-                                          "${dayoff.dayoffDateText}",
+                                          dayoff.dayoffDateText,
                                           style: const TextStyle(fontSize: 14),
                                         ),
                                       ),
                                       ListTile(
                                         title: const Text('유형'),
                                         trailing: Text(
-                                          "${dayoff.dayoffType}",
+                                          dayoff.dayoffType,
                                           style: const TextStyle(fontSize: 14),
                                         ),
                                       ),
@@ -268,7 +272,7 @@ class _DayoffScreenState extends State<DayoffScreen> with SingleTickerProviderSt
                                         trailing: SizedBox(
                                           width: 200, // Set a fixed width to limit the trailing text's width
                                           child: Text(
-                                            dayoff.requestComment ?? '없음',
+                                            dayoff.requestComment,
                                             textAlign: TextAlign.right, // Align the text to the right
                                             style: const TextStyle(fontSize: 12, height: 1.5), // Add line spacing
                                             maxLines: 3, // Limit the number of lines (adjust as needed)
@@ -356,7 +360,6 @@ class _DynamicTextWithTabBarSliverPersistentHeaderDelegate extends SliverPersist
 
     // Get status bar height to adjust for safe area (iOS specific)
     double statusBarHeight = MediaQuery.of(context).padding.top;
-    double paddingGapHeight = 8.0;
     return Stack(
       children: [
         // Background container

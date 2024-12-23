@@ -6,7 +6,7 @@ import 'services/auth_service.dart';
 import 'services/local_notification_service.dart';
 import 'services/notification_handler.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-
+//import 'package:logger/logger.dart';
 //import 'firebase_options.dart';
 import "firebase_config.dart";
 

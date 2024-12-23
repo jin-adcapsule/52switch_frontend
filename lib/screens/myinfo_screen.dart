@@ -10,16 +10,21 @@ import '../widgets/myinfo_filter.dart';
 import 'package:intl/intl.dart'; // For date formatting
 import '../services/global_service.dart'; // Import the service file
 
-class MyInfoScreen extends StatefulWidget {
+// Public create function
+Widget createMyInfoScreen(String objectId) {
+  return _MyInfoScreen(objectId: objectId);
+}
+
+class _MyInfoScreen extends StatefulWidget {
   final String? objectId;// Accept objectId as a parameter
 
-  const MyInfoScreen({super.key, required this.objectId});
+  const _MyInfoScreen({super.key, required this.objectId});
 
   @override
   _MyInfoScreenState createState() => _MyInfoScreenState();
 }
 
-class _MyInfoScreenState extends State<MyInfoScreen> {
+class _MyInfoScreenState extends State<_MyInfoScreen> {
   late Future<Employee?> _employeeFuture;
   late Future<List<Attendance>> _attendanceHistoryFuture;
 
@@ -30,10 +35,10 @@ class _MyInfoScreenState extends State<MyInfoScreen> {
   static const String statusAll="전체";
   static const List<String> statusList=["정상근무","휴가","지각","결근","주말근무","오전반차","오후반차","경조휴가","휴직"];
   // Create a Map<String, bool> with all keys having a value of true
-  static Map<String, bool> default_workTypeSelection = {
+  static Map<String, bool> defaultWorkTypeSelection = {
     for (String status in [statusAll, ...statusList]) status: true,
   };
-  Map<String,bool> _workTypeSelection = Map<String, bool>.from(default_workTypeSelection); // make mutable Map
+  Map<String,bool> _workTypeSelection = Map<String, bool>.from(defaultWorkTypeSelection); // make mutable Map
   DateTime _startDate = DateTime.now().subtract(Duration(days: 7));
   DateTime _endDate = DateTime.now();
 
@@ -56,8 +61,7 @@ class _MyInfoScreenState extends State<MyInfoScreen> {
   void initState() {
     super.initState();
     // Ensure objectId is non-null before calling the service
-    print("objectid");
-    print(widget.objectId);
+
     if (widget.objectId != null) {
       _employeeFuture = GlobalService().fetchEmployeeInfo(widget.objectId!);
       _attendanceHistoryFuture = _fetchAttendanceHistory();
@@ -109,7 +113,7 @@ class _MyInfoScreenState extends State<MyInfoScreen> {
   Future<List<Attendance>> _fetchAttendanceHistory() async {
     final attendanceData = await MyInfoService().fetchAttendanceHistory(
       //employeeId: AppConfig.employeeId!,
-      objectId: AppConfig.objectId!,
+      objectId: AppConfig.objectId,
       startDate: DateFormat('yyyy-MM-dd').format(_startDate),
       endDate: DateFormat('yyyy-MM-dd').format(_endDate),
       workTypeList: workTypeList,
@@ -125,11 +129,11 @@ class _MyInfoScreenState extends State<MyInfoScreen> {
           .where((attendance) => attendance.checkInStatus?.trim() == "결근")
           .length;
       dayoffCount = attendanceData
-          .where((attendance) => attendance.workTypeList?.any((workType) =>
+          .where((attendance) => attendance.workTypeList.any((workType) =>
           workType.trim() == '오전반차' ||
               workType.trim() == '오후반차' ||
               workType.trim() == '정기휴가'
-          ) ?? false) // null check if workTypeList is null
+          )) 
               .length;
     });
     return attendanceData;
@@ -219,7 +223,7 @@ class _MyInfoScreenState extends State<MyInfoScreen> {
                       String workduration = attendance.workduration ?? '';
                       String checkInStatus = attendance.checkInStatus ?? '';
                       String checkOutStatus = attendance.checkOutStatus ?? '';
-                      List<String> workTypeList = attendance.workTypeList ?? [''];
+                      List<String> workTypeList = attendance.workTypeList;
                       return ListTile(
                           title: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -229,7 +233,7 @@ class _MyInfoScreenState extends State<MyInfoScreen> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    "$date",
+                                    date,
                                     style: TextStyle(fontSize: 14),//fontWeight: FontWeight.bold), // Bold for emphasis
                                   ),
                                   Text(

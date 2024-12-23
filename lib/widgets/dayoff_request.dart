@@ -12,19 +12,19 @@ class DayoffRequestScreen extends StatefulWidget {
 
 
   const DayoffRequestScreen({
-    Key? key,
+    super.key,
     required this.objectId,
     required this.supervisorName,
     required this.dayoffRemaining,
     required this.supervisorId
-  }) : super(key: key);
+  });
 
   @override
-  _DayoffRequestScreenState createState() => _DayoffRequestScreenState();
+  DayoffRequestScreenState createState() => DayoffRequestScreenState();
 }
 
-class _DayoffRequestScreenState extends State<DayoffRequestScreen> {
-  List<DateTime> _selectedDates = [];
+class DayoffRequestScreenState extends State<DayoffRequestScreen> {
+  final List<DateTime> _selectedDates = [];
   final TextEditingController _commentController = TextEditingController();
   final List<String> _dayoffTypes = [ '정기휴가', '오전반차', '오후반차','예비군'];
   String? _selectedDayoffType;
@@ -375,7 +375,7 @@ class _DayoffRequestScreenState extends State<DayoffRequestScreen> {
                     const SnackBar(content: Text('휴가 신청이 완료되었습니다.')),
                   );
                   //send Notification to Supervisor
-                  PushService.sendPushToSupervisor(widget.objectId!, "휴가 신청", "${AppConfig.employeeName}  ${_selectedDayoffType} 신청");
+                  PushService.sendPushToSupervisor(widget.objectId!, "휴가 신청", "${AppConfig.employeeName}  $_selectedDayoffType 신청");
                   // Clear the form
                   setState(() {
                     _selectedDates.clear();

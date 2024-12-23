@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../services/supervisor_service.dart';
-import '../models/request.dart' as rq;
 import '../services/push_service.dart';
 import '../screens/config_screen.dart';
 
@@ -15,7 +14,7 @@ class AnswerRequestScreen extends StatefulWidget {
   final String requestKey;
 
   const AnswerRequestScreen({
-    Key? key,
+    super.key,
     required this.objectId,
     required this.employeeId,
     required this.employeeName,
@@ -24,13 +23,13 @@ class AnswerRequestScreen extends StatefulWidget {
     this.requestComment,
     required this.supervisorId,
     required this.requestKey
-  }) : super(key: key);
+  });
 
   @override
-  _AnswerRequestScreenState createState() => _AnswerRequestScreenState();
+  AnswerRequestScreenState createState() => AnswerRequestScreenState();
 }
 
-class _AnswerRequestScreenState extends State<AnswerRequestScreen> {
+class AnswerRequestScreenState extends State<AnswerRequestScreen> {
   final TextEditingController _answerCommentController = TextEditingController();
   final List<String> _statuses = ['대기중', '승인', '반려'];
   String defaultStatus = '대기중';
@@ -212,7 +211,7 @@ class _AnswerRequestScreenState extends State<AnswerRequestScreen> {
         const SnackBar(content: Text('답변이 생성되었습니다.')),
       );
       //send Notification with employeeOid
-      PushService.sendPushToEmployeeId(widget.employeeId!, "${widget.requestType} $status", "${AppConfig.employeeName}님이 처리하였습니다.");
+      PushService.sendPushToEmployeeId(widget.employeeId, "${widget.requestType} $status", "${AppConfig.employeeName}님이 처리하였습니다.");
 
       // Clear inputs and reset state
       clearForm();

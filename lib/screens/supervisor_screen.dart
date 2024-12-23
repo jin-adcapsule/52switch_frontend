@@ -8,16 +8,21 @@ import '../models/request.dart' as rq;
 import '../widgets/request_history_filter.dart';
 import '../widgets/supervisor_request_answer.dart';
 
-class SupervisorScreen extends StatefulWidget {
+// Public create function
+Widget createSupervisorScreen(String objectId) {
+  return _SupervisorScreen(objectId: objectId);
+}
+
+class _SupervisorScreen extends StatefulWidget {
   final String? objectId;
 
-  const SupervisorScreen({Key? key, required this.objectId}) : super(key: key);
+  const _SupervisorScreen({super.key, required this.objectId});
 
   @override
   _SupervisorScreenState createState() => _SupervisorScreenState();
 }
 
-class _SupervisorScreenState extends State<SupervisorScreen> with SingleTickerProviderStateMixin {
+class _SupervisorScreenState extends State<_SupervisorScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final SupervisorService _supervisorService = SupervisorService();
 
@@ -181,7 +186,7 @@ class _SupervisorScreenState extends State<SupervisorScreen> with SingleTickerPr
                                           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                         ),
                                         subtitle: Text(
-                                          "${request.requestDate}",
+                                          request.requestDate,
                                           style: const TextStyle(
                                             fontSize: 14,
                                             color: Colors.grey, // Optional: change the color for better visual hierarchy
@@ -206,7 +211,7 @@ class _SupervisorScreenState extends State<SupervisorScreen> with SingleTickerPr
                                         ListTile(
                                           title: const Text('기간'),
                                           trailing: Text(
-                                            "${request.dayoffDateText ?? 'N/A'}",
+                                            request.dayoffDateText ?? 'N/A',
                                             style: const TextStyle(fontSize: 14),
                                           ),
                                         ),
@@ -214,7 +219,7 @@ class _SupervisorScreenState extends State<SupervisorScreen> with SingleTickerPr
                                         ListTile(
                                           title: const Text('유형'),
                                           trailing: Text(
-                                            "${request.dayoffType ?? 'N/A'}",
+                                            request.dayoffType ?? 'N/A',
                                             style: const TextStyle(fontSize: 14),
                                           ),
                                         ),
@@ -223,7 +228,7 @@ class _SupervisorScreenState extends State<SupervisorScreen> with SingleTickerPr
                                         trailing: SizedBox(
                                           width: 200, // Set a fixed width to limit the trailing text's width
                                           child: Text(
-                                            request.requestComment ?? '없음',
+                                            request.requestComment,
                                             textAlign: TextAlign.right, // Align the text to the right
                                             style: const TextStyle(fontSize: 12, height: 1.5), // Add line spacing
                                             maxLines: 3, // Limit the number of lines (adjust as needed)
@@ -312,7 +317,7 @@ class _SupervisorScreenState extends State<SupervisorScreen> with SingleTickerPr
                                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                     ),
                                     subtitle: Text(
-                                      "${request.requestDate}", // Display the applyDate here
+                                      request.requestDate, // Display the applyDate here
                                       style: TextStyle(
                                         fontSize: 14,
                                         color: Colors.grey, // Optional: change the color for better visual hierarchy
@@ -352,7 +357,7 @@ class _SupervisorScreenState extends State<SupervisorScreen> with SingleTickerPr
                                     trailing: SizedBox(
                                       width: 200, // Set a fixed width to limit the trailing text's width
                                       child: Text(
-                                        request.requestComment ?? '없음',
+                                        request.requestComment,
                                         textAlign: TextAlign.right, // Align the text to the right
                                         style: const TextStyle(fontSize: 12, height: 1.5), // Add line spacing
                                         maxLines: 3, // Limit the number of lines (adjust as needed)

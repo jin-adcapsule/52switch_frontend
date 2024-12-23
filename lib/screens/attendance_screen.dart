@@ -5,17 +5,20 @@ import 'config_screen.dart'; // Import AppConfig
 import 'package:firebase_messaging/firebase_messaging.dart'; // Import Firebase Messaging
 
 import '../widgets/check_in_button.dart';
-import '../models/employee.dart';
 import '../services/global_service.dart';
 
-class AttendanceScreen extends StatefulWidget {
+// Public create function
+Widget createAttendanceScreen(bool isAttendanceMarked) {
+  return _AttendanceScreen(isAttendanceMarked: isAttendanceMarked);
+}
+
+class _AttendanceScreen extends StatefulWidget {
   final bool isAttendanceMarked;//Make AttendanceScreen receive the isAttendanceMarked value and update its background color
-  const AttendanceScreen({super.key, required this.isAttendanceMarked});
+  const _AttendanceScreen({super.key, required this.isAttendanceMarked});
   @override
   _AttendanceScreenState createState() => _AttendanceScreenState();
 }
-
-class _AttendanceScreenState extends State<AttendanceScreen> {
+class _AttendanceScreenState extends State<_AttendanceScreen> {
   late bool isAttendanceMarked;
   //bool isAttendanceMarked = AppConfig.isAttendanceMarkedNotifier.value;
   final String? objectId = AppConfig.objectId; // Example: Use actual employee ID
@@ -23,7 +26,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   final GlobalService _globalService = GlobalService();
   String workplace = '';
   // List to hold notifications
-  List<String> _notifications = [];
+  final List<String> _notifications = [];
 
 
   @override
@@ -118,11 +121,10 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
   Future<void> _fetchEmployeeInfo()  async {
     try {
       final employeeInfoData = await _globalService.fetchEmployeeInfo(AppConfig.objectId);
-      print(employeeInfoData);
       if (employeeInfoData != null) {
         setState(() {
           workplace =
-              employeeInfoData.workplace ?? "N/A"; // Set workplace or default
+              employeeInfoData.workplace; // Set workplace or default
         });
       }
     } catch (e) {
@@ -254,7 +256,7 @@ class DateWidget extends StatelessWidget {
       stream: Stream.periodic(const Duration(seconds: 1)),
       builder: (context, snapshot) {
         return Text(
-          DateFormat('yyyy.MM.dd').format(DateTime.now()) + ' | $workplace',
+          '${DateFormat('yyyy.MM.dd').format(DateTime.now())} | $workplace',
           style: TextStyle(
             fontSize: 18,
             color: Colors.grey,

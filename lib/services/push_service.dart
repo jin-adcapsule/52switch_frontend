@@ -1,11 +1,6 @@
-import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import '../services/graphql_service.dart';
-import '../screens/config_screen.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-
+import '../logger_config.dart';
 
 class PushService{
 
@@ -13,10 +8,10 @@ class PushService{
   static Future<String?> getFCMToken() async {
     String? token = await FirebaseMessaging.instance.getToken();
     if (token != null) {
-      print("FCM Token: $token");
+      LoggerConfig().logger.i("FCM Token: $token");
       // You can now send this token to your backend for registration.
     } else {
-      print("Failed to get FCM token");
+      LoggerConfig().logger.e("Failed to get FCM token");
     }
     return token;
   }
@@ -41,12 +36,11 @@ class PushService{
       mutation,
       variables: variables,
     );
-    print(variables);
     if (result.hasException) {
-      print("Error requesting day off: ${result.exception}");
+      LoggerConfig().logger.e("Error requesting day off: ${result.exception}");
       return false;  // Return false if there's an error
     } else {
-      print("Day off request status: ${result.data}");
+      LoggerConfig().logger.i("Day off request status: ${result.data}");
       return true;  // Return true if successful
     }
   }
@@ -70,15 +64,14 @@ class PushService{
       mutation,
       variables: variables,
     );
-    print(variables);
     // Extract response data
     final data = result.data?['sendNotificationToSupervisor'];
 
     if (result.hasException) {
-      print("Error requesting day off: ${result.exception}");
+      LoggerConfig().logger.e("Error requesting day off: ${result.exception}");
       return data;  // Return false if there's an error
     } else {
-      print("Day off request status: ${result.data}");
+      LoggerConfig().logger.i("Day off request status: ${result.data}");
       return data;  // Return true if successful
     }
   }
@@ -104,15 +97,14 @@ class PushService{
       mutation,
       variables: variables,
     );
-    print(variables);
     // Extract response data
     final data = result.data?['sendNotificationToEmployeeId'];
 
     if (result.hasException) {
-      print("Error requesting day off: ${result.exception}");
+      LoggerConfig().logger.e("Error requesting day off: ${result.exception}");
       return data;  // Return false if there's an error
     } else {
-      print("Day off request status: ${result.data}");
+      LoggerConfig().logger.i("Day off request status: ${result.data}");
       return data;  // Return true if successful
     }
   }

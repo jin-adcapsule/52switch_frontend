@@ -1,14 +1,13 @@
-import 'package:intl/intl.dart'; // For date formatting
+
 import 'package:flutter/material.dart';
 import '../services/attendance_service.dart';
 import '../screens/config_screen.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
 
 class CheckInButton extends StatefulWidget  {
   final bool isAttendanceMarked;
   final String? objectId;
 
-  const CheckInButton({Key? key, required this.isAttendanceMarked, required this.objectId}) : super(key: key);
+  const CheckInButton({super.key, required this.isAttendanceMarked, required this.objectId});
 
   @override
   _CheckInButtonState createState() => _CheckInButtonState();

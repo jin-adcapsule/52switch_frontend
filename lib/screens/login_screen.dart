@@ -5,13 +5,16 @@ import '../services/auth_service.dart';
 import '../services/push_service.dart';
 import 'navigation.dart';
 import 'config_screen.dart';
+import '../logger_config.dart';
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  LoginScreenState createState() => LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class LoginScreenState extends State<LoginScreen> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _otpController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -19,7 +22,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   String _verificationId = '';
   bool _isOtpSent = false;
-  bool _isOtpVerified = false;
   String _authStatusMessage = '';
 
   @override
@@ -31,8 +33,6 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _checkStoredFirebaseUid() async {
     String? uid = await _storage.read(key: 'firebaseUid');
     String? phone = await _storage.read(key: 'phoneNumber');
-    print(uid);
-    print(phone);
     if (uid != null && phone != null) {
       // Query backend to validate Firebase UID and retrieve objectId
       final success = await _validateUidAndFetchObjectId(uid, phone);
@@ -57,7 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
           result['currently_marked'] != null) {
         AppConfig.objectId = result['objectId'];
         AppConfig.employeeName = result['employeeName'];
-        AppConfig.is_supervisor = result['is_supervisor'];
+        AppConfig.isSupervisor = result['is_supervisor'];
         AppConfig.isAttendanceMarkedNotifier.value = result['currently_marked'];// Set the initial value of isAttendanceMarkedNotifier
         Navigator.pushReplacement(
           context,
@@ -113,8 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _fetchAndStoreUid(String phoneNumber) async {
     final User? user = _auth.currentUser;
     if (user != null) {
-      print("Current user: $user");
-      print("User UID: ${user.uid}");
+
       await _storage.write(key: 'firebaseUid', value: user.uid);
       await _storage.write(key: 'phoneNumber', value: phoneNumber);
 
@@ -136,9 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
           }
         });
       }
-      else {
-        print("No user found. might be latency issue. Please log in again.");
-      }
+
     }
   }
   Future<void> _saveFCMToken(String objectId) async {
@@ -147,12 +144,12 @@ class _LoginScreenState extends State<LoginScreen> {
       {
         final success = await PushService.saveFCMToken(objectId);
         if (success) {
-          print("FCM Token saved successfully!");
+          LoggerConfig().logger.i("FCM Token saved successfully!");
         } else {
-          print("Failed to save FCM token.");
+          LoggerConfig().logger.e("Failed to save FCM token.");
         }
       } catch (e) {
-      print("Error while saving FCM token: $e");
+      LoggerConfig().logger.e("Error while saving FCM token: $e");
       }
     }
 

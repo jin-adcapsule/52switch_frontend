@@ -1,6 +1,7 @@
 import 'graphql_service.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import '../models/dayoff.dart'; // Import the Attendance model
+import '../logger_config.dart';
 class DayoffService {
   // Request a day off for the employee
   Future<List<String>> RequestDayoff(String objectId, List<String> dateList, String dayoffType, String requestComment,int beforeDateRemaining) async {
@@ -31,14 +32,14 @@ class DayoffService {
 
       // Check for exceptions
       if (result.hasException) {
-        print("Error requesting day off: ${result.exception}");
+        LoggerConfig().logger.e("Error requesting day off: ${result.exception}");
         return ["Error: ${result.exception.toString()}"];
       }
 
       // Parse and return the response
       if (result.data != null) {
         var response = result.data?["requestDayoff"];
-        print("Day off request response: $response");
+        LoggerConfig().logger.i("Day off request response: $response");
 
         // Return the list of messages
         return List<String>.from(response);
@@ -47,7 +48,7 @@ class DayoffService {
       // Fallback if data is null
       return ["Error: No response from server"];
     } catch (e) {
-      print("Exception during day off request: $e");
+      LoggerConfig().logger.e("Exception during day off request: $e");
       return ["Error: ${e.toString()}"];
     }
   }
@@ -79,7 +80,7 @@ class DayoffService {
            );
 
       if (employeeResult.hasException) {
-        print('Employee Query Exception: ${employeeResult.exception}');
+        LoggerConfig().logger.e('Employee Query Exception: ${employeeResult.exception}');
         throw Exception('Failed to fetch employee data');
       }
 
@@ -87,14 +88,13 @@ class DayoffService {
       if (employeeData == null) {
         throw Exception('Employee not found');
       }
-      final return_data={
+      final returnData={
         'supervisorName': employeeData['supervisorName'] ?? 'N/A',
         'supervisorId': employeeData['supervisorId'] ?? 'N/A',
         'dayoffRemaining': employeeData['dayoffRemaining'] ?? 0,};
-      print(return_data);
-      return return_data;
+      return returnData;
     } catch (e) {
-      print('Error during GraphQL query: $e');
+      LoggerConfig().logger.e('Error during GraphQL query: $e');
       throw Exception('Failed to load employee data');
     }
   }
@@ -135,12 +135,12 @@ class DayoffService {
 
       );// Ensure data is fetched from the server
       if (result.hasException) {
-        print('Query Exception: ${result.exception}');
+        LoggerConfig().logger.e("Query Exception: ${result.exception}");
         return [];
       }
 
       final data = result.data;
-      print('API Response: $data'); // Print the response for debugging
+      LoggerConfig().logger.i('API Response: $data');// Print the response for debugging
 
       if (data != null && data['getEmployeeDayoff'] != null) {
         final List<dynamic> dayoffList = data['getEmployeeDayoff'];
@@ -149,7 +149,7 @@ class DayoffService {
         return [];
       }
     } catch (e) {
-      print('Error during GraphQL query: $e');
+      LoggerConfig().logger.e('Error during GraphQL query: $e');
       throw Exception('Failed to load dayoff history');
     }
   }

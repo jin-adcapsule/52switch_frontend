@@ -1,27 +1,7 @@
 import 'graphql_service.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
+import '../logger_config.dart';
 
 class AttendanceService {
-  static Stream<QueryResult> _subscribeToToggleStatus(String objectId) {
-    const subscription = """
-      subscription ToggleStatus(\$objectId: String!) {
-        toggleStatus(objectId: \$objectId) {
-          objectId
-          status
-        }
-      }
-    """;
-    final stream = GraphQLService.subscribe(
-      subscription,
-      variables: {'objectId': objectId},
-    );
-    return GraphQLService.subscribe(
-        subscription,
-        variables: {'objectId': objectId},
-
-    );
-  }
-
   // Mark attendance for the employee with objectId and status
   Future<bool> markAttendance(String? objectId, bool status) async {
     // Define the GraphQL mutation
@@ -52,7 +32,7 @@ class AttendanceService {
 
       // Handle potential GraphQL exceptions
       if (result.hasException) {
-        print("GraphQL Exception: ${result.exception.toString()}");
+        LoggerConfig().logger.e("GraphQL Exception: ${result.exception.toString()}");
         throw Exception("Failed to mark attendance: ${result.exception}");
       }
 
@@ -60,14 +40,14 @@ class AttendanceService {
       final data = result.data?['markAttendance'];
 
       if (data != null) {
-        print("Attendance Mutation Success: $data");
+        LoggerConfig().logger.i("Attendance Mutation Success: $data");
         return true;
       } else {
-        print("Attendance Mutation Failed: No data returned.");
+        LoggerConfig().logger.e("Attendance Mutation Failed: No data returned.");
         return false;
       }
     } catch (e) {
-      print("Error in markAttendance: $e");
+      LoggerConfig().logger.e("Error in markAttendance: $e");
       return false;
     }
   }
