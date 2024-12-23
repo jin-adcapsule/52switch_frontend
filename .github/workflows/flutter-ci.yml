@@ -72,12 +72,19 @@ jobs:
         rm -f ios/Runner/GoogleService-Info.plist
       shell: bash
 
+    - name: Create IPA from .app
+      if: ${{ env.RUNNER_OS == 'macOS' }}
+      run: |
+        # Package the .app folder into an .ipa
+        mkdir -p build/ios/ipa
+        xcrun -sdk iphoneos PackageApplication -v build/ios/iphoneos/Runner.app -o build/ios/ipa/Runner.ipa
+
     - name: Upload build artifacts (iOS)
       if: ${{ env.RUNNER_OS == 'macOS' }}
       uses: actions/upload-artifact@v4
       with:
-        name: ios-app
-        path: build/ios/iphoneos/Runner.app
+        name: ios-ipa
+        path: build/ios/ipa/Runner.ipa
 
   build_android:
     runs-on: [self-hosted]
