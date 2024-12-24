@@ -181,113 +181,136 @@ class FilterBarDelegate extends SliverPersistentHeaderDelegate {
     required this.endDate, // Initialize endDate
     required this.workTypeSelection,
     required this.onApplyFilters,
+
   });
 
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
     // Calculate the current height for the filter bar based on vertical position
-    double screenHeight = MediaQuery.of(context).size.height;
-    double maxExtent = screenHeight/2;
+    //double screenHeight = MediaQuery.of(context).size.height;
+
     // Calculate the current height for the blue box
-    double currentHeight = maxExtent - shrinkOffset;
-    currentHeight = currentHeight.clamp(minExtent, maxExtent);
+    //double currentHeight = maxExtent - shrinkOffset;
+    //currentHeight = currentHeight.clamp(minExtent, maxExtent);
 
     // Calculate the opacity for the subtitle text
     double opacity = (1 - (shrinkOffset / (maxExtent - minExtent))).clamp(0.0, 1.0);
     double fontsize = (25 - (shrinkOffset / maxExtent) * 10).clamp(20.0, 25.0);
+
+    double statusBarHeight = MediaQuery.of(context).padding.top;
+    double maxMovement = 20.0; // Maximum distance the date range can move up
+    double targetTop = 12; // Final position after pinning
+    //double dynamicBottom = targetBottom+maxMovement - shrinkOffset;
+    double minTopText=10;
+    double minTopIcon=0;
+
     return Stack(
       fit: StackFit.expand,
       children: [
-        /*
-        // Persistent filter bar
-        Align(
-          alignment: Alignment.topCenter,
-          child: SizedBox(
-            height: minExtent,
-            child: child, // This is the persistent filter bar content
-          ),
-        ),
-
-         */
         // Blue box
         Container(
           color: const Color.fromRGBO(97, 124, 255, 1.0), // Blue background
         ),
-        // Persistent filter bar (refresh and filter buttons)
-        Align(
-          alignment: Alignment.topRight,
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end, // Align buttons to the right
-              children: [
-                IconButton(
-                  onPressed: () => onApplyFilters(startDate, endDate, workTypeSelection),
-                  icon: const Icon(Icons.refresh, color: Colors.white),
-                ),
-                IconButton(
-                  onPressed: () {
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      builder: (context) {
-                        return MyinfoFilterPopup(
-                          startDate: startDate,
-                          endDate: endDate,
-                          workTypeSelection: workTypeSelection,
-                          onApplyFilters: onApplyFilters,
-                        );
-                      },
-                    );
-                  },
-                  icon: const Icon(Icons.filter_list, color: Colors.white),
-                ),
-              ],
-            ),
-          ),
-        ),
-        // Filter bar content with moving date and subtitle
+        // Filter bar content with date range and subtitle
         Positioned(
           left: 16.0,
-          top: currentHeight * 0.1, // Adjust top positioning for the moving content
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          top: calculateDynamicPosition(shrinkOffset, statusBarHeight),
+          child: buildFilterBarContent(shrinkOffset, fontsize, opacity, startDate, endDate),
+        ),
+      // Filter bar buttons
+        Positioned(
+          top: (-maxMovement + shrinkOffset).clamp(minTopIcon, statusBarHeight+minTopIcon), 
+          right: 16.0, // Align buttons to the right side
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              // Date range
-              Text(
-                "${DateFormat('yy.MM.dd').format(startDate)} ~ ${DateFormat('yy.MM.dd').format(endDate)}",
-                style:  TextStyle(
-                  color: Colors.white,
-                  fontSize: fontsize, // Dynamic font size
-                  fontWeight: FontWeight.bold,
-                ),
+              IconButton(
+                onPressed: () => onApplyFilters(startDate, endDate, workTypeSelection),
+                icon: const Icon(Icons.refresh, color: Colors.white),
               ),
-
-              // "나의 출퇴근 기록" moves with date
-              Opacity(
-                opacity: opacity, // Dynamic opacity
-                child: const Text(
-                  "나의 출퇴근 기록",
-                  style: TextStyle(
-                    color: Colors.white70, // Slightly dimmed color
-                    fontSize: 15,
-                  ),
-                ),
+              IconButton(
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (context) {
+                      return MyinfoFilterPopup(
+                        startDate: startDate,
+                        endDate: endDate,
+                        workTypeSelection: workTypeSelection,
+                        onApplyFilters: onApplyFilters,
+                      );
+                    },
+                  );
+                },
+                icon: const Icon(Icons.filter_list, color: Colors.white),
               ),
             ],
           ),
         ),
-
-
+      ],
+    );
+  }
+// Function to build the filter bar content (Date range and subtitle)
+  Widget buildFilterBarContent(
+    double shrinkOffset,
+    double fontsize,
+    double opacity,
+    DateTime startDate,
+    DateTime endDate,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Date range
+        Text(
+          "${DateFormat('yy.MM.dd').format(startDate)} ~ ${DateFormat('yy.MM.dd').format(endDate)}",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: fontsize, // Dynamic font size
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        // "나의 출퇴근 기록"
+        Opacity(
+          opacity: opacity, // Dynamic opacity
+          child: const Text(
+            "나의 출퇴근 기록",
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 15,
+            ),
+          ),
+        ),
       ],
     );
   }
 
-  @override
-  double get maxExtent =>  150.0;// Return a static value for maxExtent, but it can still be used in calculations inside build
+  // Function to calculate dynamic position based on shrinkOffset
+  double calculateDynamicPosition(double shrinkOffset, double statusBarHeight) {
+    double maxMovement = 1.0; // Maximum distance the date range can move up
+    double minTopText = 1.0; // Minimum position for text
+    // Adjust the top position dynamically based on shrinkOffset
+    return (-maxMovement + shrinkOffset).clamp(minTopText, statusBarHeight + minTopText);
+  }
+
+  // Function to calculate dynamic font size based on shrinkOffset
+  double calculateFontSize(double shrinkOffset) {
+    // Calculate font size dynamically, clamp it between 20.0 and 25.0
+    return (25 - (shrinkOffset / 300) * 10).clamp(20.0, 25.0);
+  }
+
+  // Function to calculate dynamic opacity based on shrinkOffset
+  double calculateOpacity(double shrinkOffset) {
+    // Calculate opacity based on shrinkOffset, clamp it between 0.0 and 1.0
+    return (1 - (shrinkOffset / 300)).clamp(0.0, 1.0);
+  }
 
   @override
-  double get minExtent => 60.0;
+  double get maxExtent =>  180.0;// Return a static value for maxExtent, but it can still be used in calculations inside build
+
+  @override
+  double get minExtent => 90.0;
   @override
   bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
     // Trigger rebuild if startDate or endDate changes

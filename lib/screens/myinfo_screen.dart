@@ -1,4 +1,6 @@
 //pass the employeeId from the HomeScreen when navigating.
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import '../services/myinfo_service.dart'; // Import the service file
 import '../models/employee.dart'; // Import the Employee model
@@ -49,12 +51,15 @@ class _MyInfoScreenState extends State<_MyInfoScreen> {
           entry.key
     ];
   }
+  //appbar 
+  double expandedHeightAppBar=60.0;
   //overlapping box
   int lateCount = 0; // initial count for overlapping box
   int absentCount = 0; // initial count for overlapping box
   int dayoffCount = 0; // initial count for overlapping box
   bool isDataFetched = false; // Flag to control box visibility
-
+  double maxExtentBox= 220;
+  double minExtentBox= -100;
 
   ///initial setup
   @override
@@ -171,7 +176,7 @@ class _MyInfoScreenState extends State<_MyInfoScreen> {
 
               // SliverAppBar with only the title and icon
               SliverAppBar(
-                expandedHeight: 60.0, // Standard AppBar height
+                expandedHeight: expandedHeightAppBar, // Standard AppBar height
                 pinned: false,// AppBar scrolls out of view
                 floating: false,
                 backgroundColor: AppConfig.getColor(ColorType.background),
@@ -200,6 +205,7 @@ class _MyInfoScreenState extends State<_MyInfoScreen> {
                     endDate: _endDate, // Pass endDate
                     workTypeSelection: _workTypeSelection,
                     onApplyFilters: _applyFilters,
+
             ),
               ),
             ];
@@ -301,21 +307,20 @@ class _MyInfoScreenState extends State<_MyInfoScreen> {
             },
           ),
         ),
-
+            
             OverlappingBox(
               scrollOffset: _scrollOffset,
               lateCount: lateCount,
               absentCount: absentCount,
               dayoffCount: dayoffCount,
               isDataFetched: isDataFetched,
+              maxExtentBox: maxExtentBox,
+              minExtentBox: minExtentBox,
             ),
       ]
     )
     );
   }
-
-
-
 }
 
 class OverlappingBox extends StatelessWidget {
@@ -324,6 +329,8 @@ class OverlappingBox extends StatelessWidget {
   final int absentCount;
   final int dayoffCount;
   final bool isDataFetched; // Flag to control displaying count values
+  final double maxExtentBox;
+  final double minExtentBox;
 
   const OverlappingBox({
     required this.scrollOffset,
@@ -331,16 +338,18 @@ class OverlappingBox extends StatelessWidget {
     required this.absentCount,
     required this.dayoffCount,
     required this.isDataFetched, // Pass the flag to control visibility
+    required this.maxExtentBox, 
+    required this.minExtentBox, 
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    double position = 160.0 - scrollOffset; // Adjust position dynamically
+    double position = maxExtentBox - scrollOffset; // Adjust position dynamically
     double opacity = (position > 100) ? 1.0 : (position / 100).clamp(0.0, 1.0);
 
     return Positioned(
-      top: position.clamp(-100.0, 160.0),
+      top: position.clamp(minExtentBox, maxExtentBox),
       left: 30,
       right: 30,
       child: Opacity(
