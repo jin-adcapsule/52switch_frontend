@@ -64,7 +64,7 @@ class DayoffRequestScreenState extends State<DayoffRequestScreen> {
       "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}")
           .toList();
       // Await the response from the mutation
-      final response = await _dayoffService.RequestDayoff(
+      final response = await _dayoffService.requestDayoff(
         widget.objectId!,
         dateList,
         _selectedDayoffType!,

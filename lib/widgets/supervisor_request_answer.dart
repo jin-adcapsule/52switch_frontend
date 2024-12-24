@@ -207,18 +207,22 @@ class AnswerRequestScreenState extends State<AnswerRequestScreen> {
         answerComment,
         widget.requestKey,
       );
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('답변이 생성되었습니다.')),
-      );
+      if(mounted){
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('답변이 생성되었습니다.')),
+        );
+      }
       //send Notification with employeeOid
       PushService.sendPushToEmployeeId(widget.employeeId, "${widget.requestType} $status", "${AppConfig.employeeName}님이 처리하였습니다.");
 
       // Clear inputs and reset state
       clearForm();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('에러 발생: ${e.toString()}')),
-      );
+      if(mounted){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('에러 발생: ${e.toString()}')),
+        );
+      }
     }
   }
   // Clear inputs and reset state

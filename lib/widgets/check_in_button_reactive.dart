@@ -10,10 +10,10 @@ class CheckInButton extends StatefulWidget  {
   const CheckInButton({super.key, required this.isAttendanceMarked, required this.objectId});
 
   @override
-  _CheckInButtonState createState() => _CheckInButtonState();
+  CheckInButtonState createState() => CheckInButtonState();
 }
 
-class _CheckInButtonState extends State<CheckInButton> {
+class CheckInButtonState extends State<CheckInButton> {
   late bool isAttendanceMarked;
   late bool _isLoading;
   //late Stream<QueryResult> subscriptionStream;
@@ -53,10 +53,11 @@ class _CheckInButtonState extends State<CheckInButton> {
       setState(() {
         _isLoading = false; // Stop loading indicator
       });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
-      );
+      if(mounted){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${e.toString()}')),
+        );
+      }
     }
   }
   @override

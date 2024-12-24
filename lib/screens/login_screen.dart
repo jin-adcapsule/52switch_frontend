@@ -37,15 +37,13 @@ class LoginScreenState extends State<LoginScreen> {
       // Query backend to validate Firebase UID and retrieve objectId
       final success = await _validateUidAndFetchObjectId(uid, phone);
       if (success)return;
-
-
-          // Clear storage if validation fails
-          await _storage.deleteAll();
-          setState(() {
-            _authStatusMessage = 'Validation failed, please log in again.';
-          });
-        }
+      // Clear storage if validation fails
+      await _storage.deleteAll();
+      setState(() {
+        _authStatusMessage = 'Validation failed, please log in again.';
+      });
     }
+  }
 
 
   Future<bool> _validateUidAndFetchObjectId(String uid, String phone) async {
@@ -59,10 +57,12 @@ class LoginScreenState extends State<LoginScreen> {
         AppConfig.employeeName = result['employeeName'];
         AppConfig.isSupervisor = result['is_supervisor'];
         AppConfig.isAttendanceMarkedNotifier.value = result['currently_marked'];// Set the initial value of isAttendanceMarkedNotifier
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => Navigation()),
-        );
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => Navigation()),
+          );
+        }
         await _saveFCMToken(AppConfig.objectId);
         return true;
       }
@@ -209,9 +209,9 @@ class LoginScreenState extends State<LoginScreen> {
                     await _auth.signInWithCredential(credential);
                     await _fetchAndStoreUid(_phoneController.text);
                   } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Invalid OTP')),
-                    );
+                    setState(() {
+                      _authStatusMessage = 'Invalid OTP';
+                    });
                   }
                 },
                 child: Text('Verify OTP'),

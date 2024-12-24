@@ -4,7 +4,7 @@ import '../models/dayoff.dart'; // Import the Attendance model
 import '../logger_config.dart';
 class DayoffService {
   // Request a day off for the employee
-  Future<List<String>> RequestDayoff(String objectId, List<String> dateList, String dayoffType, String requestComment,int beforeDateRemaining) async {
+  Future<List<String>> requestDayoff(String objectId, List<String> dateList, String dayoffType, String requestComment,int beforeDateRemaining) async {
     String formattedDateList = dateList.map((date) => '"$date"').toList().toString();
     String mutation = """
       mutation {

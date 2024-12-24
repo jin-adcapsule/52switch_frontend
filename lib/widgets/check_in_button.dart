@@ -8,10 +8,10 @@ class CheckInButton extends StatefulWidget {
   const CheckInButton({super.key, required this.objectId});
 
   @override
-  _CheckInButtonState createState() => _CheckInButtonState();
+  CheckInButtonState createState() => CheckInButtonState();
 }
 
-class _CheckInButtonState extends State<CheckInButton> {
+class CheckInButtonState extends State<CheckInButton> {
   late bool _isLoading; // To manage loading state
 
   @override
@@ -50,9 +50,11 @@ class _CheckInButtonState extends State<CheckInButton> {
       setState(() {
         _isLoading = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
-      );
+      if(mounted){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${e.toString()}')),
+        );
+      }
     }
   }
 
