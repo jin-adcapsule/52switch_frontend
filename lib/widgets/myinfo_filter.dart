@@ -185,6 +185,9 @@ class FilterBarDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    // Calculate the current height for the filter bar based on vertical position
+    double screenHeight = MediaQuery.of(context).size.height;
+    double maxExtent = screenHeight/3;
     // Calculate the current height for the blue box
     double currentHeight = maxExtent - shrinkOffset;
     currentHeight = currentHeight.clamp(minExtent, maxExtent);
@@ -281,7 +284,8 @@ class FilterBarDelegate extends SliverPersistentHeaderDelegate {
   }
 
   @override
-  double get maxExtent => 150.0;
+  double get maxExtent =>  150.0;// Return a static value for maxExtent, but it can still be used in calculations inside build
+
   @override
   double get minExtent => 60.0;
   @override
