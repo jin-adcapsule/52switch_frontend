@@ -307,10 +307,21 @@ class _DayoffScreenState extends State<_DayoffScreen> with SingleTickerProviderS
       return;
     }
 
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DayoffRequestScreen(
+                objectId: widget.objectId,
+        )
+      ),
+    );
+
+/*
     try {
       // Fetch data
       final employeeData = await _dayoffService.fetchDayoffInfo(
           widget.objectId!);
+
 
       // Navigate to DayoffRequestScreen with fetched data
       Navigator.push(
@@ -325,11 +336,13 @@ class _DayoffScreenState extends State<_DayoffScreen> with SingleTickerProviderS
               ),
         ),
       );
+
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: ${e.toString()}')),
       );
     }
+*/
   }
 
 }
