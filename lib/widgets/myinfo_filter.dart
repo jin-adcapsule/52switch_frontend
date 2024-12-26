@@ -199,9 +199,9 @@ class FilterBarDelegate extends SliverPersistentHeaderDelegate {
 
     double statusBarHeight = MediaQuery.of(context).padding.top;
     double maxMovement = 20.0; // Maximum distance the date range can move up
-    double targetTop = 12; // Final position after pinning
+    //double targetTop = 12; // Final position after pinning
     //double dynamicBottom = targetBottom+maxMovement - shrinkOffset;
-    double minTopText=10;
+    //double minTopText=10;
     double minTopIcon=0;
 
     return Stack(

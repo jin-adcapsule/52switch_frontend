@@ -19,8 +19,8 @@ class _AttendanceScreen extends StatefulWidget {
   _AttendanceScreenState createState() => _AttendanceScreenState();
 }
 class _AttendanceScreenState extends State<_AttendanceScreen> {
-  late bool isAttendanceMarked;
-  //bool isAttendanceMarked = AppConfig.isAttendanceMarkedNotifier.value;
+  //late bool isAttendanceMarked;
+  bool isAttendanceMarked = AppConfig.isAttendanceMarkedNotifier.value;
   final String? objectId = AppConfig.objectId; // Example: Use actual employee ID
   //final int? employeeId = AppConfig.employeeId;
   final GlobalService _globalService = GlobalService();
@@ -193,6 +193,7 @@ class _AttendanceScreenState extends State<_AttendanceScreen> {
                 Center(
                   child: CheckInButton(
                     objectId: objectId,
+                    isAttendanceMarked: isAttendanceMarked,
                   ),
                 ),
                 SizedBox(height: 80),

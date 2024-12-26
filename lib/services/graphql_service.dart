@@ -11,42 +11,11 @@ class GraphQLService {
   static final String webSocketUrl = EnvConfig.apiWebSocketUrl; // Add WebSocket URL in `env_config.dart`
   // HttpLink for queries and mutations
   static final HttpLink httpLink = HttpLink(EnvConfig.apiUrl);
-  /*
-  // WebSocketLink for subscriptions
-  static final WebSocketLink webSocketLink = WebSocketLink(
-    webSocketUrl,
-    config: SocketClientConfig(
-      autoReconnect: true,
-      inactivityTimeout: Duration(minutes: 1),
-      initialPayload: () => {
-    "type": "connection_init",
-    "payload": {}, // Optional authentication or metadata
-    },
-    
-    ),
-  );*/
-// WebSocketLink for subscriptions by gql_websocket_link
-  //static final gql_ws.WebSocketLink webSocketLink = gql_ws.WebSocketLink(webSocketUrl);
-
-  static final gql_ws.TransportWebSocketLink webSocketLink = gql_ws.TransportWebSocketLink(
-      gql_ws.TransportWsClientOptions(
-          // Provide the WebSocket URL
-        socketMaker: gql_ws.WebSocketMaker.url(() => webSocketUrl)
-      ),
-
-    );
-
-  // Combine HttpLink and WebSocketLink
-  static final Link link = Link.split(
-        (request) => request.isSubscription, // Route subscriptions to WebSocketLink
-    //webSocketLink,
-    webSocketLink,
-    httpLink,
-  );
+  
   // Initialize the GraphQL client
   static ValueNotifier<GraphQLClient> client = ValueNotifier(
     GraphQLClient(
-      link: link, //
+      link: httpLink, //
       cache: GraphQLCache(store: InMemoryStore()),
     ),
   );

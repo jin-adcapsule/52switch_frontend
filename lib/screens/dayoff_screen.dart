@@ -316,33 +316,6 @@ class _DayoffScreenState extends State<_DayoffScreen> with SingleTickerProviderS
       ),
     );
 
-/*
-    try {
-      // Fetch data
-      final employeeData = await _dayoffService.fetchDayoffInfo(
-          widget.objectId!);
-
-
-      // Navigate to DayoffRequestScreen with fetched data
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) =>
-              DayoffRequestScreen(
-                objectId: widget.objectId,
-                supervisorName: employeeData['supervisorName'],
-                supervisorId: employeeData['supervisorId'],
-                dayoffRemaining: employeeData['dayoffRemaining'],
-              ),
-        ),
-      );
-
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
-      );
-    }
-*/
   }
 
 }

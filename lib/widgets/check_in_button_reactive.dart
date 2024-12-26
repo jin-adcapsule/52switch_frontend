@@ -23,7 +23,6 @@ class CheckInButtonState extends State<CheckInButton> {
     super.initState();
     isAttendanceMarked = widget.isAttendanceMarked;
     _isLoading = false;
-
   }
   Future<void> _toggleAttendance(bool newValue) async {
     final attendanceService = AttendanceService();
@@ -34,7 +33,6 @@ class CheckInButtonState extends State<CheckInButton> {
     try {
       // Call the service to update attendance
       await attendanceService.markAttendance(widget.objectId, newValue);
-
       // Update state only if the call succeeds
       setState(() {
         isAttendanceMarked = newValue;
