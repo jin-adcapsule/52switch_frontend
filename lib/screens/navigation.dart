@@ -48,7 +48,7 @@ class NavigationState extends State<Navigation> {
     Widget screen;
     switch (selectedKey) {
       case 'attendance':
-        screen = createAttendanceScreen(isAttendanceMarked);
+        screen = createAttendanceScreen();
         break;
       case 'dayoff':
         screen = createDayoffScreen(objectId);
@@ -63,7 +63,7 @@ class NavigationState extends State<Navigation> {
         screen = MoreScreen();
         break;
       default:
-        screen = createAttendanceScreen(isAttendanceMarked);
+        screen = createAttendanceScreen();
         break;
     }
         // Store the screen in the cache

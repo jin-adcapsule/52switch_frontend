@@ -4,9 +4,8 @@ import '../screens/config_screen.dart';
 
 class CheckInButton extends StatefulWidget {
   final String? objectId;
-  final bool isAttendanceMarked;
 
-  const CheckInButton({super.key, required this.objectId, required this.isAttendanceMarked});
+  const CheckInButton({super.key, required this.objectId});
 
   @override
   CheckInButtonState createState() => CheckInButtonState();
@@ -14,12 +13,14 @@ class CheckInButton extends StatefulWidget {
 
 class CheckInButtonState extends State<CheckInButton> {
   late bool _isLoading; // To manage loading state
-  late bool isAttendanceMarked;
+  bool isAttendanceMarked = AppConfig.isAttendanceMarkedNotifier.value;
+  late String? objectId;
   @override
   void initState() {
     super.initState();
     _isLoading = false; // Initialize loading as false
-    isAttendanceMarked = widget.isAttendanceMarked;
+    isAttendanceMarked = isAttendanceMarked;
+    objectId = widget.objectId;
     // Fetch attendance status on init
     _getAttendanceStatus();
     
@@ -31,22 +32,26 @@ class CheckInButtonState extends State<CheckInButton> {
     });
     try {
       // Send API call to toggle attendance
-      await attendanceService.fetchAttendanceStatus(widget.objectId);
+      final result = await attendanceService.fetchAttendanceStatus(objectId);
 
       // Stop loading once API call succeeds
       setState(() {
         _isLoading = false;
       });
+      if (result['querySuccess'] == true) {
+        setState(() {
+          isAttendanceMarked = result['status']; // Update the attendance status
+          // Directly update the ValueNotifier
+          AppConfig.isAttendanceMarkedNotifier.value = isAttendanceMarked;
+        });
+      } else {
+        _showErrorSnackBar('Failed to fetch attendance status.');
+      }
     } catch (e) {
-      // Handle error and stop loading
       setState(() {
         _isLoading = false;
       });
-      if(mounted){
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
-        );
-      }
+      _showErrorSnackBar('Error: ${e.toString()}');
     }
   }
   Future<void> _toggleAttendance(bool newValue) async {
@@ -57,25 +62,34 @@ class CheckInButtonState extends State<CheckInButton> {
 
     try {
       // Send API call to toggle attendance
-      await attendanceService.markAttendance(widget.objectId, newValue);
+      final result = await attendanceService.markAttendance(objectId, newValue);
 
       // Stop loading once API call succeeds
       setState(() {
         _isLoading = false;
       });
+      if (result['mutationSuccess'] == true) {
+        setState(() {
+          isAttendanceMarked = result['status']; // Update status on success
+          // Directly update the ValueNotifier
+          AppConfig.isAttendanceMarkedNotifier.value = isAttendanceMarked;
+        });
+      } else {
+        _showErrorSnackBar('Failed to mark attendance.');
+      }
     } catch (e) {
-      // Handle error and stop loading
       setState(() {
         _isLoading = false;
       });
-      if(mounted){
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
-        );
-      }
+      _showErrorSnackBar('Error: ${e.toString()}');
     }
   }
-
+  // Show error snack bar
+  void _showErrorSnackBar(String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -92,6 +106,7 @@ class CheckInButtonState extends State<CheckInButton> {
                     if (!_isLoading) {
                       await _toggleAttendance(val);
                     }
+                    
                   },
                   activeColor: Colors.green,
                   inactiveThumbColor: Colors.grey,

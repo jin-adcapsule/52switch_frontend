@@ -1,7 +1,6 @@
 
 import 'package:flutter/material.dart';
 import '../services/graphql_service.dart';
-import '../screens/config_screen.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import '../logger_config.dart';
 
@@ -16,8 +15,6 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Subscription stream
-  Stream<QueryResult>? _subscriptionStream;
 
   // Validates the Firebase UID and phone number and retrieves the associated objectId.
   Future<Map<String, dynamic>?> validateUidAndPhone(String uid, String phone) async {
@@ -52,7 +49,12 @@ class AuthService extends ChangeNotifier {
       final data = result.data?['validateUidAndPhone'];
       if (data != null) {
         final objectId = data['objectId'];
-  
+        return {
+          'objectId': objectId,
+          'is_supervisor': data['isSupervisor'],
+          'currently_marked': data['currently_marked'],
+          'employeeName': data['employeeName']
+        };
       } else {
         throw Exception('Invalid UID or phone number.');
       }

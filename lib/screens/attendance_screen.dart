@@ -8,19 +8,20 @@ import '../widgets/check_in_button.dart';
 import '../services/global_service.dart';
 
 // Public create function
-Widget createAttendanceScreen(bool isAttendanceMarked) {
-  return _AttendanceScreen(isAttendanceMarked: isAttendanceMarked);
+Widget createAttendanceScreen() {
+  return _AttendanceScreen();
 }
 
 class _AttendanceScreen extends StatefulWidget {
-  final bool isAttendanceMarked;//Make AttendanceScreen receive the isAttendanceMarked value and update its background color
-  const _AttendanceScreen({required this.isAttendanceMarked});
+  //final bool isAttendanceMarked;//Make AttendanceScreen receive the isAttendanceMarked value and update its background color
+  const _AttendanceScreen();
   @override
   _AttendanceScreenState createState() => _AttendanceScreenState();
 }
 class _AttendanceScreenState extends State<_AttendanceScreen> {
   //late bool isAttendanceMarked;
   bool isAttendanceMarked = AppConfig.isAttendanceMarkedNotifier.value;
+  
   final String? objectId = AppConfig.objectId; // Example: Use actual employee ID
   //final int? employeeId = AppConfig.employeeId;
   final GlobalService _globalService = GlobalService();
@@ -32,8 +33,6 @@ class _AttendanceScreenState extends State<_AttendanceScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize with the passed value or AppConfig state
-    isAttendanceMarked = widget.isAttendanceMarked;
     _fetchEmployeeInfo(); // Fetch and set workplace
 
     // Listen for foreground messages
@@ -136,72 +135,76 @@ class _AttendanceScreenState extends State<_AttendanceScreen> {
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        backgroundColor: AppConfig.getColor(ColorType.background),//getBackgroundColor(AppConfig.selectedIndexNotifier.value, isAttendanceMarked),
-        appBar: AppBar(
-          title: Text(AppConfig.getAppbarTitle(AppConfig.selectedKeyNotifier.value), style: TextStyle(color: AppConfig.getColor(ColorType.text))),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          centerTitle: false, // Forces left alignment on both Android and iOS
-          actions: [
-            IconButton(
-              icon: Icon(Icons.notifications),
-              color: AppConfig.getColor(ColorType.text),
-              onPressed: _showNotifications,
+    return ValueListenableBuilder<bool>(
+      valueListenable: AppConfig.isAttendanceMarkedNotifier,
+      builder: (context, isAttendanceMarked, child) {
+        return Scaffold(
+            backgroundColor: AppConfig.getColor(ColorType.background),//getBackgroundColor(AppConfig.selectedIndexNotifier.value, isAttendanceMarked),
+            appBar: AppBar(
+              title: Text(AppConfig.getAppbarTitle(AppConfig.selectedKeyNotifier.value), style: TextStyle(color: AppConfig.getColor(ColorType.text))),
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              centerTitle: false, // Forces left alignment on both Android and iOS
+              actions: [
+                IconButton(
+                  icon: Icon(Icons.notifications),
+                  color: AppConfig.getColor(ColorType.text),
+                  onPressed: _showNotifications,
+                  ),
+                ],
               ),
-            ],
-          ),
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            body: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
 
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 30),
-                DateWidget(workplace: workplace),
-                SizedBox(height: 50),
-                const ClockWidget(),
-                Container(
-                  margin: EdgeInsets.only(top: 0),
-                  width: 100,
-                  height: 4,
-                  color: Colors.white,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: Text(
-                    AppConfig.getMaintextHome(),
-                    style: TextStyle(
-                      fontSize: 60,
-                      fontWeight: FontWeight.bold,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 30),
+                    DateWidget(workplace: workplace),
+                    SizedBox(height: 50),
+                    const ClockWidget(),
+                    Container(
+                      margin: EdgeInsets.only(top: 0),
+                      width: 100,
+                      height: 4,
                       color: Colors.white,
                     ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: Text(
-                    AppConfig.getSubtextHome(),
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white,
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Text(
+                        AppConfig.getMaintextHome(),
+                        style: TextStyle(
+                          fontSize: 60,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
-                  ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Text(
+                        AppConfig.getSubtextHome(),
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    Spacer(),
+                    Center(
+                      child: CheckInButton(
+                        objectId: objectId,
+                      ),
+                    ),
+                    SizedBox(height: 80),
+                  ],
                 ),
-                Spacer(),
-                Center(
-                  child: CheckInButton(
-                    objectId: objectId,
-                    isAttendanceMarked: isAttendanceMarked,
-                  ),
-                ),
-                SizedBox(height: 80),
-              ],
-            ),
-          ),
-        )
-      );
+              ),
+            )
+          );
+      }
+    );
   }
 }
 
