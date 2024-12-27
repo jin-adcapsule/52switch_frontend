@@ -54,48 +54,47 @@ class DayoffService {
   }
 
 // Fetch employee info including supervisor and dayoffRemaining
-  Future<Map<String, dynamic>> fetchDayoffInfo(String objectId) async {
-    if (objectId.isEmpty) {
+  Future<Map<String, dynamic>> fetchDayoffInfo(String employeeOid) async {
+    if (employeeOid.isEmpty) {
       throw Exception('Invalid objectId: It is null or empty');
     }
 
-    final employeeQuery = '''
-    query GetDayoffInfo(\$objectId: String!) {
-      getEmployeeInfo(objectId: \$objectId) {
+    final query = '''
+    query GetDayoffInfo(\$employeeOid: String!) {
+      getDayoffInfo(employeeOid: \$employeeOid) {
         supervisorName
-        
-        supervisorId
+        supervisorOid
         dayoffRemaining
       }
     }
     ''';
 
-    final variables = {'objectId': objectId};
+    final variables = {'employeeOid': employeeOid};
 
     try {
-      final employeeResult = await GraphQLService.query(
-          employeeQuery,
+      final response = await GraphQLService.query(
+          query,
           variables: variables,
           fetchPolicy: FetchPolicy.networkOnly, // Force network fetch
            );
 
-      if (employeeResult.hasException) {
-        LoggerConfig().logger.e('Employee Query Exception: ${employeeResult.exception}');
-        throw Exception('Failed to fetch employee data');
+      if (response.hasException) {
+        LoggerConfig().logger.e('Employee Query Exception: ${response.exception}');
+        throw Exception('Failed to fetch getDayoffInfo data');
       }
 
-      final employeeData = employeeResult.data?['getEmployeeInfo'];
-      if (employeeData == null) {
+      final responseData = response.data?['getDayoffInfo'];
+      if (responseData == null) {
         throw Exception('Employee not found');
       }
       final returnData={
-        'supervisorName': employeeData['supervisorName'] ?? 'N/A',
-        'supervisorId': employeeData['supervisorId'] ?? 'N/A',
-        'dayoffRemaining': employeeData['dayoffRemaining'] ?? 0,};
+        'supervisorName': responseData['supervisorName'] ?? 'N/A',
+        'supervisorId': responseData['supervisorOid'] ?? 'N/A',
+        'dayoffRemaining': responseData['dayoffRemaining'] ?? 0,};
       return returnData;
     } catch (e) {
       LoggerConfig().logger.e('Error during GraphQL query: $e');
-      throw Exception('Failed to load employee data');
+      throw Exception('Failed to load getDayoffInfo data');
     }
   }
 // Fetch attendance history

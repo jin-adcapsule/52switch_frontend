@@ -29,7 +29,6 @@ class EnvConfig {
     */
   // Get the API URL (constructed dynamically)
   static String get apiUrl => 'http://$hostAddress:$serverPort/graphql';
-  static String get apiWebSocketUrl => 'ws://$hostAddress:$serverPort/graphql';
 
 
 

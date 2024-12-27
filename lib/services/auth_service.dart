@@ -1,7 +1,6 @@
 
 import 'package:flutter/material.dart';
 import '../services/graphql_service.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
 import '../logger_config.dart';
 
 

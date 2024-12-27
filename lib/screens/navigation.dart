@@ -16,7 +16,8 @@ class NavigationState extends State<Navigation> {
   final String objectId = AppConfig.objectId; // Use from config
   final bool isSupervisor = AppConfig.isSupervisor; // Use from config
     // Cache for storing created screens
-  final Map<String, Widget> _screenCache = {};
+  //final Map<String, Widget> _screenCache = {};
+  final Map<String, Widget Function()> _screenCache = {};
 
   void _onItemTapped(String key) {
     if (key == 'supervisor' && !isSupervisor) {
@@ -39,38 +40,38 @@ class NavigationState extends State<Navigation> {
     }).toList();
   }
 
-  // Use a Map to cache the screens
-  Widget _getSelectedScreen(String selectedKey,bool isAttendanceMarked) {
-    if (_screenCache.containsKey(selectedKey)) {
-      return _screenCache[selectedKey]!; // Return cached screen
-    }
-    // If the screen isn't cached, create it and store it in the Map
-    Widget screen;
-    switch (selectedKey) {
-      case 'attendance':
-        screen = createAttendanceScreen();
-        break;
-      case 'dayoff':
-        screen = createDayoffScreen(objectId);
-        break;
-      case 'supervisor':
-        screen = createSupervisorScreen(objectId) ;
-        break;
-      case 'myinfo':
-        screen = createMyInfoScreen(objectId);
-        break;
-      case 'more':
-        screen = MoreScreen();
-        break;
-      default:
-        screen = createAttendanceScreen();
-        break;
-    }
-        // Store the screen in the cache
-    _screenCache[selectedKey] = screen;
-
-    return screen;
+  Widget _getSelectedScreen(String selectedKey, bool isAttendanceMarked) {
+  if (_screenCache.containsKey(selectedKey)) {
+    return _screenCache[selectedKey]!(); // Call the cached function to create a fresh screen
   }
+  // If the screen isn't cached, create a factory function and store it in the Map
+  Widget Function() screenFactory;
+  switch (selectedKey) {
+    case 'attendance':
+      screenFactory = () => createAttendanceScreen();
+      break;
+    case 'dayoff':
+      screenFactory = () => createDayoffScreen(objectId);
+      break;
+    case 'supervisor':
+      screenFactory = () => createSupervisorScreen(objectId);
+      break;
+    case 'myinfo':
+      screenFactory = () => createMyInfoScreen(objectId);
+      break;
+    case 'more':
+      screenFactory = () => MoreScreen();
+      break;
+    default:
+      screenFactory = () => createAttendanceScreen();
+      break;
+  }
+  // Store the factory in the cache
+  _screenCache[selectedKey] = screenFactory;
+
+  return screenFactory();
+}
+
 
 
 //buildformat

@@ -7,8 +7,6 @@ import '../env_config.dart'; // graphqlendpoint
 import "package:gql_websocket_link/gql_websocket_link.dart" as gql_ws;
 import '../logger_config.dart';
 class GraphQLService {
-  // WebSocket endpoint
-  static final String webSocketUrl = EnvConfig.apiWebSocketUrl; // Add WebSocket URL in `env_config.dart`
   // HttpLink for queries and mutations
   static final HttpLink httpLink = HttpLink(EnvConfig.apiUrl);
   
@@ -68,25 +66,6 @@ class GraphQLService {
       LoggerConfig().logger.e("Error during query: $e");
       rethrow; // Optionally rethrow the error for higher-level handling
     }
-  }
-// Subscribe to real-time data
-  static Stream<QueryResult> subscribe(String subscription, {Map<String, dynamic>? variables}) {
-    final GraphQLClient graphqlClient = client.value;
-    LoggerConfig().logger.i("Starting subscription...");
-    return graphqlClient.subscribe(
-      SubscriptionOptions(
-        document: gql(subscription),
-        variables: variables ?? {},
-      ),
-    ).map((result) {
-      if (result.hasException) {
-        LoggerConfig().logger.e("Query Exception: ${result.exception}");
-      }
-      LoggerConfig().logger.i("Subscription Data: ${result.data}");
-      return result;
-    }).handleError((error) {
-      LoggerConfig().logger.e("Error in subscription stream: $error");
-    });
   }
 
 }

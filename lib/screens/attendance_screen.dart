@@ -26,6 +26,9 @@ class _AttendanceScreenState extends State<_AttendanceScreen> {
   //final int? employeeId = AppConfig.employeeId;
   final GlobalService _globalService = GlobalService();
   String workplace = '';
+  String workhourOn = '';
+  String workhourOff = '';
+  String workhourHalf = '';  
   // List to hold notifications
   final List<String> _notifications = [];
 
@@ -119,13 +122,14 @@ class _AttendanceScreenState extends State<_AttendanceScreen> {
   ///get a response for search from service
   Future<void> _fetchEmployeeInfo()  async {
     try {
-      final employeeInfoData = await _globalService.fetchEmployeeInfo(AppConfig.objectId);
-      if (employeeInfoData != null) {
-        setState(() {
-          workplace =
-              employeeInfoData.workplace; // Set workplace or default
-        });
-      }
+      final locationData = await _globalService.fetchLocationInfo(AppConfig.objectId);
+      setState(() {
+        workplace =locationData['workplace']; 
+        workhourOn =locationData['workhourOn']; 
+        workhourOff =locationData['workhourOff']; 
+        workhourHalf =locationData['workhourHalf']; 
+      });
+      
     } catch (e) {
       setState(() {
         workplace = "Error"; // Display error if fetching fails
