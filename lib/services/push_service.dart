@@ -18,17 +18,17 @@ class PushService{
 
   //mutate credential information
   // Request a day off for the employee
-  static Future<bool> saveFCMToken(String objectId) async {
+  static Future<bool> saveFCMToken(String employeeOid) async {
     String? fcmToken = await getFCMToken();
     String mutation =
     """
         mutation {
-          saveFCMToken(objectId: "$objectId",
+          saveFCMToken(employeeOid: "$employeeOid",
                         fcmToken: "$fcmToken",
                         )}
       """;
     final variables = {
-      'objectId': objectId,
+      'employeeOid': employeeOid,
       'fcmToken': fcmToken,
     };
     // Call the mutate method from GraphQLService
@@ -45,17 +45,17 @@ class PushService{
     }
   }
 //push notification to supervisor
-  static Future<String> sendPushToSupervisor(String objectId, String title, String message) async {
+  static Future<String> sendPushToSupervisor(String employeeOid, String title, String message) async {
     String mutation =
     """
         mutation {
-          sendNotificationToSupervisor(objectId: "$objectId",
+          sendNotificationToSupervisor(employeeOid: "$employeeOid",
                         title: "$title",
                         message: "$message"
                         )}
       """;
     final variables = {
-      'objectId': objectId,
+      'employeeOid': employeeOid,
       'title': title,
       'message': message
     };
@@ -78,17 +78,17 @@ class PushService{
 
 
   //push notification to EmployeeId
-  static Future<String> sendPushToEmployeeId(int employeeId, String title, String message) async {
+  static Future<String> sendPushToEmployeeOid(String employeeOid, String title, String message) async {
     String mutation =
     """
         mutation {
-          sendNotificationToEmployeeId(employeeId: $employeeId,
+          sendNotificationToEmployeeOid(employeeOid: $employeeOid,
                         title: "$title",
                         message: "$message"
                         )}
       """;
     final variables = {
-      'employeeId': employeeId,
+      'employeeOid': employeeOid,
       'title': title,
       'message': message
     };

@@ -143,7 +143,7 @@ class _AttendanceScreenState extends State<_AttendanceScreen> {
       valueListenable: AppConfig.isAttendanceMarkedNotifier,
       builder: (context, isAttendanceMarked, child) {
         return Scaffold(
-            backgroundColor: AppConfig.getColor(ColorType.background),//getBackgroundColor(AppConfig.selectedIndexNotifier.value, isAttendanceMarked),
+            //backgroundColor: AppConfig.getColor(ColorType.background),//getBackgroundColor(AppConfig.selectedIndexNotifier.value, isAttendanceMarked),
             appBar: AppBar(
               title: Text(AppConfig.getAppbarTitle(AppConfig.selectedKeyNotifier.value), style: TextStyle(color: AppConfig.getColor(ColorType.text))),
               backgroundColor: Colors.transparent,
@@ -157,7 +157,9 @@ class _AttendanceScreenState extends State<_AttendanceScreen> {
                   ),
                 ],
               ),
-            body: Center(
+            body: AnimatedContainer(
+              duration: Duration(milliseconds: 500),
+              color: AppConfig.getColor(ColorType.background),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
 
@@ -174,24 +176,32 @@ class _AttendanceScreenState extends State<_AttendanceScreen> {
                       height: 4,
                       color: Colors.white,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8),
-                      child: Text(
-                        AppConfig.getMaintextHome(),
-                        style: TextStyle(
-                          fontSize: 60,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                    // Slide animation for main text
+                    AnimatedSwitcher(
+                      duration: Duration(milliseconds: 500),
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Text(
+                          AppConfig.getMaintextHome(),
+                          style: TextStyle(
+                            fontSize: 60,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8),
-                      child: Text(
-                        AppConfig.getSubtextHome(),
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.white,
+                    // Slide animation for subtext
+                    AnimatedSwitcher(
+                      duration: Duration(milliseconds: 500),
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Text(
+                          AppConfig.getSubtextHome(),
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),

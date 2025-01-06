@@ -202,7 +202,7 @@ class FilterBarDelegate extends SliverPersistentHeaderDelegate {
     //double targetTop = 12; // Final position after pinning
     //double dynamicBottom = targetBottom+maxMovement - shrinkOffset;
     //double minTopText=10;
-    double minTopIcon=0;
+    double minTopIcon=10;
 
     return Stack(
       fit: StackFit.expand,
@@ -289,7 +289,7 @@ class FilterBarDelegate extends SliverPersistentHeaderDelegate {
   // Function to calculate dynamic position based on shrinkOffset
   double calculateDynamicPosition(double shrinkOffset, double statusBarHeight) {
     double maxMovement = 1.0; // Maximum distance the date range can move up
-    double minTopText = 1.0; // Minimum position for text
+    double minTopText = 20.0; // Minimum position for text
     // Adjust the top position dynamically based on shrinkOffset
     return (-maxMovement + shrinkOffset).clamp(minTopText, statusBarHeight + minTopText);
   }

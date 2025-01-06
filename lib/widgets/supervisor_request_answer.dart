@@ -213,7 +213,7 @@ class AnswerRequestScreenState extends State<AnswerRequestScreen> {
         );
       }
       //send Notification with employeeOid
-      PushService.sendPushToEmployeeId(widget.employeeId, "${widget.requestType} $status", "${AppConfig.employeeName}님이 처리하였습니다.");
+      PushService.sendPushToEmployeeOid(widget.employeeOid!, "${widget.requestType} $status", "${AppConfig.employeeName}님이 처리하였습니다.");
 
       // Clear inputs and reset state
       clearForm();

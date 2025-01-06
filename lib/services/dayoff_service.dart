@@ -75,7 +75,7 @@ class DayoffService {
       final response = await GraphQLService.query(
           query,
           variables: variables,
-          fetchPolicy: FetchPolicy.networkOnly, // Force network fetch
+          fetchPolicy: FetchPolicy.networkOnly, // Force network fertch
            );
 
       if (response.hasException) {
@@ -91,7 +91,7 @@ class DayoffService {
         'supervisorName': responseData['supervisorName'] ?? 'N/A',
         'supervisorOid': responseData['supervisorOid'] ?? 'N/A',
         'dayoffPerYear': responseData['dayoffPerYear'] ?? 0,};
-      print(returnData);
+
       return returnData;
     } catch (e) {
       LoggerConfig().logger.e('Error during GraphQL query: $e');

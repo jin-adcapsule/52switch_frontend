@@ -58,7 +58,7 @@ class _MyInfoScreenState extends State<_MyInfoScreen> {
   int absentCount = 0; // initial count for overlapping box
   int dayoffCount = 0; // initial count for overlapping box
   bool isDataFetched = false; // Flag to control box visibility
-  double maxExtentBox= 220;
+  double maxExtentBox= 190;
   double minExtentBox= -100;
 
   ///initial setup
@@ -224,7 +224,7 @@ class _MyInfoScreenState extends State<_MyInfoScreen> {
 
 
                 return Padding(
-                  padding: EdgeInsets.only(top: 40),
+                  padding: EdgeInsets.only(top: 70),
                   child: ListView.builder(
                     itemCount: snapshot.data!.length,
                     itemBuilder: (context, index) {
