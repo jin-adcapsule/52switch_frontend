@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'config_screen.dart'; // Import AppConfig
@@ -18,30 +17,49 @@ class _AttendanceScreen extends StatefulWidget {
   @override
   _AttendanceScreenState createState() => _AttendanceScreenState();
 }
-class _AttendanceScreenState extends State<_AttendanceScreen> {
+
+class _AttendanceScreenState extends State<_AttendanceScreen>
+    with SingleTickerProviderStateMixin {
   //late bool isAttendanceMarked;
   bool isAttendanceMarked = AppConfig.isAttendanceMarkedNotifier.value;
-  
-  final String? employeeOid = AppConfig.employeeOid; // Example: Use actual employee ID
+
+  final String? employeeOid =
+      AppConfig.employeeOid; // Example: Use actual employee ID
   //final int? employeeId = AppConfig.employeeId;
   final GlobalService _globalService = GlobalService();
   String workplace = '';
   String workhourOn = '';
   String workhourOff = '';
-  String workhourHalf = '';  
+  String workhourHalf = '';
   // List to hold notifications
   final List<String> _notifications = [];
-
+  late AnimationController _animationController;
+  late Animation<Offset> _slideAnimation;
 
   @override
   void initState() {
     super.initState();
     _fetchEmployeeInfo(); // Fetch and set workplace
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 500),
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: Offset(1.0, 0.0), // Start from the right
+      end: Offset(0.0, 0.0), // Slide to the normal position
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
 
+    // Start the animation
+    _animationController.forward();
     // Listen for foreground messages
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       // Check if notification body is null, then use message data as fallback
-      String notificationMessage = message.notification?.body ?? message.data['message'] ?? 'New notification';
+      String notificationMessage = message.notification?.body ??
+          message.data['message'] ??
+          'New notification';
 
       // Add the notification (or fallback message) to the list
       if (mounted) {
@@ -53,6 +71,13 @@ class _AttendanceScreenState extends State<_AttendanceScreen> {
       //_showNotifications();
     });
   }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
   String getMaintextHome() => AppConfig.getMaintextHome();
   String getSubtextHome() => AppConfig.getSubtextHome();
 
@@ -67,7 +92,8 @@ class _AttendanceScreenState extends State<_AttendanceScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('알림', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              Text('알림',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               Divider(),
               // Display list of notifications dynamically
               Expanded(
@@ -75,8 +101,10 @@ class _AttendanceScreenState extends State<_AttendanceScreen> {
                   itemCount: _notifications.length,
                   itemBuilder: (context, index) {
                     return Dismissible(
-                      key: Key(_notifications[index]), // Use notification content as key
-                      direction: DismissDirection.endToStart, // Slide from right to left
+                      key: Key(_notifications[
+                          index]), // Use notification content as key
+                      direction: DismissDirection
+                          .endToStart, // Slide from right to left
                       onDismissed: (direction) {
                         // Handle the action when the notification is dismissed
                         setState(() {
@@ -93,7 +121,8 @@ class _AttendanceScreenState extends State<_AttendanceScreen> {
                         color: Colors.red, // Background color when swiped
                         alignment: Alignment.centerRight,
                         padding: EdgeInsets.symmetric(horizontal: 20.0),
-                        child: Icon(Icons.delete, color: Colors.white), // Delete icon
+                        child: Icon(Icons.delete,
+                            color: Colors.white), // Delete icon
                       ),
                       child: ListTile(
                         title: Text(_notifications[index]),
@@ -112,6 +141,7 @@ class _AttendanceScreenState extends State<_AttendanceScreen> {
       },
     );
   }
+
   // Example method to mark the notification as read (you can implement the actual logic)
   void _markAsRead(int index) {
     setState(() {
@@ -119,17 +149,18 @@ class _AttendanceScreenState extends State<_AttendanceScreen> {
       _notifications[index] = "${_notifications[index]} (Read)";
     });
   }
+
   ///get a response for search from service
-  Future<void> _fetchEmployeeInfo()  async {
+  Future<void> _fetchEmployeeInfo() async {
     try {
-      final locationData = await _globalService.fetchLocationInfo(AppConfig.employeeOid);
+      final locationData =
+          await _globalService.fetchLocationInfo(AppConfig.employeeOid);
       setState(() {
-        workplace =locationData['workplace']; 
-        workhourOn =locationData['workhourOn']; 
-        workhourOff =locationData['workhourOff']; 
-        workhourHalf =locationData['workhourHalf']; 
+        workplace = locationData['workplace'];
+        workhourOn = locationData['workhourOn'];
+        workhourOff = locationData['workhourOff'];
+        workhourHalf = locationData['workhourHalf'];
       });
-      
     } catch (e) {
       setState(() {
         workplace = "Error"; // Display error if fetching fails
@@ -137,88 +168,96 @@ class _AttendanceScreenState extends State<_AttendanceScreen> {
       throw Exception('Failed to fetch employeeInfoData: $e');
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<bool>(
-      valueListenable: AppConfig.isAttendanceMarkedNotifier,
-      builder: (context, isAttendanceMarked, child) {
-        return Scaffold(
+        valueListenable: AppConfig.isAttendanceMarkedNotifier,
+        builder: (context, isAttendanceMarked, child) {
+          // Trigger animation based on the value
+          if (isAttendanceMarked) {
+            _animationController.forward(
+                from: 0.0); // Always start from the beginning
+          } else {
+            _animationController.forward(
+                from: 0.0); // Always start from the beginning
+          }
+          return Scaffold(
             //backgroundColor: AppConfig.getColor(ColorType.background),//getBackgroundColor(AppConfig.selectedIndexNotifier.value, isAttendanceMarked),
             appBar: AppBar(
-              title: Text(AppConfig.getAppbarTitle(AppConfig.selectedKeyNotifier.value), style: TextStyle(color: AppConfig.getColor(ColorType.text))),
+              title: Text(
+                  AppConfig.getAppbarTitle(AppConfig.selectedKeyNotifier.value),
+                  style: TextStyle(color: AppConfig.getColor(ColorType.text))),
               backgroundColor: Colors.transparent,
               elevation: 0,
-              centerTitle: false, // Forces left alignment on both Android and iOS
+              centerTitle:
+                  false, // Forces left alignment on both Android and iOS
               actions: [
                 IconButton(
                   icon: Icon(Icons.notifications),
                   color: AppConfig.getColor(ColorType.text),
                   onPressed: _showNotifications,
+                ),
+              ],
+            ),
+            body: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 30),
+                  DateWidget(workplace: workplace),
+                  SizedBox(height: 50),
+                  // Slide animation for main text
+                  SlideTransition(
+                      position: _slideAnimation, child: const ClockWidget()),
+                  Container(
+                    margin: EdgeInsets.only(top: 0),
+                    width: 100,
+                    height: 4,
+                    color: Colors.white,
                   ),
+                  // Slide animation for main text
+                  SlideTransition(
+                    position: _slideAnimation,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Text(
+                        AppConfig.getMaintextHome(),
+                        style: TextStyle(
+                          fontSize: 60,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Slide animation for subtext
+                  SlideTransition(
+                    position: _slideAnimation,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Text(
+                        AppConfig.getSubtextHome(),
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Spacer(),
+                  Center(
+                    child: CheckInButton(
+                      employeeOid: employeeOid,
+                    ),
+                  ),
+                  SizedBox(height: 80),
                 ],
               ),
-            body: AnimatedContainer(
-              duration: Duration(milliseconds: 500),
-              color: AppConfig.getColor(ColorType.background),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 30),
-                    DateWidget(workplace: workplace),
-                    SizedBox(height: 50),
-                    const ClockWidget(),
-                    Container(
-                      margin: EdgeInsets.only(top: 0),
-                      width: 100,
-                      height: 4,
-                      color: Colors.white,
-                    ),
-                    // Slide animation for main text
-                    AnimatedSwitcher(
-                      duration: Duration(milliseconds: 500),
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Text(
-                          AppConfig.getMaintextHome(),
-                          style: TextStyle(
-                            fontSize: 60,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                    // Slide animation for subtext
-                    AnimatedSwitcher(
-                      duration: Duration(milliseconds: 500),
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Text(
-                          AppConfig.getSubtextHome(),
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Spacer(),
-                    Center(
-                      child: CheckInButton(
-                        employeeOid: employeeOid,
-                      ),
-                    ),
-                    SizedBox(height: 80),
-                  ],
-                ),
-              ),
-            )
+            ),
           );
-      }
-    );
+        });
   }
 }
 
@@ -235,14 +274,26 @@ class ClockWidget extends StatelessWidget {
           text: TextSpan(
             children: [
               TextSpan(
-                text: DateFormat('h:mma', 'en_US').format(DateTime.now()).substring(0, DateFormat('h:mma', 'en_US').format(DateTime.now()).length - 2), // Hour and Minute (e.g. 12:45)
+                text: DateFormat('h:mma', 'en_US')
+                    .format(DateTime.now())
+                    .substring(
+                        0,
+                        DateFormat('h:mma', 'en_US')
+                                .format(DateTime.now())
+                                .length -
+                            2), // Hour and Minute (e.g. 12:45)
                 style: TextStyle(
                   fontSize: 36, // Larger font size for time
                   fontWeight: FontWeight.bold,
                 ),
               ),
               TextSpan(
-                text: DateFormat('h:mma', 'en_US').format(DateTime.now()).substring(DateFormat('h:mma', 'en_US').format(DateTime.now()).length - 2), // AM/PM
+                text: DateFormat('h:mma', 'en_US')
+                    .format(DateTime.now())
+                    .substring(DateFormat('h:mma', 'en_US')
+                            .format(DateTime.now())
+                            .length -
+                        2), // AM/PM
                 style: TextStyle(
                   fontSize: 20, // Smaller font size for AM/PM
                   fontWeight: FontWeight.bold,

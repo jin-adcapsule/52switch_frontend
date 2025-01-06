@@ -71,6 +71,7 @@ Every push or pull request to the `dev` branch automatically triggers a build fo
    Before running the Flutter app, configure the use of the Firebase emulator in the following file:
    ```plaintext
    dummy/config_env.dart
+   flutter run --dart-define=HOST_ADDRESS=10.0.0.176 --dart-define=SERVER_PORT=8080 --dart-define=USE_EMULATOR=true --dart-define=EMULATOR_PORT=9099 
    ```
 
       

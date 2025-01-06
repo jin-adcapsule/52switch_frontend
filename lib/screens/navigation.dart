@@ -5,6 +5,7 @@ import 'supervisor_screen.dart';
 import 'myinfo_screen.dart';
 import 'more_screen.dart';
 import 'config_screen.dart'; // For app configuration
+
 class Navigation extends StatefulWidget {
   const Navigation({super.key});
 
@@ -15,7 +16,7 @@ class Navigation extends StatefulWidget {
 class NavigationState extends State<Navigation> {
   final String employeeOid = AppConfig.employeeOid; // Use from config
   final bool isSupervisor = AppConfig.isSupervisor; // Use from config
-    // Cache for storing created screens
+  // Cache for storing created screens
   //final Map<String, Widget> _screenCache = {};
   final Map<String, Widget Function()> _screenCache = {};
 
@@ -31,6 +32,7 @@ class NavigationState extends State<Navigation> {
       AppConfig.selectedKeyNotifier.value = key; // Update the notifier
     });
   }
+
   List<Map<String, dynamic>> getVisibleTabs() {
     return AppConfig.tabConfig.where((tab) {
       if (tab['key'] == 'supervisor' && !isSupervisor) {
@@ -41,38 +43,37 @@ class NavigationState extends State<Navigation> {
   }
 
   Widget _getSelectedScreen(String selectedKey, bool isAttendanceMarked) {
-  if (_screenCache.containsKey(selectedKey)) {
-    return _screenCache[selectedKey]!(); // Call the cached function to create a fresh screen
+    if (_screenCache.containsKey(selectedKey)) {
+      return _screenCache[
+          selectedKey]!(); // Call the cached function to create a fresh screen
+    }
+    // If the screen isn't cached, create a factory function and store it in the Map
+    Widget Function() screenFactory;
+    switch (selectedKey) {
+      case 'attendance':
+        screenFactory = () => createAttendanceScreen();
+        break;
+      case 'dayoff':
+        screenFactory = () => createDayoffScreen(employeeOid);
+        break;
+      case 'supervisor':
+        screenFactory = () => createSupervisorScreen(employeeOid);
+        break;
+      case 'myinfo':
+        screenFactory = () => createMyInfoScreen(employeeOid);
+        break;
+      case 'more':
+        screenFactory = () => MoreScreen();
+        break;
+      default:
+        screenFactory = () => createAttendanceScreen();
+        break;
+    }
+    // Store the factory in the cache
+    _screenCache[selectedKey] = screenFactory;
+
+    return screenFactory();
   }
-  // If the screen isn't cached, create a factory function and store it in the Map
-  Widget Function() screenFactory;
-  switch (selectedKey) {
-    case 'attendance':
-      screenFactory = () => createAttendanceScreen();
-      break;
-    case 'dayoff':
-      screenFactory = () => createDayoffScreen(employeeOid);
-      break;
-    case 'supervisor':
-      screenFactory = () => createSupervisorScreen(employeeOid);
-      break;
-    case 'myinfo':
-      screenFactory = () => createMyInfoScreen(employeeOid);
-      break;
-    case 'more':
-      screenFactory = () => MoreScreen();
-      break;
-    default:
-      screenFactory = () => createAttendanceScreen();
-      break;
-  }
-  // Store the factory in the cache
-  _screenCache[selectedKey] = screenFactory;
-
-  return screenFactory();
-}
-
-
 
 //buildformat
   @override
@@ -80,33 +81,36 @@ class NavigationState extends State<Navigation> {
     return ValueListenableBuilder<String>(
         valueListenable: AppConfig.selectedKeyNotifier,
         builder: (context, selectedKey, child) {
-        return ValueListenableBuilder<bool>(
-          valueListenable: AppConfig.isAttendanceMarkedNotifier,
-          builder: (context, isAttendanceMarked, child) {
-            final visibleTabs = getVisibleTabs();
-            return Scaffold(
-              body: _getSelectedScreen(selectedKey,isAttendanceMarked),//bodyscreen load from each screen file
+          return ValueListenableBuilder<bool>(
+              valueListenable: AppConfig.isAttendanceMarkedNotifier,
+              builder: (context, isAttendanceMarked, child) {
+                final visibleTabs = getVisibleTabs();
+                return Scaffold(
+                  body: _getSelectedScreen(selectedKey,
+                      isAttendanceMarked), //bodyscreen load from each screen file
 
-              bottomNavigationBar: BottomNavigationBar(
-                type: BottomNavigationBarType.fixed,
-                backgroundColor: AppConfig.getColor(ColorType.background),
-                elevation: 0,
-                items: visibleTabs.map((tab) {
-                  return BottomNavigationBarItem(
-                    icon: Icon(tab['icon']),
-                    label: tab['label'],
-                  );
-                }).toList(),
-                currentIndex: visibleTabs.indexWhere((tab) => tab['key'] == selectedKey),
-                onTap: (index) => _onItemTapped(visibleTabs[index]['key']),
-                selectedItemColor: AppConfig.getColor(ColorType.selectedItem),
-                unselectedItemColor: AppConfig.getColor(ColorType.unselectedItem),
-                showUnselectedLabels: true,
-              ),
-            );
-          }
-        );
-      }
-    );
+                  bottomNavigationBar: BottomNavigationBar(
+                    type: BottomNavigationBarType.fixed,
+                    backgroundColor: AppConfig.getColor(
+                        ColorType.background), // Match with AnimatedContainer
+                    elevation: 0,
+                    items: visibleTabs.map((tab) {
+                      return BottomNavigationBarItem(
+                        icon: Icon(tab['icon']),
+                        label: tab['label'],
+                      );
+                    }).toList(),
+                    currentIndex: visibleTabs
+                        .indexWhere((tab) => tab['key'] == selectedKey),
+                    onTap: (index) => _onItemTapped(visibleTabs[index]['key']),
+                    selectedItemColor:
+                        AppConfig.getColor(ColorType.selectedItem),
+                    unselectedItemColor:
+                        AppConfig.getColor(ColorType.unselectedItem),
+                    showUnselectedLabels: true,
+                  ),
+                );
+              });
+        });
   }
 }
