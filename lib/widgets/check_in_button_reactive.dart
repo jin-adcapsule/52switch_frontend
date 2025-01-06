@@ -5,9 +5,9 @@ import '../screens/config_screen.dart';
 
 class CheckInButton extends StatefulWidget  {
   final bool isAttendanceMarked;
-  final String? objectId;
+  final String? employeeOid;
 
-  const CheckInButton({super.key, required this.isAttendanceMarked, required this.objectId});
+  const CheckInButton({super.key, required this.isAttendanceMarked, required this.employeeOid});
 
   @override
   CheckInButtonState createState() => CheckInButtonState();
@@ -32,7 +32,7 @@ class CheckInButtonState extends State<CheckInButton> {
 
     try {
       // Call the service to update attendance
-      await attendanceService.markAttendance(widget.objectId, newValue);
+      await attendanceService.markAttendance(widget.employeeOid, newValue);
       // Update state only if the call succeeds
       setState(() {
         isAttendanceMarked = newValue;

@@ -4,7 +4,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import '../env_config.dart'; // graphqlendpoint
-import "package:gql_websocket_link/gql_websocket_link.dart" as gql_ws;
 import '../logger_config.dart';
 class GraphQLService {
   // HttpLink for queries and mutations

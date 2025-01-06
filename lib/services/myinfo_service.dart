@@ -11,16 +11,16 @@ class MyInfoService {
 
 // Fetch attendance history
   Future<List<Attendance>> fetchAttendanceHistory({
-    required String objectId,
+    required String employeeOid,
     //required int employeeId,
     required String startDate,
     required String endDate,
     required List<String> workTypeList,
   }) async {
     final query = '''
-    query GetEmployeeAttendance(\$objectId: String!, \$startDate: String!, \$endDate: String!, \$workTypeList: [String!]) {
-      getEmployeeAttendance(objectId: \$objectId, startDate: \$startDate, endDate: \$endDate, workTypeList: \$workTypeList) {
-        employeeId
+    query GetEmployeeAttendance(\$employeeOid: String!, \$startDate: String!, \$endDate: String!, \$workTypeList: [String!]) {
+      getEmployeeAttendance(employeeOid: \$employeeOid, startDate: \$startDate, endDate: \$endDate, workTypeList: \$workTypeList) {
+        employeeOid
         date
         checkInTime
         checkOutTime
@@ -34,7 +34,7 @@ class MyInfoService {
     ''';
 
     final variables = {
-      'objectId': objectId,
+      'employeeOid': employeeOid,
       'startDate': startDate,
       'endDate': endDate,
       'workTypeList': workTypeList,

@@ -9,14 +9,14 @@ import '../widgets/request_history_filter.dart';
 import '../widgets/supervisor_request_answer.dart';
 
 // Public create function
-Widget createSupervisorScreen(String objectId) {
-  return _SupervisorScreen(objectId: objectId);
+Widget createSupervisorScreen(String employeeOid) {
+  return _SupervisorScreen(employeeOid: employeeOid);
 }
 
 class _SupervisorScreen extends StatefulWidget {
-  final String? objectId;
+  final String? employeeOid;
 
-  const _SupervisorScreen({ required this.objectId});
+  const _SupervisorScreen({ required this.employeeOid});
 
   @override
   _SupervisorScreenState createState() => _SupervisorScreenState();
@@ -52,7 +52,7 @@ class _SupervisorScreenState extends State<_SupervisorScreen> with SingleTickerP
             entry.key
       ];
       final requestHistoryData = await _supervisorService.fetchRequestHistory(
-        objectId: AppConfig.objectId,
+        employeeOid: AppConfig.employeeOid,
         startDate: DateFormat('yyyy-MM-dd').format(_startDate),
         endDate: DateFormat('yyyy-MM-dd').format(_endDate),
         requestStatusList: requestStatusList //null directs get all regardless of status
@@ -66,7 +66,7 @@ class _SupervisorScreenState extends State<_SupervisorScreen> with SingleTickerP
   Future<List<rq.Request>> _fetchPendingRequests() async {
     try {
       final requestPendingData = await _supervisorService.fetchPendingRequests(
-        objectId: AppConfig.objectId,
+        employeeOid: AppConfig.employeeOid,
       );
       return requestPendingData;
     } catch (e) {
@@ -389,7 +389,7 @@ class _SupervisorScreenState extends State<_SupervisorScreen> with SingleTickerP
       context,
       MaterialPageRoute(
         builder: (context) => AnswerRequestScreen(
-          objectId: AppConfig.objectId,
+          employeeOid: AppConfig.employeeOid,
           employeeId: request.employeeId,
           employeeName: request.employeeName,
           requestType: request.requestType,

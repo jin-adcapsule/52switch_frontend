@@ -6,13 +6,13 @@ import '../services/dayoff_service.dart';
 import '../models/dayoff.dart';
 import '../widgets/dayoff_history_filter.dart';
 // Public create function
-Widget createDayoffScreen(String objectId) {
-  return _DayoffScreen(objectId: objectId);
+Widget createDayoffScreen(String employeeOid) {
+  return _DayoffScreen(employeeOid: employeeOid);
 }
 class _DayoffScreen extends StatefulWidget {
-  final String? objectId;
+  final String? employeeOid;
 
-  const _DayoffScreen({required this.objectId});
+  const _DayoffScreen({required this.employeeOid});
 
   @override
   _DayoffScreenState createState() => _DayoffScreenState();
@@ -46,7 +46,7 @@ class _DayoffScreenState extends State<_DayoffScreen> with SingleTickerProviderS
         ];
 
       final dayoffData = await _dayoffService.fetchDayoffHistory(
-        objectId: AppConfig.objectId,
+        employeeOid: AppConfig.employeeOid,
         startDate: DateFormat('yyyy-MM-dd').format(_startDate),
         endDate: DateFormat('yyyy-MM-dd').format(_endDate),
         requestStatusList: requestStatusList , //null directs get all regardless of status
@@ -300,7 +300,7 @@ class _DayoffScreenState extends State<_DayoffScreen> with SingleTickerProviderS
     );
   }
   void _onDayoffRequestTap() async {
-    if (widget.objectId == null || widget.objectId!.isEmpty) {
+    if (widget.employeeOid == null || widget.employeeOid!.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Invalid user ID')),
       );
@@ -311,7 +311,7 @@ class _DayoffScreenState extends State<_DayoffScreen> with SingleTickerProviderS
       context,
       MaterialPageRoute(
         builder: (context) => DayoffRequestScreen(
-                objectId: widget.objectId,
+                employeeOid: widget.employeeOid,
         )
       ),
     );

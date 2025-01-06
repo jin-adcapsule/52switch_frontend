@@ -4,17 +4,17 @@ import '../models/request.dart' as rq; // Import the Attendance model
 import '../logger_config.dart';
 class SupervisorService {
   // Request a day off for the employee
-  Future<void> answerRequest(String objectId,String requestStatus, String answerComment, String requestKey ) async {
+  Future<void> answerRequest(String employeeOid,String requestStatus, String answerComment, String requestKey ) async {
     String mutation = """
       mutation {
-        answerRequest(objectId: "$objectId",
+        answerRequest(employeeOid: "$employeeOid",
                       requestStatus: "$requestStatus",
                       answerComment: "$answerComment",
                       requestKey:"$requestKey",
                       )}
     """;
     final variables = {
-      'objectId': objectId,
+      'employeeOid': employeeOid,
       'requestStatus': requestStatus,
       'answerComment': answerComment,
       'requestKey':requestKey,
@@ -32,14 +32,14 @@ class SupervisorService {
   }
 
 // Fetch request info by current object Id as supervisor
-  Future<Map<String, dynamic>> fetchRequestInfo(String objectId) async {
-    if (objectId.isEmpty) {
-      throw Exception('Invalid objectId: It is null or empty');
+  Future<Map<String, dynamic>> fetchRequestInfo(String employeeOid) async {
+    if (employeeOid.isEmpty) {
+      throw Exception('Invalid employeeOid: It is null or empty');
     }
 
     final employeeQuery = '''
-    query GetRequestInfo(\$objectId: String!) {
-      getRequestInfo(objectId: \$objectId) {
+    query GetRequestInfo(\$employeeOid: String!) {
+      getRequestInfo(employeeOid: \$employeeOid) {
         supervisor {
           name
         }
@@ -49,7 +49,7 @@ class SupervisorService {
     }
     ''';
 
-    final variables = {'objectId': objectId};
+    final variables = {'employeeOid': employeeOid};
 
     try {
       final employeeResult = await GraphQLService.query(
@@ -79,14 +79,14 @@ class SupervisorService {
   }
 // Fetch attendance history
   Future<List<rq.Request>> fetchRequestHistory({
-    required String objectId,
+    required String employeeOid,
     required String startDate,
     required String endDate,
     List<String>? requestStatusList,
   }) async {
     final query = '''
-    query GetRequestHistory(\$objectId: String!, \$startDate: String!, \$endDate: String!, \$requestStatusList: [String!] ) {
-      getRequestHistory(objectId: \$objectId, startDate: \$startDate, endDate: \$endDate, requestStatusList: \$requestStatusList) {
+    query GetRequestHistory(\$employeeOid: String!, \$startDate: String!, \$endDate: String!, \$requestStatusList: [String!] ) {
+      getRequestHistory(employeeOid: \$employeeOid, startDate: \$startDate, endDate: \$endDate, requestStatusList: \$requestStatusList) {
         employeeId
         employeeName
         requestStatus
@@ -103,7 +103,7 @@ class SupervisorService {
     ''';
 
     final variables = {
-      'objectId': objectId,
+      'employeeOid': employeeOid,
       //'employeeId': employeeId,
       'startDate': startDate,
       'endDate': endDate,
@@ -139,11 +139,11 @@ class SupervisorService {
 
   // Fetch Pending Request
   Future<List<rq.Request>> fetchPendingRequests({
-    required String objectId,
+    required String employeeOid,
   }) async {
     final query = '''
-    query GetPendingRequests(\$objectId: String!) {
-      getPendingRequests(objectId: \$objectId) {
+    query GetPendingRequests(\$employeeOid: String!) {
+      getPendingRequests(employeeOid: \$employeeOid) {
         employeeId
         employeeName
         requestType
@@ -160,7 +160,7 @@ class SupervisorService {
     ''';
 
     final variables = {
-      'objectId': objectId,
+      'employeeOid': employeeOid,
     };
 
     try {

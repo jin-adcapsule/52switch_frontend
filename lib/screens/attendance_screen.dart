@@ -22,7 +22,7 @@ class _AttendanceScreenState extends State<_AttendanceScreen> {
   //late bool isAttendanceMarked;
   bool isAttendanceMarked = AppConfig.isAttendanceMarkedNotifier.value;
   
-  final String? objectId = AppConfig.objectId; // Example: Use actual employee ID
+  final String? employeeOid = AppConfig.employeeOid; // Example: Use actual employee ID
   //final int? employeeId = AppConfig.employeeId;
   final GlobalService _globalService = GlobalService();
   String workplace = '';
@@ -122,7 +122,7 @@ class _AttendanceScreenState extends State<_AttendanceScreen> {
   ///get a response for search from service
   Future<void> _fetchEmployeeInfo()  async {
     try {
-      final locationData = await _globalService.fetchLocationInfo(AppConfig.objectId);
+      final locationData = await _globalService.fetchLocationInfo(AppConfig.employeeOid);
       setState(() {
         workplace =locationData['workplace']; 
         workhourOn =locationData['workhourOn']; 
@@ -198,7 +198,7 @@ class _AttendanceScreenState extends State<_AttendanceScreen> {
                     Spacer(),
                     Center(
                       child: CheckInButton(
-                        objectId: objectId,
+                        employeeOid: employeeOid,
                       ),
                     ),
                     SizedBox(height: 80),

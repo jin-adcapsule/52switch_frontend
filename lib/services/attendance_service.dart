@@ -6,11 +6,11 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 
 class AttendanceService {
   // Mark attendance for the employee with objectId and status
-  Future<Map<String, dynamic>> markAttendance(String? objectId, bool status) async {
+  Future<Map<String, dynamic>> markAttendance(String? employeeOid, bool status) async {
     // Define the GraphQL mutation
     const String mutation = """
-      mutation MarkAttendance(\$objectId: String!, \$status: Boolean!) {
-        markAttendance(objectId: \$objectId, status: \$status) {
+      mutation MarkAttendance(\$employeeOid: String!, \$status: Boolean!) {
+        markAttendance(employeeOid: \$employeeOid, status: \$status) {
           status
         }
       }
@@ -18,7 +18,7 @@ class AttendanceService {
 
     // Construct variables for the GraphQL mutation
     final Map<String, dynamic> variables = {
-      'objectId': objectId,
+      'employeeOid': employeeOid,
       'status': status,
     };
 
@@ -40,7 +40,7 @@ class AttendanceService {
 
       if (data != null) {
         final bool updatedStatus = data['status']; // Get the status from the response
-        LoggerConfig().logger.i("Attendance Mutation Success: $updatedStatus");
+        LoggerConfig().logger.i("Attendance Status: $updatedStatus");
         return {'mutationSuccess': true, 'status': updatedStatus}; // Return both success and status
       } else {
         LoggerConfig().logger.e("Attendance Mutation Failed: No data returned.");
@@ -53,11 +53,11 @@ class AttendanceService {
   }
 
 // Fetch attendance status bool
-  Future<Map<String, dynamic>> fetchAttendanceStatus(String? objectId) async {
+  Future<Map<String, dynamic>> fetchAttendanceStatus(String? employeeOid) async {
 
     final attendanceStatusQuery = '''
-    query GetAttendanceStatus(\$objectId: String!) {
-      getAttendanceStatus(objectId: \$objectId){
+    query GetAttendanceStatus(\$employeeOid: String!) {
+      getAttendanceStatus(employeeOid: \$employeeOid){
       status
       }
 
@@ -65,7 +65,7 @@ class AttendanceService {
     ''';
 
     final variables = {
-      'objectId': objectId,
+      'employeeOid': employeeOid,
 
     };
 

@@ -17,7 +17,7 @@ class AppConfig {
   static final ValueNotifier<String> selectedKeyNotifier = ValueNotifier(
       "attendance");
   //static int? employeeId; // Example: This can be loaded from an environment variable or a secure storage
-  static late String objectId; // Nullable until assigned after successful login
+  static late String employeeOid; // Nullable until assigned after successful login
   static late String employeeName; // Nullable until assigned after successful login
   static late bool isSupervisor; // by position == '사원'
   static const String appName = "52SWITCH";

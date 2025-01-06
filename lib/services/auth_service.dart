@@ -20,9 +20,9 @@ class AuthService extends ChangeNotifier {
     const String query = '''
       query ValidateUidAndPhone(\$uid: String!, \$phone: String!) {
         validateUidAndPhone(uid: \$uid, phone: \$phone) {
-          objectId
+          employeeOid
           isSupervisor
-          currently_marked
+          currentlyMarked
           employeeName
         }
       }
@@ -34,32 +34,41 @@ class AuthService extends ChangeNotifier {
     };
 
     try {
+        // Indicate the start of a loading process
       setLoading(true);
 
+      // Perform the GraphQL query
       final result = await GraphQLService.query(query, variables: variables);
 
+      // Stop the loading indicator after query completion
       setLoading(false);
 
+      // Handle GraphQL exceptions
       if (result.hasException) {
         LoggerConfig().logger.e('GraphQL Exception: ${result.exception}');
         throw Exception('Validation failed due to server error.');
       }
 
+      // Extract and validate the data
       final data = result.data?['validateUidAndPhone'];
       if (data != null) {
-        final objectId = data['objectId'];
         return {
-          'objectId': objectId,
-          'is_supervisor': data['isSupervisor'],
-          'currently_marked': data['currently_marked'],
-          'employeeName': data['employeeName']
+          'employeeOid': data['employeeOid'],
+          'isSupervisor': data['isSupervisor'],
+          'currentlyMarked': data['currentlyMarked'],
+          'employeeName': data['employeeName'],
         };
       } else {
         throw Exception('Invalid UID or phone number.');
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      // Ensure loading is stopped even if an exception occurs
       setLoading(false);
-      LoggerConfig().logger.e('Error in validateUidAndPhone: $e');
+
+      // Log the error with stack trace for debugging purposes
+      LoggerConfig().logger.e('Error in validateUidAndPhone: $e', stackTrace);
+
+      // Rethrow the error for higher-level handling
       rethrow;
     }
   }

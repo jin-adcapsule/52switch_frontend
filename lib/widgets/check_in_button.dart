@@ -3,9 +3,9 @@ import '../services/attendance_service.dart';
 import '../screens/config_screen.dart';
 
 class CheckInButton extends StatefulWidget {
-  final String? objectId;
+  final String? employeeOid;
 
-  const CheckInButton({super.key, required this.objectId});
+  const CheckInButton({super.key, required this.employeeOid});
 
   @override
   CheckInButtonState createState() => CheckInButtonState();
@@ -14,13 +14,13 @@ class CheckInButton extends StatefulWidget {
 class CheckInButtonState extends State<CheckInButton> {
   late bool _isLoading; // To manage loading state
   bool isAttendanceMarked = AppConfig.isAttendanceMarkedNotifier.value;
-  late String? objectId;
+  late String? employeeOid;
   @override
   void initState() {
     super.initState();
     _isLoading = false; // Initialize loading as false
     isAttendanceMarked = isAttendanceMarked;
-    objectId = widget.objectId;
+    employeeOid = widget.employeeOid;
     // Fetch attendance status on init
     _getAttendanceStatus();
     
@@ -32,7 +32,7 @@ class CheckInButtonState extends State<CheckInButton> {
     });
     try {
       // Send API call to toggle attendance
-      final result = await attendanceService.fetchAttendanceStatus(objectId);
+      final result = await attendanceService.fetchAttendanceStatus(employeeOid);
 
       // Stop loading once API call succeeds
       setState(() {
@@ -62,7 +62,7 @@ class CheckInButtonState extends State<CheckInButton> {
 
     try {
       // Send API call to toggle attendance
-      final result = await attendanceService.markAttendance(objectId, newValue);
+      final result = await attendanceService.markAttendance(employeeOid, newValue);
 
       // Stop loading once API call succeeds
       setState(() {

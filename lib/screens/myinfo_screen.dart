@@ -13,14 +13,14 @@ import 'package:intl/intl.dart'; // For date formatting
 import '../services/global_service.dart'; // Import the service file
 
 // Public create function
-Widget createMyInfoScreen(String objectId) {
-  return _MyInfoScreen(objectId: objectId);
+Widget createMyInfoScreen(String employeeOid) {
+  return _MyInfoScreen(employeeOid: employeeOid);
 }
 
 class _MyInfoScreen extends StatefulWidget {
-  final String? objectId;// Accept objectId as a parameter
+  final String? employeeOid;// Accept objectId as a parameter
 
-  const _MyInfoScreen({required this.objectId});
+  const _MyInfoScreen({required this.employeeOid});
 
   @override
   _MyInfoScreenState createState() => _MyInfoScreenState();
@@ -67,8 +67,8 @@ class _MyInfoScreenState extends State<_MyInfoScreen> {
     super.initState();
     // Ensure objectId is non-null before calling the service
 
-    if (widget.objectId != null) {
-      _employeeFuture = GlobalService().fetchEmployeeInfo(widget.objectId!);
+    if (widget.employeeOid != null) {
+      _employeeFuture = GlobalService().fetchEmployeeInfo(widget.employeeOid!);
       _attendanceHistoryFuture = _fetchAttendanceHistory();
     } else {
       // Handle the case where objectId is null
@@ -124,7 +124,7 @@ class _MyInfoScreenState extends State<_MyInfoScreen> {
   Future<List<Attendance>> _fetchAttendanceHistory() async {
     final attendanceData = await MyInfoService().fetchAttendanceHistory(
       //employeeId: AppConfig.employeeId!,
-      objectId: AppConfig.objectId,
+      employeeOid: AppConfig.employeeOid,
       startDate: DateFormat('yyyy-MM-dd').format(_startDate),
       endDate: DateFormat('yyyy-MM-dd').format(_endDate),
       workTypeList: workTypeList,

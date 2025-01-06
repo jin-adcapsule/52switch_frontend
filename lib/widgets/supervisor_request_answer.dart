@@ -4,7 +4,7 @@ import '../services/push_service.dart';
 import '../screens/config_screen.dart';
 
 class AnswerRequestScreen extends StatefulWidget {
-  final String? objectId;
+  final String? employeeOid;
   final int employeeId;
   final String employeeName;
   final String requestType;
@@ -15,7 +15,7 @@ class AnswerRequestScreen extends StatefulWidget {
 
   const AnswerRequestScreen({
     super.key,
-    required this.objectId,
+    required this.employeeOid,
     required this.employeeId,
     required this.employeeName,
     required this.requestType,
@@ -202,7 +202,7 @@ class AnswerRequestScreenState extends State<AnswerRequestScreen> {
       final String status = _selectedStatus!;
       //await Future.delayed(const Duration(seconds: 1)); // Simulate async operation
       await supervisorService.answerRequest(
-        widget.objectId!,
+        widget.employeeOid!,
         status,
         answerComment,
         widget.requestKey,

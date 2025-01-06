@@ -6,10 +6,10 @@ import '../screens/config_screen.dart';
 import '../services/push_service.dart';
 import '../toast_config.dart';
 class DayoffRequestScreen extends StatefulWidget {
-  final String? objectId;
+  final String? employeeOid;
   const DayoffRequestScreen({
     super.key,
-    required this.objectId,
+    required this.employeeOid,
   });
 
   @override
@@ -34,13 +34,13 @@ class DayoffRequestScreenState extends State<DayoffRequestScreen> {
   final DayoffService _dayoffService = DayoffService();
   Future<Map<String, dynamic>> _fetchDayoffInfo() async {
     // Simulate fetching data
-    final dayoffInfoData = await _dayoffService.fetchDayoffInfo(widget.objectId!);
+    final dayoffInfoData = await _dayoffService.fetchDayoffInfo(widget.employeeOid!);
     return {
       'supervisorName': dayoffInfoData['supervisorName'],
-      'dayoffRemaining': dayoffInfoData['dayoffRemaining'],
+      'dayoffPerYear': dayoffInfoData['dayoffPerYear'],
       };
   }
-  Future<List<String>> submitDayOffApplication(int dayoffRemaining) async {
+  Future<List<String>> submitDayOffApplication(int dayoffPerYear) async {
     // Use default comment if the text field is empty
     String requestComment = _commentController.text.trim().isEmpty
       ? '위와 같이 휴가를 신청합니다. 재가하여 주시기 바랍니다.'
@@ -53,11 +53,11 @@ class DayoffRequestScreenState extends State<DayoffRequestScreen> {
           .toList();
       // Await the response from the mutation
       final response = await _dayoffService.requestDayoff(
-        widget.objectId!,
+        widget.employeeOid!,
         dateList,
         _selectedDayoffType!,
         requestComment,
-        dayoffRemaining,
+        dayoffPerYear,
       );
       return response; // Return the response for further handling
     } catch (e) {
@@ -69,7 +69,7 @@ class DayoffRequestScreenState extends State<DayoffRequestScreen> {
     if (listEquals(response, ["Success"])) {
       ToastConfig.showToast('휴가 신청 완료');
       PushService.sendPushToSupervisor(
-        widget.objectId!,
+        widget.employeeOid!,
         "휴가 신청",
         "${AppConfig.employeeName} $_selectedDayoffType 신청",
       );

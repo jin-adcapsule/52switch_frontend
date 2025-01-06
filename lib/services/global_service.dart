@@ -8,14 +8,14 @@ import '../logger_config.dart';
 class GlobalService {
 
   // Fetch employee information
-  Future<Map<String,dynamic>> fetchLocationInfo(String objectId) async {
-    if (objectId.isEmpty) {
-      throw Exception('Invalid objectId: It is null or empty');
+  Future<Map<String,dynamic>> fetchLocationInfo(String employeeOid) async {
+    if (employeeOid.isEmpty) {
+      throw Exception('Invalid employeeOid: It is null or empty');
     }
 
     final query = '''
-    query GetLocationInfo(\$objectId: String!) {
-      getLocationInfo(employeeOid: \$objectId) {
+    query GetLocationInfo(\$employeeOid: String!) {
+      getLocationInfo(employeeOid: \$employeeOid) {
         workplace
         workhourOn
         workhourOff
@@ -26,7 +26,7 @@ class GlobalService {
     ''';
 
     final variables = {
-      'objectId': objectId,
+      'employeeOid': employeeOid,
 
     };
 
@@ -57,14 +57,14 @@ class GlobalService {
   }
 
   // Fetch employee information
-  Future<Employee?> fetchEmployeeInfo(String objectId) async {
-    if (objectId.isEmpty) {
-      throw Exception('Invalid objectId: It is null or empty');
+  Future<Employee?> fetchEmployeeInfo(String employeeOid) async {
+    if (employeeOid.isEmpty) {
+      throw Exception('Invalid employeeOid: It is null or empty');
     }
 
     final employeeQuery = '''
-    query GetEmployeeInfo(\$objectId: String!) {
-      getEmployeeInfo(objectId: \$objectId) {
+    query GetEmployeeInfo(\$employeeOid: String!) {
+      getEmployeeInfo(employeeOid: \$employeeOid) {
         employeeId
         name
         email
@@ -76,16 +76,16 @@ class GlobalService {
         workplace
         workhour
         
-        supervisorId
+        supervisorOid
         supervisorName
-        dayoffRemaining
+        dayoffPerYear
       }
 
     }
     ''';
 
     final variables = {
-      'objectId': objectId,
+      'employeeOid': employeeOid,
 
     };
 

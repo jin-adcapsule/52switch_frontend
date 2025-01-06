@@ -13,7 +13,7 @@ class Navigation extends StatefulWidget {
 }
 
 class NavigationState extends State<Navigation> {
-  final String objectId = AppConfig.objectId; // Use from config
+  final String employeeOid = AppConfig.employeeOid; // Use from config
   final bool isSupervisor = AppConfig.isSupervisor; // Use from config
     // Cache for storing created screens
   //final Map<String, Widget> _screenCache = {};
@@ -51,13 +51,13 @@ class NavigationState extends State<Navigation> {
       screenFactory = () => createAttendanceScreen();
       break;
     case 'dayoff':
-      screenFactory = () => createDayoffScreen(objectId);
+      screenFactory = () => createDayoffScreen(employeeOid);
       break;
     case 'supervisor':
-      screenFactory = () => createSupervisorScreen(objectId);
+      screenFactory = () => createSupervisorScreen(employeeOid);
       break;
     case 'myinfo':
-      screenFactory = () => createMyInfoScreen(objectId);
+      screenFactory = () => createMyInfoScreen(employeeOid);
       break;
     case 'more':
       screenFactory = () => MoreScreen();

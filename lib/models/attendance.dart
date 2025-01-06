@@ -1,5 +1,5 @@
 class Attendance {
-  final int employeeId;
+  final String employeeOid;
   final String? checkInTime; // this can be null if toggle never on
   final String? checkOutTime;// this can be null if toggle never on
   final String? checkInStatus;// this can be null if checkintime null
@@ -10,7 +10,7 @@ class Attendance {
   final String? workduration; // Ensure this field exists
 
   Attendance({
-    required this.employeeId,
+    required this.employeeOid,
     required this.checkInTime,
     required this.checkOutTime,
     required this.status,
@@ -23,7 +23,7 @@ class Attendance {
 
   factory Attendance.fromJson(Map<String, dynamic> json) {
     return Attendance(
-      employeeId: json['employeeId'] as int,
+      employeeOid: json['employeeOid'] as String,
       checkInTime: json['checkInTime'] as String?,
       checkOutTime: json['checkOutTime'] as String?,
       checkInStatus: json['checkInStatus'] as String?,

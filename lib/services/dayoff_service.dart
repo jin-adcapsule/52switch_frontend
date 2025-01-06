@@ -4,11 +4,11 @@ import '../models/dayoff.dart'; // Import the Attendance model
 import '../logger_config.dart';
 class DayoffService {
   // Request a day off for the employee
-  Future<List<String>> requestDayoff(String objectId, List<String> dateList, String dayoffType, String requestComment,int beforeDateRemaining) async {
+  Future<List<String>> requestDayoff(String employeeOid, List<String> dateList, String dayoffType, String requestComment,int beforeDateRemaining) async {
     String formattedDateList = dateList.map((date) => '"$date"').toList().toString();
     String mutation = """
       mutation {
-        requestDayoff(objectId: "$objectId",
+        requestDayoff(employeeOid: "$employeeOid",
                       dateList: $formattedDateList,
                       dayoffType: "$dayoffType",
                       requestComment: "$requestComment",
@@ -17,7 +17,7 @@ class DayoffService {
       }
     """;
     final variables = {
-      'objectId': objectId,
+      'employeeOid': employeeOid,
       'dateList': formattedDateList,
       'dayoffType': dayoffType,
       'requestComment': requestComment,
@@ -56,7 +56,7 @@ class DayoffService {
 // Fetch employee info including supervisor and dayoffRemaining
   Future<Map<String, dynamic>> fetchDayoffInfo(String employeeOid) async {
     if (employeeOid.isEmpty) {
-      throw Exception('Invalid objectId: It is null or empty');
+      throw Exception('Invalid employeeOid: It is null or empty');
     }
 
     final query = '''
@@ -64,7 +64,7 @@ class DayoffService {
       getDayoffInfo(employeeOid: \$employeeOid) {
         supervisorName
         supervisorOid
-        dayoffRemaining
+        dayoffPerYear
       }
     }
     ''';
@@ -89,8 +89,9 @@ class DayoffService {
       }
       final returnData={
         'supervisorName': responseData['supervisorName'] ?? 'N/A',
-        'supervisorId': responseData['supervisorOid'] ?? 'N/A',
-        'dayoffRemaining': responseData['dayoffRemaining'] ?? 0,};
+        'supervisorOid': responseData['supervisorOid'] ?? 'N/A',
+        'dayoffPerYear': responseData['dayoffPerYear'] ?? 0,};
+      print(returnData);
       return returnData;
     } catch (e) {
       LoggerConfig().logger.e('Error during GraphQL query: $e');
@@ -99,14 +100,14 @@ class DayoffService {
   }
 // Fetch attendance history
   Future<List<Dayoff>> fetchDayoffHistory({
-    required String objectId,
+    required String employeeOid,
     required String startDate,
     required String endDate,
     required List<String> requestStatusList,
   }) async {
     final query = '''
-    query GetEmployeeDayoff(\$objectId: String!, \$startDate: String!, \$endDate: String!, \$requestStatusList: [String!]) {
-      getEmployeeDayoff(objectId: \$objectId, startDate: \$startDate, endDate: \$endDate, requestStatusList: \$requestStatusList) {
+    query GetEmployeeDayoff(\$employeeOid: String!, \$startDate: String!, \$endDate: String!, \$requestStatusList: [String!]) {
+      getEmployeeDayoff(employeeOid: \$employeeOid, startDate: \$startDate, endDate: \$endDate, requestStatusList: \$requestStatusList) {
         requestStatus
         requestDate
         dayoffDateText
@@ -118,7 +119,7 @@ class DayoffService {
     ''';
 
     final variables = {
-      'objectId': objectId,
+      'employeeOid': employeeOid,
       //'employeeId': employeeId,
       'startDate': startDate,
       'endDate': endDate,

@@ -51,19 +51,19 @@ class LoginScreenState extends State<LoginScreen> {
     try {
       final result = await authService.validateUidAndPhone(uid, phone);
 
-      if (result != null && result['objectId'] != null &&result['is_supervisor'] !=null &&
-          result['currently_marked'] != null) {
-        AppConfig.objectId = result['objectId'];
+      if (result != null && result['employeeOid'] != null &&result['isSupervisor'] !=null &&
+          result['currentlyMarked'] != null) {
+        AppConfig.employeeOid = result['employeeOid'];
         AppConfig.employeeName = result['employeeName'];
-        AppConfig.isSupervisor = result['is_supervisor'];
-        AppConfig.isAttendanceMarkedNotifier.value = result['currently_marked'];// Set the initial value of isAttendanceMarkedNotifier
+        AppConfig.isSupervisor = result['isSupervisor'];
+        AppConfig.isAttendanceMarkedNotifier.value = result['currentlyMarked'];// Set the initial value of isAttendanceMarkedNotifier
         if (mounted) {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => Navigation()),
           );
         }
-        await _saveFCMToken(AppConfig.objectId);
+        await _saveFCMToken(AppConfig.employeeOid);
         return true;
       }
     } catch (e) {
@@ -138,11 +138,11 @@ class LoginScreenState extends State<LoginScreen> {
 
     }
   }
-  Future<void> _saveFCMToken(String objectId) async {
+  Future<void> _saveFCMToken(String employeeOid) async {
       // Query backend for objectId
       try
       {
-        final success = await PushService.saveFCMToken(objectId);
+        final success = await PushService.saveFCMToken(employeeOid);
         if (success) {
           LoggerConfig().logger.i("FCM Token saved successfully!");
         } else {
