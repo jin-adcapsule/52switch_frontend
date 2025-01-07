@@ -31,10 +31,14 @@ class _SupervisorScreenState extends State<_SupervisorScreen> with SingleTickerP
 
   static const String statusAll="전체";
   static const List<String> defaultRequestStatusList=["대기중","승인","반려"];
-  // Create a Map<String, bool> with all keys having a value of true
+  static const List<String> defaultRequestStatusTrueList = ["승인", "반려"];
+
+  // Create a Map<String, bool> with default statuses, and set true for statuses in defaultRequestStatusTrueList
   static Map<String, bool> defaultRequestStatusSelection = {
-    for (String status in [statusAll, ...defaultRequestStatusList]) status: true,
+    for (String status in [statusAll,...defaultRequestStatusList])
+      status: defaultRequestStatusTrueList.contains(status),
   };
+  
   Map<String,bool> _requestStatusSelection = Map<String, bool>.from(defaultRequestStatusSelection); // make mutable Map
 
   DateTime _startDate = DateTime.now().subtract(const Duration(days: 30));
@@ -389,13 +393,12 @@ class _SupervisorScreenState extends State<_SupervisorScreen> with SingleTickerP
       context,
       MaterialPageRoute(
         builder: (context) => AnswerRequestScreen(
-          employeeOid: AppConfig.employeeOid,
-          employeeId: request.employeeId,
+          employeeOid: request.employeeOid,
           employeeName: request.employeeName,
           requestType: request.requestType,
           requestDate: request.requestDate,
           requestComment: request.requestComment,
-          supervisorId: request.supervisorId,
+          supervisorOid: request.supervisorOid,
           requestKey: request.requestKey,
         ),
       ),

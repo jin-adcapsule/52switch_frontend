@@ -1,9 +1,9 @@
 class Request {
-  final int employeeId; //requested employee
+  final String employeeOid; //requested employee
   final String employeeName; //requested employee
   final String requestType; //dayoff, earlyLeave....
   final String requestStatus; // Pending, Approved, Denied
-  final int supervisorId;
+  final String supervisorOid;
   final String requestKey;
   final String requestDate; //
   final String requestComment;
@@ -20,11 +20,11 @@ class Request {
 
   Request({
     //required this.employeeId,
-    required this.employeeId,
+    required this.employeeOid,
     required this.employeeName,
     required this.requestType,
     required this.requestStatus,
-    required this.supervisorId,
+    required this.supervisorOid,
     required this.requestKey,
     required this.requestDate,
     required this.requestComment,
@@ -37,13 +37,13 @@ class Request {
 
   factory Request.fromJson(Map<String, dynamic> json) {
     return Request(
-      employeeId: json['employeeId'] as int,
+      employeeOid: json['employeeOid'] as String,
       employeeName: json['employeeName'],
       requestType: json['requestType'],
       requestStatus: json['requestStatus'] as String,
       requestDate: json['requestDate'],
       requestKey: json['requestKey'],
-      supervisorId: json['supervisorId'] as int,
+      supervisorOid: json['supervisorOid'] as String,
       requestComment: json['requestComment'],
 
       answerComment: json['answerComment'] as String?,

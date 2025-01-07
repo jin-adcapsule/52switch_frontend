@@ -43,7 +43,7 @@ class SupervisorService {
         supervisor {
           name
         }
-        supervisorId
+        supervisorOid
         dayoffRemaining
       }
     }
@@ -69,7 +69,7 @@ class SupervisorService {
       }
       final returnData={
         'supervisorName': employeeData['supervisor']?['name'] ?? 'N/A',
-        'supervisorId': employeeData['supervisorId'] ?? 'N/A',
+        'supervisorOid': employeeData['supervisorOid'] ?? 'N/A',
         'dayoffRemaining': employeeData['dayoffRemaining'] ?? 0,};
       return returnData;
     } catch (e) {
@@ -87,13 +87,13 @@ class SupervisorService {
     final query = '''
     query GetRequestHistory(\$employeeOid: String!, \$startDate: String!, \$endDate: String!, \$requestStatusList: [String!] ) {
       getRequestHistory(employeeOid: \$employeeOid, startDate: \$startDate, endDate: \$endDate, requestStatusList: \$requestStatusList) {
-        employeeId
+        employeeOid
         employeeName
         requestStatus
         requestType
         requestDate
         requestComment
-        supervisorId
+        supervisorOid
         requestKey
         
         dayoffDateText
@@ -144,11 +144,11 @@ class SupervisorService {
     final query = '''
     query GetPendingRequests(\$employeeOid: String!) {
       getPendingRequests(employeeOid: \$employeeOid) {
-        employeeId
+        employeeOid
         employeeName
         requestType
         requestStatus
-        supervisorId
+        supervisorOid
         requestKey
         requestDate
         requestComment
@@ -177,7 +177,7 @@ class SupervisorService {
       }
 
       final data = result.data;
-      //print('API Response: $data'); // Print the response for debugging
+      print('API Response: $data'); // Print the response for debugging
 
       if (data != null && data['getPendingRequests'] != null) {
         final List<dynamic> requestList = data['getPendingRequests'];

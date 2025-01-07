@@ -82,7 +82,8 @@ class PushService{
     String mutation =
     """
         mutation {
-          sendNotificationToEmployeeOid(employeeOid: $employeeOid,
+          sendNotificationToEmployeeOid(
+                        employeeOid: "$employeeOid",
                         title: "$title",
                         message: "$message"
                         )}

@@ -5,23 +5,21 @@ import '../screens/config_screen.dart';
 
 class AnswerRequestScreen extends StatefulWidget {
   final String? employeeOid;
-  final int employeeId;
   final String employeeName;
   final String requestType;
   final String requestDate;
   final String? requestComment;
-  final int supervisorId;
+  final String supervisorOid;
   final String requestKey;
 
   const AnswerRequestScreen({
     super.key,
     required this.employeeOid,
-    required this.employeeId,
     required this.employeeName,
     required this.requestType,
     required this.requestDate,
     this.requestComment,
-    required this.supervisorId,
+    required this.supervisorOid,
     required this.requestKey
   });
 
