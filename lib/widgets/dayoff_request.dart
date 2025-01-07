@@ -72,6 +72,8 @@ class DayoffRequestScreenState extends State<DayoffRequestScreen> {
         widget.employeeOid!,
         "휴가 신청",
         "${AppConfig.employeeName} $_selectedDayoffType 신청",
+        "supervisor"
+
       );
       setState(() {
         _selectedDates.clear();

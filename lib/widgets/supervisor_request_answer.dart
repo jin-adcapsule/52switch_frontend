@@ -210,8 +210,8 @@ class AnswerRequestScreenState extends State<AnswerRequestScreen> {
           const SnackBar(content: Text('답변이 생성되었습니다.')),
         );
       }
-      //send Notification with employeeOid
-      PushService.sendPushToEmployeeOid(widget.employeeOid!, "${widget.requestType} $status", "${AppConfig.employeeName}님이 처리하였습니다.");
+      //send Notification with employeeOid, title, message, redirect page key, redirect request key
+      PushService.sendPushToEmployeeOid(widget.employeeOid!, "${widget.requestType} $status", "${AppConfig.employeeName}님이 처리하였습니다.","dayoff");
 
       // Clear inputs and reset state
       clearForm();
@@ -227,11 +227,12 @@ class AnswerRequestScreenState extends State<AnswerRequestScreen> {
   void clearForm(){
     // Clear inputs and reset state
     setState(() {
+      
       _answerCommentController.clear();
       _selectedStatus = '대기중';
     });
     _answerCommentController.clear();
     // Navigate back
-    Navigator.pop(context);
+    Navigator.pop(context, 'Updated');
   }
 }

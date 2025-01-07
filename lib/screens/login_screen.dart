@@ -63,7 +63,7 @@ class LoginScreenState extends State<LoginScreen> {
             MaterialPageRoute(builder: (context) => Navigation()),
           );
         }
-        await _saveFCMToken(AppConfig.employeeOid);
+        await _saveFCMToken(result['employeeOid']);
         return true;
       }
     } catch (e) {

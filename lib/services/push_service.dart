@@ -45,19 +45,21 @@ class PushService{
     }
   }
 //push notification to supervisor
-  static Future<String> sendPushToSupervisor(String employeeOid, String title, String message) async {
+  static Future<String> sendPushToSupervisor(String employeeOid, String title, String message,String pageKey) async {
     String mutation =
     """
         mutation {
           sendNotificationToSupervisor(employeeOid: "$employeeOid",
                         title: "$title",
-                        message: "$message"
+                        message: "$message",
+                        pageKey: "$pageKey"
                         )}
       """;
     final variables = {
       'employeeOid': employeeOid,
       'title': title,
-      'message': message
+      'message': message,
+      'pageKey': pageKey
     };
     // Call the mutate method from GraphQLService
     var result = await GraphQLService.mutate(
@@ -78,20 +80,24 @@ class PushService{
 
 
   //push notification to EmployeeId
-  static Future<String> sendPushToEmployeeOid(String employeeOid, String title, String message) async {
+  static Future<String> sendPushToEmployeeOid(String employeeOid, String title, String message,String pageKey) async {
     String mutation =
     """
         mutation {
           sendNotificationToEmployeeOid(
                         employeeOid: "$employeeOid",
                         title: "$title",
-                        message: "$message"
+                        message: "$message",
+                        pageKey: "$pageKey"
+
                         )}
       """;
     final variables = {
       'employeeOid': employeeOid,
       'title': title,
-      'message': message
+      'message': message,
+      'pageKey': pageKey
+
     };
     // Call the mutate method from GraphQLService
     var result = await GraphQLService.mutate(
@@ -102,10 +108,10 @@ class PushService{
     final data = result.data?['sendNotificationToEmployeeId'];
 
     if (result.hasException) {
-      LoggerConfig().logger.e("Error requesting day off: ${result.exception}");
+      LoggerConfig().logger.e("Error Answering day off: ${result.exception}");
       return data;  // Return false if there's an error
     } else {
-      LoggerConfig().logger.i("Day off request status: ${result.data}");
+      LoggerConfig().logger.i("Day off Answering status: ${result.data}");
       return data;  // Return true if successful
     }
   }

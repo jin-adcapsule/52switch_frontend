@@ -161,6 +161,7 @@ class _SupervisorScreenState extends State<_SupervisorScreen> with SingleTickerP
                               onTap: () {
                                 // Handle item tap action
                                 _onRequestTap(request);
+
                               },
                               child:Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -388,21 +389,29 @@ class _SupervisorScreenState extends State<_SupervisorScreen> with SingleTickerP
       ),
     );
   }
-  void _onRequestTap(rq.Request request) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => AnswerRequestScreen(
-          employeeOid: request.employeeOid,
-          employeeName: request.employeeName,
-          requestType: request.requestType,
-          requestDate: request.requestDate,
-          requestComment: request.requestComment,
-          supervisorOid: request.supervisorOid,
-          requestKey: request.requestKey,
+  void _onRequestTap(rq.Request request) async {
+    // Navigate to the details or action screen for the selected request
+    final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AnswerRequestScreen(
+            employeeOid: request.employeeOid,
+            employeeName: request.employeeName,
+            requestType: request.requestType,
+            requestDate: request.requestDate,
+            requestComment: request.requestComment,
+            supervisorOid: request.supervisorOid,
+            requestKey: request.requestKey,
+          ),
         ),
-      ),
-    );
+      );
+    // Check if there was any result returned when popping the screen
+    if (result != null && mounted) {
+      // Trigger setState to refresh the widget when returning from the detail screen
+      setState(() {
+        _fetchPendingRequests();  // refresh data
+      });
+    }
   }
 
 
