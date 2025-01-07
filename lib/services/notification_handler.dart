@@ -55,12 +55,14 @@ class NotificationHandler {
   // Function to handle navigation based on the notification data
   static void _handleNotificationNavigation(RemoteMessage message) {
     // Assuming the notification data includes a `page` field to navigate to
-    String? page = message.data['page'];  // This can be customized to match your payload
-
+    String? pageKey = message.data['pageKey'];  // This can be customized to match your payload
+    print(pageKey);
     // Check if the page is valid and change the selected key in AppConfig
-    if (page != null) {
+    if (pageKey != null) {
       // For example, navigate to the "attendance" screen when "attendance" is passed
-      AppConfig.selectedKeyNotifier.value = page;
+      AppConfig.selectedKeyNotifier.value = pageKey;
+      print(pageKey);
+      print(AppConfig.selectedKeyNotifier.value);
       /*
       // If there's additional data (like a request ID), you can pass it as well
       if (page == 'supervisor') {
