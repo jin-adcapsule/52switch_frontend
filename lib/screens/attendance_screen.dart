@@ -7,24 +7,25 @@ import '../widgets/check_in_button.dart';
 import '../services/global_service.dart';
 
 // Public create function
-Widget createAttendanceScreen() {
-  return _AttendanceScreen();
+Widget createAttendanceScreen(bool isAttendanceMarked) {
+  return _AttendanceScreen(isAttendanceMarked:isAttendanceMarked);
 }
 
 class _AttendanceScreen extends StatefulWidget {
-  //final bool isAttendanceMarked;//Make AttendanceScreen receive the isAttendanceMarked value and update its background color
-  const _AttendanceScreen();
+  final bool isAttendanceMarked;//Make AttendanceScreen receive the isAttendanceMarked value and update its background color
+
+  const _AttendanceScreen({required this.isAttendanceMarked});
   @override
   _AttendanceScreenState createState() => _AttendanceScreenState();
 }
 
 class _AttendanceScreenState extends State<_AttendanceScreen>
     with SingleTickerProviderStateMixin {
-  //late bool isAttendanceMarked;
-  bool isAttendanceMarked = AppConfig.isAttendanceMarkedNotifier.value;
+  //bool isAttendanceMarked = AppConfig.isAttendanceMarkedNotifier.value;
 
   final String? employeeOid =
       AppConfig.employeeOid; // Example: Use actual employee ID
+  bool? oldIsAttendanceMarked; 
   //final int? employeeId = AppConfig.employeeId;
   final GlobalService _globalService = GlobalService();
   String workplace = '';
@@ -51,9 +52,7 @@ class _AttendanceScreenState extends State<_AttendanceScreen>
       parent: _animationController,
       curve: Curves.easeInOut,
     ));
-
-    // Start the animation
-    _animationController.forward();
+    _animationController.forward(from: 0.0); 
     // Listen for foreground messages
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       // Check if notification body is null, then use message data as fallback
@@ -71,7 +70,19 @@ class _AttendanceScreenState extends State<_AttendanceScreen>
       //_showNotifications();
     });
   }
-
+@override
+  void didUpdateWidget(covariant _AttendanceScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Detect changes in isAttendanceMarked and trigger animation
+    if (widget.isAttendanceMarked != oldIsAttendanceMarked) {
+      oldIsAttendanceMarked = widget.isAttendanceMarked;
+      if (widget.isAttendanceMarked) {
+        _animationController.forward(from: 0.0); // Slide in
+      } else {
+        _animationController.forward(from: 0.0); // Slide out
+      }
+    }
+  }
   @override
   void dispose() {
     _animationController.dispose();
@@ -171,19 +182,9 @@ class _AttendanceScreenState extends State<_AttendanceScreen>
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<bool>(
-        valueListenable: AppConfig.isAttendanceMarkedNotifier,
-        builder: (context, isAttendanceMarked, child) {
-          // Trigger animation based on the value
-          if (isAttendanceMarked) {
-            _animationController.forward(
-                from: 0.0); // Always start from the beginning
-          } else {
-            _animationController.forward(
-                from: 0.0); // Always start from the beginning
-          }
-          return Scaffold(
-            //backgroundColor: AppConfig.getColor(ColorType.background),//getBackgroundColor(AppConfig.selectedIndexNotifier.value, isAttendanceMarked),
+
+    return Scaffold(
+            backgroundColor: Colors.transparent,//getBackgroundColor(AppConfig.selectedIndexNotifier.value, isAttendanceMarked),
             appBar: AppBar(
               title: Text(
                   AppConfig.getAppbarTitle(AppConfig.selectedKeyNotifier.value),
@@ -257,8 +258,8 @@ class _AttendanceScreenState extends State<_AttendanceScreen>
               ),
             ),
           );
-        });
-  }
+        }
+  
 }
 
 // Clock Widget for Real-Time Time Display

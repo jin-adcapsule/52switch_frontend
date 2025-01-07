@@ -16,6 +16,9 @@ class CheckInButtonState extends State<CheckInButton> {
   bool isAttendanceMarked = AppConfig.isAttendanceMarkedNotifier.value;
   late String? employeeOid;
   bool isToggling = false; // To track if toggle is in process
+  double sliderHeight = 80.0;
+  double sliderWidth = 200.0;
+  double buttonSizeRatio = 0.8; // Size of the inside button
 
   @override
   void initState() {
@@ -101,23 +104,110 @@ class CheckInButtonState extends State<CheckInButton> {
   }
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        AnimatedSwitcher(
-          duration: Duration(milliseconds: 600), // Smooth animation duration
-          transitionBuilder: (Widget child, Animation<double> animation) {
-            final slideAnimation = Tween<Offset>(
-              begin: Offset(0.5, 0), // Start slightly offset
-              end: Offset.zero, // End at the original position
-            ).animate(animation);
-
-            return SlideTransition(
-              position: slideAnimation,
-              child: child,
-            );
-          },
-          child: Stack(
+    return GestureDetector(
+      onTap: () async {
+        if (!isToggling) { // Ensure it's not already toggling
+          setState(() => isToggling = true);
+          await _toggleAttendance(!isAttendanceMarked); // Call your toggle function
+          setState(() => isToggling = false);
+        }
+      },
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 300),
+        height: sliderHeight,
+        width: sliderWidth,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(sliderHeight),
+          color: isAttendanceMarked ? Colors.grey.shade100 : Colors.grey.shade100,
+          gradient: LinearGradient(
+            colors: isAttendanceMarked
+                ? [
+                    Colors.green.shade500, // Darker green for depth
+                    Colors.green.shade400, // Lighter green for highlight
+                  ]
+                : [
+                    Colors.red.shade500, // Darker red for depth
+                    Colors.redAccent.shade200, // Lighter red for highlight
+                  ],
+            begin: Alignment.topLeft, // Start of the gradient
+            end: Alignment.bottomRight, // End of the gradient
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: isAttendanceMarked
+                  ? Colors.black.withOpacity(0.2) // Subtle dark shadow for depth
+                  : Colors.black.withOpacity(0.3),
+              offset: Offset(-3, -3), // Shadow positioned inside
+              blurRadius: 6,
+            ),
+            BoxShadow(
+              color: isAttendanceMarked
+                  ? Colors.white.withOpacity(0.3) // Light glow on the inside
+                  : Colors.white.withOpacity(0.4),
+              offset: Offset(3, 3), // Inner glow
+              blurRadius: 6,
+            ),
+          ],
+        ),
+        child: Stack(
+          children: <Widget>[
+            AnimatedPositioned(
+              duration: Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              top: (sliderHeight - buttonSizeRatio*sliderHeight) / 2, // Centers the button vertically
+              left: isAttendanceMarked ? (sliderWidth - sliderHeight) : 0.0,
+              right: isAttendanceMarked ? 0.0 : (sliderWidth -sliderHeight),
+              child: AnimatedSwitcher(
+                duration: Duration(milliseconds: 300),
+                transitionBuilder: (Widget child, Animation<double> animation) {
+                  return RotationTransition(
+                    turns: animation,
+                    child: child,
+                  );
+                },
+                child: Container(
+                  key: ValueKey<bool>(isAttendanceMarked),
+                  height: buttonSizeRatio*sliderHeight, // Adjust the size of the inside button here
+                  width: buttonSizeRatio*sliderHeight,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white, // Inside button color
+                    gradient: LinearGradient(
+                      colors: isAttendanceMarked
+                          ? [Colors.white, Colors.grey.shade500]
+                          : [Colors.white, Colors.grey.shade500],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: [
+                      // Lighter shadow for raised effect (top-left)
+                      BoxShadow(
+                        color: Colors.white.withOpacity(0.6),
+                        offset: Offset(-4, -4),
+                        blurRadius: 6,
+                      ),
+                      // Darker shadow for depth (bottom-right)
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        offset: Offset(4, 4),
+                        blurRadius: 6,
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    isAttendanceMarked ? Icons.circle_outlined : Icons.close,
+                    size: buttonSizeRatio*sliderHeight * 0.6, // Adjust icon size relative to button size
+                    color: isAttendanceMarked ? Colors.green : Colors.red,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+    /*
+    return Stack(
             alignment: Alignment.center,
             children: [
               Transform.scale(
@@ -148,9 +238,7 @@ class CheckInButtonState extends State<CheckInButton> {
                   ),
                 ),
             ],
-          ),
-        ),
-      ],
-    );
+          );
+*/
   }
 }

@@ -16,6 +16,8 @@ class Navigation extends StatefulWidget {
 class NavigationState extends State<Navigation> {
   final String employeeOid = AppConfig.employeeOid; // Use from config
   final bool isSupervisor = AppConfig.isSupervisor; // Use from config
+  final Duration animationDuration = const Duration(milliseconds: 300);
+  String? oldSelectedKey; // Variable to hold the previous selectedKey
   // Cache for storing created screens
   //final Map<String, Widget> _screenCache = {};
   final Map<String, Widget Function()> _screenCache = {};
@@ -43,15 +45,16 @@ class NavigationState extends State<Navigation> {
   }
 
   Widget _getSelectedScreen(String selectedKey, bool isAttendanceMarked) {
-    if (_screenCache.containsKey(selectedKey)) {
+    /*if (_screenCache.containsKey(selectedKey)) {
       return _screenCache[
           selectedKey]!(); // Call the cached function to create a fresh screen
     }
+    */
     // If the screen isn't cached, create a factory function and store it in the Map
     Widget Function() screenFactory;
     switch (selectedKey) {
       case 'attendance':
-        screenFactory = () => createAttendanceScreen();
+        screenFactory = () => createAttendanceScreen(isAttendanceMarked);
         break;
       case 'dayoff':
         screenFactory = () => createDayoffScreen(employeeOid);
@@ -66,12 +69,13 @@ class NavigationState extends State<Navigation> {
         screenFactory = () => MoreScreen();
         break;
       default:
-        screenFactory = () => createAttendanceScreen();
+        screenFactory = () => createAttendanceScreen(isAttendanceMarked);
         break;
     }
+    /*
     // Store the factory in the cache
     _screenCache[selectedKey] = screenFactory;
-
+*/
     return screenFactory();
   }
 
@@ -85,31 +89,56 @@ class NavigationState extends State<Navigation> {
               valueListenable: AppConfig.isAttendanceMarkedNotifier,
               builder: (context, isAttendanceMarked, child) {
                 final visibleTabs = getVisibleTabs();
+                // Whether the selected key has changed, for example
+                final bool isKeyChanged = selectedKey != oldSelectedKey; 
+                // Update the oldSelectedKey after rebuilding
+                if (isKeyChanged) {
+                  oldSelectedKey = selectedKey; // Save the new key as old
+                }
                 return Scaffold(
-                  body: _getSelectedScreen(selectedKey,
-                      isAttendanceMarked), //bodyscreen load from each screen file
+                    backgroundColor: AppConfig.getColor(ColorType.background),
+                    body: AnimatedContainer(
+                      duration: isKeyChanged ? Duration.zero : animationDuration,
+                      color:AppConfig.getColor(
+                            ColorType.background), // Match with AnimatedContainer
+                      child:_getSelectedScreen(selectedKey,isAttendanceMarked),),
+                     //bodyscreen load from each screen file
 
-                  bottomNavigationBar: BottomNavigationBar(
-                    type: BottomNavigationBarType.fixed,
-                    backgroundColor: AppConfig.getColor(
-                        ColorType.background), // Match with AnimatedContainer
-                    elevation: 0,
-                    items: visibleTabs.map((tab) {
-                      return BottomNavigationBarItem(
-                        icon: Icon(tab['icon']),
-                        label: tab['label'],
-                      );
-                    }).toList(),
-                    currentIndex: visibleTabs
-                        .indexWhere((tab) => tab['key'] == selectedKey),
-                    onTap: (index) => _onItemTapped(visibleTabs[index]['key']),
-                    selectedItemColor:
-                        AppConfig.getColor(ColorType.selectedItem),
-                    unselectedItemColor:
-                        AppConfig.getColor(ColorType.unselectedItem),
-                    showUnselectedLabels: true,
-                  ),
-                );
+                    bottomNavigationBar: AnimatedContainer(
+                      // Only animate when the background color needs to change
+                      duration: isKeyChanged ? Duration.zero : animationDuration,
+                      color:AppConfig.getColor(
+                            ColorType.background), // Match with AnimatedContainer
+                      child:Theme(
+                        // Wrap BottomNavigationBar with Theme to override splash effects
+                        data: Theme.of(context).copyWith(
+                          splashColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                        ),
+                        child:BottomNavigationBar(
+                          //key: ValueKey(selectedKey),  // Use selectedKey as a key to force rebuild
+                          type: BottomNavigationBarType.fixed,
+                          backgroundColor: Colors.transparent, // Match with AnimatedContainer
+                          elevation: 0,
+                          items: visibleTabs.map((tab) {
+                            return BottomNavigationBarItem(
+                              icon: Icon(tab['icon']),
+                              label: tab['label'],
+                            );
+                          }).toList(),
+                          currentIndex: visibleTabs
+                              .indexWhere((tab) => tab['key'] == selectedKey),
+                          onTap: (index) => _onItemTapped(visibleTabs[index]['key']),
+                          selectedItemColor:
+                              AppConfig.getColor(ColorType.selectedItem),
+                          unselectedItemColor:
+                              AppConfig.getColor(ColorType.unselectedItem),
+                          showUnselectedLabels: true,
+                        ),
+                      )
+                    ),
+                  );
+              
               });
         });
   }
