@@ -20,7 +20,7 @@ class NavigationState extends State<Navigation> {
   String? oldSelectedKey; // Variable to hold the previous selectedKey
   // Cache for storing created screens
   //final Map<String, Widget> _screenCache = {};
-  final Map<String, Widget Function()> _screenCache = {};
+  //final Map<String, Widget Function()> _screenCache = {};
 
   void _onItemTapped(String key) {
     if (key == 'supervisor' && !isSupervisor) {
@@ -90,35 +90,38 @@ class NavigationState extends State<Navigation> {
               builder: (context, isAttendanceMarked, child) {
                 final visibleTabs = getVisibleTabs();
                 // Whether the selected key has changed, for example
-                final bool isKeyChanged = selectedKey != oldSelectedKey; 
+                final bool isKeyChanged = selectedKey != oldSelectedKey;
                 // Update the oldSelectedKey after rebuilding
                 if (isKeyChanged) {
                   oldSelectedKey = selectedKey; // Save the new key as old
                 }
                 return Scaffold(
-                    backgroundColor: AppConfig.getColor(ColorType.background),
-                    body: AnimatedContainer(
-                      duration: isKeyChanged ? Duration.zero : animationDuration,
-                      color:AppConfig.getColor(
-                            ColorType.background), // Match with AnimatedContainer
-                      child:_getSelectedScreen(selectedKey,isAttendanceMarked),),
-                     //bodyscreen load from each screen file
+                  backgroundColor: AppConfig.getColor(ColorType.background),
+                  body: AnimatedContainer(
+                    duration: isKeyChanged ? Duration.zero : animationDuration,
+                    color: AppConfig.getColor(
+                        ColorType.background), // Match with AnimatedContainer
+                    child: _getSelectedScreen(selectedKey, isAttendanceMarked),
+                  ),
+                  //bodyscreen load from each screen file
 
-                    bottomNavigationBar: AnimatedContainer(
+                  bottomNavigationBar: AnimatedContainer(
                       // Only animate when the background color needs to change
-                      duration: isKeyChanged ? Duration.zero : animationDuration,
-                      color:AppConfig.getColor(
-                            ColorType.background), // Match with AnimatedContainer
-                      child:Theme(
+                      duration:
+                          isKeyChanged ? Duration.zero : animationDuration,
+                      color: AppConfig.getColor(
+                          ColorType.background), // Match with AnimatedContainer
+                      child: Theme(
                         // Wrap BottomNavigationBar with Theme to override splash effects
                         data: Theme.of(context).copyWith(
                           splashColor: Colors.transparent,
                           highlightColor: Colors.transparent,
                         ),
-                        child:BottomNavigationBar(
+                        child: BottomNavigationBar(
                           //key: ValueKey(selectedKey),  // Use selectedKey as a key to force rebuild
                           type: BottomNavigationBarType.fixed,
-                          backgroundColor: Colors.transparent, // Match with AnimatedContainer
+                          backgroundColor: Colors
+                              .transparent, // Match with AnimatedContainer
                           elevation: 0,
                           items: visibleTabs.map((tab) {
                             return BottomNavigationBarItem(
@@ -128,17 +131,16 @@ class NavigationState extends State<Navigation> {
                           }).toList(),
                           currentIndex: visibleTabs
                               .indexWhere((tab) => tab['key'] == selectedKey),
-                          onTap: (index) => _onItemTapped(visibleTabs[index]['key']),
+                          onTap: (index) =>
+                              _onItemTapped(visibleTabs[index]['key']),
                           selectedItemColor:
                               AppConfig.getColor(ColorType.selectedItem),
                           unselectedItemColor:
                               AppConfig.getColor(ColorType.unselectedItem),
                           showUnselectedLabels: true,
                         ),
-                      )
-                    ),
-                  );
-              
+                      )),
+                );
               });
         });
   }

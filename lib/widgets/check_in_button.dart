@@ -12,7 +12,7 @@ class CheckInButton extends StatefulWidget {
 }
 
 class CheckInButtonState extends State<CheckInButton> {
-  late bool _isLoading; // To manage loading state
+// To manage loading state
   bool isAttendanceMarked = AppConfig.isAttendanceMarkedNotifier.value;
   late String? employeeOid;
   bool isToggling = false; // To track if toggle is in process
@@ -24,27 +24,25 @@ class CheckInButtonState extends State<CheckInButton> {
   @override
   void initState() {
     super.initState();
-    _isLoading = false; // Initialize loading as false
+// Initialize loading as false
     employeeOid = widget.employeeOid;
     // Fetch attendance status on init
     _getAttendanceStatus();
     // Set the initial drag offset based on attendance status
     _dragOffset = isAttendanceMarked ? (sliderWidth - sliderHeight) : 0.0;
-    
   }
+
   Future<void> _getAttendanceStatus() async {
     final attendanceService = AttendanceService();
     setState(() {
-      _isLoading = true; // Start loading indicator
+// Start loading indicator
     });
     try {
       // Send API call to toggle attendance
       final result = await attendanceService.fetchAttendanceStatus(employeeOid);
 
       // Stop loading once API call succeeds
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() {});
       if (result['querySuccess'] == true) {
         setState(() {
           isAttendanceMarked = result['status']; // Update the attendance status
@@ -55,26 +53,25 @@ class CheckInButtonState extends State<CheckInButton> {
         _showErrorSnackBar('Failed to fetch attendance status.');
       }
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() {});
       _showErrorSnackBar('Error: ${e.toString()}');
     }
   }
+
   Future<void> _toggleAttendance(bool newValue) async {
     final attendanceService = AttendanceService();
     setState(() {
-      _isLoading = true; // Start loading indicator
+// Start loading indicator
       isToggling = true; // Mark that toggle is in progress
     });
 
     try {
       // Send API call to toggle attendance
-      final result = await attendanceService.markAttendance(employeeOid, newValue);
+      final result =
+          await attendanceService.markAttendance(employeeOid, newValue);
 
       // Stop loading once API call succeeds
       setState(() {
-        _isLoading = false;
         isToggling = false; // Mark toggle as done
       });
       if (result['mutationSuccess'] == true) {
@@ -85,26 +82,28 @@ class CheckInButtonState extends State<CheckInButton> {
         });
       } else {
         _showErrorSnackBar('Failed to mark attendance.');
-         // Snap back to original state
+        // Snap back to original state
         setState(() {
           isAttendanceMarked = !newValue;
         });
       }
     } catch (e) {
       setState(() {
-        _isLoading = false;
-         isToggling = false; // Mark toggle as done
+        isToggling = false; // Mark toggle as done
         isAttendanceMarked = !newValue; // Snap back to original state
       });
       _showErrorSnackBar('Error: ${e.toString()}');
     }
   }
+
   // Show error snack bar
   void _showErrorSnackBar(String message) {
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(message)));
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -120,7 +119,8 @@ class CheckInButtonState extends State<CheckInButton> {
       onPanUpdate: (details) {
         // Update the drag offset based on user's drag movement
         setState(() {
-          _dragOffset = details.localPosition.dx.clamp(0.0, sliderWidth - sliderHeight);
+          _dragOffset =
+              details.localPosition.dx.clamp(0.0, sliderWidth - sliderHeight);
         });
       },
       onPanEnd: (details) async {
@@ -138,8 +138,6 @@ class CheckInButtonState extends State<CheckInButton> {
             _dragOffset = 0;
           });
         }
-
-        
       },
       child: AnimatedContainer(
         duration: Duration(milliseconds: 300),
@@ -147,7 +145,8 @@ class CheckInButtonState extends State<CheckInButton> {
         width: sliderWidth,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(sliderHeight),
-          color: isAttendanceMarked ? Colors.grey.shade100 : Colors.grey.shade100,
+          color:
+              isAttendanceMarked ? Colors.grey.shade100 : Colors.grey.shade100,
           gradient: LinearGradient(
             colors: isAttendanceMarked
                 ? [
@@ -164,15 +163,16 @@ class CheckInButtonState extends State<CheckInButton> {
           boxShadow: [
             BoxShadow(
               color: isAttendanceMarked
-                  ? Colors.black.withOpacity(0.2) // Subtle dark shadow for depth
-                  : Colors.black.withOpacity(0.3),
+                  ? Color.fromRGBO(0, 0, 0, 0.2) // Subtle dark shadow
+                  : Color.fromRGBO(0, 0, 0, 0.3), // Subtle dark shadow
               offset: Offset(-3, -3), // Shadow positioned inside
               blurRadius: 6,
             ),
             BoxShadow(
               color: isAttendanceMarked
-                  ? Colors.white.withOpacity(0.3) // Light glow on the inside
-                  : Colors.white.withOpacity(0.4),
+                  ? Color.fromRGBO(255, 255, 255,
+                      0.1) // Subtle dark shadow // Light glow on the inside
+                  : Color.fromRGBO(255, 255, 255, 0.4),
               offset: Offset(3, 3), // Inner glow
               blurRadius: 6,
             ),
@@ -183,9 +183,12 @@ class CheckInButtonState extends State<CheckInButton> {
             AnimatedPositioned(
               duration: Duration(milliseconds: 300),
               curve: Curves.easeInOut,
-              top: (sliderHeight - buttonSizeRatio*sliderHeight) / 2, // Centers the button vertically
-              left: _dragOffset,//isAttendanceMarked ? (sliderWidth - sliderHeight) : 0.0,
-              right: (sliderWidth - sliderHeight)-_dragOffset,//isAttendanceMarked ? 0.0 : (sliderWidth -sliderHeight),
+              top: (sliderHeight - buttonSizeRatio * sliderHeight) /
+                  2, // Centers the button vertically
+              left:
+                  _dragOffset, //isAttendanceMarked ? (sliderWidth - sliderHeight) : 0.0,
+              right: (sliderWidth - sliderHeight) -
+                  _dragOffset, //isAttendanceMarked ? 0.0 : (sliderWidth -sliderHeight),
               child: AnimatedSwitcher(
                 duration: Duration(milliseconds: 300),
                 transitionBuilder: (Widget child, Animation<double> animation) {
@@ -196,8 +199,9 @@ class CheckInButtonState extends State<CheckInButton> {
                 },
                 child: Container(
                   key: ValueKey<bool>(isAttendanceMarked),
-                  height: buttonSizeRatio*sliderHeight, // Adjust the size of the inside button here
-                  width: buttonSizeRatio*sliderHeight,
+                  height: buttonSizeRatio *
+                      sliderHeight, // Adjust the size of the inside button here
+                  width: buttonSizeRatio * sliderHeight,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: Colors.white, // Inside button color
@@ -211,13 +215,13 @@ class CheckInButtonState extends State<CheckInButton> {
                     boxShadow: [
                       // Lighter shadow for raised effect (top-left)
                       BoxShadow(
-                        color: Colors.white.withOpacity(0.6),
+                        color: Color.fromRGBO(255, 255, 255, 0.6),
                         offset: Offset(-4, -4),
                         blurRadius: 6,
                       ),
                       // Darker shadow for depth (bottom-right)
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
+                        color: Color.fromRGBO(255, 255, 255, 0.2),
                         offset: Offset(4, 4),
                         blurRadius: 6,
                       ),
@@ -225,7 +229,9 @@ class CheckInButtonState extends State<CheckInButton> {
                   ),
                   child: Icon(
                     isAttendanceMarked ? Icons.circle_outlined : Icons.close,
-                    size: buttonSizeRatio*sliderHeight * 0.6, // Adjust icon size relative to button size
+                    size: buttonSizeRatio *
+                        sliderHeight *
+                        0.6, // Adjust icon size relative to button size
                     color: isAttendanceMarked ? Colors.green : Colors.red,
                   ),
                 ),
@@ -235,39 +241,5 @@ class CheckInButtonState extends State<CheckInButton> {
         ),
       ),
     );
-    /*
-    return Stack(
-            alignment: Alignment.center,
-            children: [
-              Transform.scale(
-                key: ValueKey<bool>(isAttendanceMarked), // Ensure proper rebuild
-                scale: 4,
-                child: IgnorePointer( // Disable interaction during loading state
-                  ignoring: isToggling || _isLoading, // Ignore pointer when toggling or loading
-                  child: Switch(
-                    value: isAttendanceMarked,
-                    onChanged: (val) async {
-                      if (!_isLoading && !isToggling) { // Only toggle if not already loading
-                        await _toggleAttendance(val);
-                      }
-                    },
-                    activeColor: Colors.green,
-                    inactiveThumbColor: Colors.grey,
-                  ),
-                ),
-              ),
-              // Overlay the CircularProgressIndicator over the switch
-              if (_isLoading && !isToggling)
-                Positioned(
-                  child: Container(
-                    color: Colors.transparent,
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  ),
-                ),
-            ],
-          );
-*/
   }
 }

@@ -4,15 +4,16 @@ import 'config_screen.dart'; // Import AppConfig
 import 'package:firebase_messaging/firebase_messaging.dart'; // Import Firebase Messaging
 
 import '../widgets/check_in_button.dart';
-import '../services/global_service.dart';
+import '../services/attendance_service.dart';
 
 // Public create function
 Widget createAttendanceScreen(bool isAttendanceMarked) {
-  return _AttendanceScreen(isAttendanceMarked:isAttendanceMarked);
+  return _AttendanceScreen(isAttendanceMarked: isAttendanceMarked);
 }
 
 class _AttendanceScreen extends StatefulWidget {
-  final bool isAttendanceMarked;//Make AttendanceScreen receive the isAttendanceMarked value and update its background color
+  final bool
+      isAttendanceMarked; //Make AttendanceScreen receive the isAttendanceMarked value and update its background color
 
   const _AttendanceScreen({required this.isAttendanceMarked});
   @override
@@ -25,13 +26,12 @@ class _AttendanceScreenState extends State<_AttendanceScreen>
 
   final String? employeeOid =
       AppConfig.employeeOid; // Example: Use actual employee ID
-  bool? oldIsAttendanceMarked; 
+  bool? oldIsAttendanceMarked;
   //final int? employeeId = AppConfig.employeeId;
-  final GlobalService _globalService = GlobalService();
-  String workplace = '';
-  String workhourOn = '';
-  String workhourOff = '';
-  String workhourHalf = '';
+  final AttendanceService _attendanceService = AttendanceService();
+  String locationName = '';
+  String startTime = '';
+  String endTime = '';
   // List to hold notifications
   final List<String> _notifications = [];
   late AnimationController _animationController;
@@ -40,7 +40,7 @@ class _AttendanceScreenState extends State<_AttendanceScreen>
   @override
   void initState() {
     super.initState();
-    _fetchEmployeeInfo(); // Fetch and set workplace
+    _fetchAttedanceStatusAndDetails();
     _animationController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 500),
@@ -52,7 +52,7 @@ class _AttendanceScreenState extends State<_AttendanceScreen>
       parent: _animationController,
       curve: Curves.easeInOut,
     ));
-    _animationController.forward(from: 0.0); 
+    _animationController.forward(from: 0.0);
     // Listen for foreground messages
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       // Check if notification body is null, then use message data as fallback
@@ -70,7 +70,8 @@ class _AttendanceScreenState extends State<_AttendanceScreen>
       //_showNotifications();
     });
   }
-@override
+
+  @override
   void didUpdateWidget(covariant _AttendanceScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     // Detect changes in isAttendanceMarked and trigger animation
@@ -83,6 +84,7 @@ class _AttendanceScreenState extends State<_AttendanceScreen>
       }
     }
   }
+
   @override
   void dispose() {
     _animationController.dispose();
@@ -162,104 +164,101 @@ class _AttendanceScreenState extends State<_AttendanceScreen>
   }
 
   ///get a response for search from service
-  Future<void> _fetchEmployeeInfo() async {
+  Future<void> _fetchAttedanceStatusAndDetails() async {
     try {
-      final locationData =
-          await _globalService.fetchLocationInfo(AppConfig.employeeOid);
+      final attendanceStatusAndDetails = await _attendanceService
+          .fetchAttendanceStatusAndDetails(AppConfig.employeeOid);
       setState(() {
-        workplace = locationData['workplace'];
-        workhourOn = locationData['workhourOn'];
-        workhourOff = locationData['workhourOff'];
-        workhourHalf = locationData['workhourHalf'];
+        locationName = attendanceStatusAndDetails['locationName'];
+        startTime = attendanceStatusAndDetails['startTime'];
+        endTime = attendanceStatusAndDetails['endTime'];
       });
     } catch (e) {
       setState(() {
-        workplace = "Error"; // Display error if fetching fails
+        locationName = "Error"; // Display error if fetching fails
       });
-      throw Exception('Failed to fetch employeeInfoData: $e');
+      throw Exception('Failed to fetch attendanceStatusAndDetails: $e');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-            backgroundColor: Colors.transparent,//getBackgroundColor(AppConfig.selectedIndexNotifier.value, isAttendanceMarked),
-            appBar: AppBar(
-              title: Text(
-                  AppConfig.getAppbarTitle(AppConfig.selectedKeyNotifier.value),
-                  style: TextStyle(color: AppConfig.getColor(ColorType.text))),
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              centerTitle:
-                  false, // Forces left alignment on both Android and iOS
-              actions: [
-                IconButton(
-                  icon: Icon(Icons.notifications),
-                  color: AppConfig.getColor(ColorType.text),
-                  onPressed: _showNotifications,
-                ),
-              ],
+      backgroundColor: Colors
+          .transparent, //getBackgroundColor(AppConfig.selectedIndexNotifier.value, isAttendanceMarked),
+      appBar: AppBar(
+        title: Text(
+            AppConfig.getAppbarTitle(AppConfig.selectedKeyNotifier.value),
+            style: TextStyle(color: AppConfig.getColor(ColorType.text))),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: false, // Forces left alignment on both Android and iOS
+        actions: [
+          IconButton(
+            icon: Icon(Icons.notifications),
+            color: AppConfig.getColor(ColorType.text),
+            onPressed: _showNotifications,
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 30),
+            DateWidget(locationName: locationName),
+            SizedBox(height: 50),
+            // Slide animation for main text
+            SlideTransition(
+                position: _slideAnimation, child: const ClockWidget()),
+            Container(
+              margin: EdgeInsets.only(top: 0),
+              width: 100,
+              height: 4,
+              color: Colors.white,
             ),
-            body: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 30),
-                  DateWidget(workplace: workplace),
-                  SizedBox(height: 50),
-                  // Slide animation for main text
-                  SlideTransition(
-                      position: _slideAnimation, child: const ClockWidget()),
-                  Container(
-                    margin: EdgeInsets.only(top: 0),
-                    width: 100,
-                    height: 4,
+            // Slide animation for main text
+            SlideTransition(
+              position: _slideAnimation,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  AppConfig.getMaintextHome(),
+                  style: TextStyle(
+                    fontSize: 60,
+                    fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
-                  // Slide animation for main text
-                  SlideTransition(
-                    position: _slideAnimation,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 8),
-                      child: Text(
-                        AppConfig.getMaintextHome(),
-                        style: TextStyle(
-                          fontSize: 60,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                  // Slide animation for subtext
-                  SlideTransition(
-                    position: _slideAnimation,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 8),
-                      child: Text(
-                        AppConfig.getSubtextHome(),
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Spacer(),
-                  Center(
-                    child: CheckInButton(
-                      employeeOid: employeeOid,
-                    ),
-                  ),
-                  SizedBox(height: 80),
-                ],
+                ),
               ),
             ),
-          );
-        }
-  
+            // Slide animation for subtext
+            SlideTransition(
+              position: _slideAnimation,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  AppConfig.getSubtextHome(),
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+            Spacer(),
+            Center(
+              child: CheckInButton(
+                employeeOid: employeeOid,
+              ),
+            ),
+            SizedBox(height: 80),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 // Clock Widget for Real-Time Time Display
@@ -317,8 +316,8 @@ class ClockWidget extends StatelessWidget {
 
 // Date Widget for Real-Time Date Display
 class DateWidget extends StatelessWidget {
-  final String workplace;
-  const DateWidget({super.key, required this.workplace});
+  final String locationName;
+  const DateWidget({super.key, required this.locationName});
 
   @override
   Widget build(BuildContext context) {
@@ -326,7 +325,7 @@ class DateWidget extends StatelessWidget {
       stream: Stream.periodic(const Duration(seconds: 1)),
       builder: (context, snapshot) {
         return Text(
-          '${DateFormat('yyyy.MM.dd').format(DateTime.now())} | $workplace',
+          '${DateFormat('yyyy.MM.dd').format(DateTime.now())} | $locationName',
           style: TextStyle(
             fontSize: 18,
             color: Colors.grey,

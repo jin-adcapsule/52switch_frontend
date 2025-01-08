@@ -1,4 +1,5 @@
 //navigate to MyInfoScreen after a successful login. You can use the Navigator.pushReplacement to change the screen.
+import 'package:app52switch/logger_config.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'screens/login_screen.dart';
@@ -18,7 +19,9 @@ void main() async {
   LocalNotificationService.initialize((payload) {
     if (payload != null) {
       // Navigate based on payload
-      print("User tapped notification with payload: $payload");
+      LoggerConfig()
+          .logger
+          .i("User tapped notification with payload: $payload");
       AppConfig.selectedKeyNotifier.value = payload;
     }
   });
@@ -26,7 +29,6 @@ void main() async {
   NotificationHandler.initialize();
   runApp(MyApp());
 }
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -49,7 +51,7 @@ class MyApp extends StatelessWidget {
           Locale('en', 'US'), // English
           Locale('ko', 'KR'), // Korean
         ],
-        home: LoginScreen(),// Initial screen is LoginScreen
+        home: LoginScreen(), // Initial screen is LoginScreen
         routes: {
           '/login': (context) => LoginScreen(),
         },
