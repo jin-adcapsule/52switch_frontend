@@ -55,7 +55,7 @@ class MyInfoService {
       }
 
       final data = result.data;
-
+      print(data);
       if (data != null && data['getEmployeeAttendance'] != null) {
         final List<dynamic> attendanceList = data['getEmployeeAttendance'];
         return attendanceList.map((json) => Attendance.fromJson(json)).toList();

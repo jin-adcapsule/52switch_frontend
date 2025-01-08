@@ -28,6 +28,8 @@ class CheckInButtonState extends State<CheckInButton> {
     employeeOid = widget.employeeOid;
     // Fetch attendance status on init
     _getAttendanceStatus();
+    // Set the initial drag offset based on attendance status
+    _dragOffset = isAttendanceMarked ? (sliderWidth - sliderHeight) : 0.0;
     
   }
   Future<void> _getAttendanceStatus() async {
