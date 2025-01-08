@@ -5,17 +5,35 @@ class LocalNotificationService {
   static final FlutterLocalNotificationsPlugin _notificationsPlugin =
   FlutterLocalNotificationsPlugin();
 
-  static void initialize() {
+  static void initialize(Function(String?) onNotificationResponse) {
     const InitializationSettings initializationSettings =
     InitializationSettings(
       android: AndroidInitializationSettings('@mipmap/ic_launcher'),
       iOS: DarwinInitializationSettings(),
     );
 
-    _notificationsPlugin.initialize(initializationSettings);
+    _notificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse response) {
+        // Handle notification tap
+        String? payload = response.payload;
+        onNotificationResponse(payload);
+      },
+    );
   }
+  static Future<void> createNotificationChannel(String id, String name, String description) async {
+    final androidChannel = AndroidNotificationChannel(
+      id,
+      name,
+      description: description,
+      importance: Importance.high,
+    );
 
-  static void showNotification(RemoteMessage message) {
+    await _notificationsPlugin
+        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(androidChannel);
+  }
+  static void showNotification(RemoteMessage message, {String? payload}) {
     final notification = message.notification;
     final androidDetails = AndroidNotificationDetails(
       'default_channel', // Channel ID
@@ -32,6 +50,7 @@ class LocalNotificationService {
         notification.title,
         notification.body,
         notificationDetails,
+        payload: payload ?? message.data['pageKey'], // Optional payload for navigation
       );
     }else{
       // If the notification fields are null, handle the data fields manually
@@ -45,7 +64,7 @@ class LocalNotificationService {
             title,
             body,
             notificationDetails,
-            payload: 'Default_Sound',
+            payload: payload ?? message.data['pageKey'], // Optional payload
         );
       }
     }

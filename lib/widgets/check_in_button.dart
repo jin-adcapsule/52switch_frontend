@@ -19,6 +19,7 @@ class CheckInButtonState extends State<CheckInButton> {
   double sliderHeight = 80.0;
   double sliderWidth = 200.0;
   double buttonSizeRatio = 0.8; // Size of the inside button
+  double _dragOffset = 0.0; // Track the drag offset
 
   @override
   void initState() {
@@ -105,12 +106,38 @@ class CheckInButtonState extends State<CheckInButton> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      /*
       onTap: () async {
         if (!isToggling) { // Ensure it's not already toggling
           setState(() => isToggling = true);
           await _toggleAttendance(!isAttendanceMarked); // Call your toggle function
           setState(() => isToggling = false);
         }
+      },
+      */
+      onPanUpdate: (details) {
+        // Update the drag offset based on user's drag movement
+        setState(() {
+          _dragOffset = details.localPosition.dx.clamp(0.0, sliderWidth - sliderHeight);
+        });
+      },
+      onPanEnd: (details) async {
+        // When the user stops dragging, toggle the attendance based on the final position
+        if (_dragOffset >= (sliderWidth - sliderHeight) / 2) {
+          await _toggleAttendance(true); // Mark attendance
+          // Set the drag offset to right
+          setState(() {
+            _dragOffset = (sliderWidth - sliderHeight);
+          });
+        } else {
+          await _toggleAttendance(false); // Unmark attendance
+          // Set the drag offset to left
+          setState(() {
+            _dragOffset = 0;
+          });
+        }
+
+        
       },
       child: AnimatedContainer(
         duration: Duration(milliseconds: 300),
@@ -155,8 +182,8 @@ class CheckInButtonState extends State<CheckInButton> {
               duration: Duration(milliseconds: 300),
               curve: Curves.easeInOut,
               top: (sliderHeight - buttonSizeRatio*sliderHeight) / 2, // Centers the button vertically
-              left: isAttendanceMarked ? (sliderWidth - sliderHeight) : 0.0,
-              right: isAttendanceMarked ? 0.0 : (sliderWidth -sliderHeight),
+              left: _dragOffset,//isAttendanceMarked ? (sliderWidth - sliderHeight) : 0.0,
+              right: (sliderWidth - sliderHeight)-_dragOffset,//isAttendanceMarked ? 0.0 : (sliderWidth -sliderHeight),
               child: AnimatedSwitcher(
                 duration: Duration(milliseconds: 300),
                 transitionBuilder: (Widget child, Animation<double> animation) {

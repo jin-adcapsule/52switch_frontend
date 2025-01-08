@@ -17,26 +17,26 @@ class NotificationHandler {
   static Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     LoggerConfig().logger.i('Handling a background data message: ${message.data}');
     LoggerConfig().logger.i('Handling a background noti message: ${message.notification?.title}, ${message.notification?.body}');
-    // Show the notification using flutter_local_nostifications
-    LocalNotificationService.showNotification(message);
-    // Navigate if needed when tapped
-    _handleNotificationNavigation(message);
+    // Show the notification only if it's not already being handled
+    if (message.notification != null) {
+      LocalNotificationService.showNotification(message);
+    }
+
   }
   static Future<void> _firebaseMessagingForegroundHandler(RemoteMessage message) async {
     LoggerConfig().logger.i('Handling a foreground data message: ${message.data}');
     LoggerConfig().logger.i('Handling a foreground noti message: ${message.notification?.title}, ${message.notification?.body}');
-    // Show the notification using flutter_local_nostifications
+    // Show the notification and when tabbed then navigate using flutter_local_nostifications
     LocalNotificationService.showNotification(message);
-     // Navigate if needed when tapped
-    _handleNotificationNavigation(message);
+
   }
   // Handler for when the app is opened from the background (user tapped on the notification)
   static void _firebaseMessagingOpenedAppHandler(RemoteMessage message) {
     LoggerConfig().logger.i('App opened from notification: ${message.data}');
     LoggerConfig().logger.i('Notification clicked: ${message.notification?.title}, ${message.notification?.body}');
     
-    // Handle navigation based on the data in the notification
-    _handleNotificationNavigation(message);
+    // Handle navigation based on notification data
+    _handleNotificationNavigation(message.data['pageKey']);
   }
   static void requestNotificationPermissions() async {
     NotificationSettings settings = await FirebaseMessaging.instance.requestPermission(
@@ -53,15 +53,13 @@ class NotificationHandler {
   }
 
   // Function to handle navigation based on the notification data
-  static void _handleNotificationNavigation(RemoteMessage message) {
-    // Assuming the notification data includes a `page` field to navigate to
-    String? pageKey = message.data['pageKey'];  // This can be customized to match your payload
+  static void _handleNotificationNavigation(String? pageKey) {
     print(pageKey);
     // Check if the page is valid and change the selected key in AppConfig
     if (pageKey != null) {
       // For example, navigate to the "attendance" screen when "attendance" is passed
       AppConfig.selectedKeyNotifier.value = pageKey;
-      print(pageKey);
+      LoggerConfig().logger.i('Navigated to page: $pageKey');
       print(AppConfig.selectedKeyNotifier.value);
       /*
       // If there's additional data (like a request ID), you can pass it as well

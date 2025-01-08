@@ -97,7 +97,6 @@ class PushService{
       'title': title,
       'message': message,
       'pageKey': pageKey
-
     };
     // Call the mutate method from GraphQLService
     var result = await GraphQLService.mutate(

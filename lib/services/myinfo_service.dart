@@ -22,13 +22,14 @@ class MyInfoService {
       getEmployeeAttendance(employeeOid: \$employeeOid, startDate: \$startDate, endDate: \$endDate, workTypeList: \$workTypeList) {
         employeeOid
         date
+        locationId
         checkInTime
         checkOutTime
         status
         checkInStatus
         checkOutStatus
         workTypeList
-        
+
       }
     }
     ''';

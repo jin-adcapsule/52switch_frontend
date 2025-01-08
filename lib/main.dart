@@ -6,7 +6,7 @@ import 'services/auth_service.dart';
 import 'services/local_notification_service.dart';
 import 'services/notification_handler.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-
+import 'package:app52switch/screens/config_screen.dart';
 
 import "firebase_config.dart";
 
@@ -15,7 +15,13 @@ void main() async {
   // Initialize Firebase
   await FirebaseConfig.loadFirebaseConfig();
   // Initialize Local Notifications
-  LocalNotificationService.initialize();
+  LocalNotificationService.initialize((payload) {
+    if (payload != null) {
+      // Navigate based on payload
+      print("User tapped notification with payload: $payload");
+      AppConfig.selectedKeyNotifier.value = payload;
+    }
+  });
   // Listen for foreground & background notifications with requesting permission
   NotificationHandler.initialize();
   runApp(MyApp());
