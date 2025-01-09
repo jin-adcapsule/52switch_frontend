@@ -37,10 +37,10 @@ class DayoffRequestScreenState extends State<DayoffRequestScreen> {
     final dayoffInfoData = await _dayoffService.fetchDayoffInfo(widget.employeeOid!);
     return {
       'supervisorName': dayoffInfoData['supervisorName'],
-      'dayoffPerYear': dayoffInfoData['dayoffPerYear'],
+      'dayoffRemaining': dayoffInfoData['dayoffRemaining'],
       };
   }
-  Future<List<String>> submitDayOffApplication(int dayoffPerYear) async {
+  Future<List<String>> submitDayOffApplication(int dayoffRemaining) async {
     // Use default comment if the text field is empty
     String requestComment = _commentController.text.trim().isEmpty
       ? '위와 같이 휴가를 신청합니다. 재가하여 주시기 바랍니다.'
@@ -57,7 +57,7 @@ class DayoffRequestScreenState extends State<DayoffRequestScreen> {
         dateList,
         _selectedDayoffType!,
         requestComment,
-        dayoffPerYear,
+        dayoffRemaining,
       );
       return response; // Return the response for further handling
     } catch (e) {

@@ -64,7 +64,7 @@ class DayoffService {
       getDayoffInfo(employeeOid: \$employeeOid) {
         supervisorName
         supervisorOid
-        dayoffPerYear
+        dayoffRemaining
       }
     }
     ''';
@@ -90,7 +90,7 @@ class DayoffService {
       final returnData={
         'supervisorName': responseData['supervisorName'] ?? 'N/A',
         'supervisorOid': responseData['supervisorOid'] ?? 'N/A',
-        'dayoffPerYear': responseData['dayoffPerYear'] ?? 0,};
+        'dayoffRemaining': responseData['dayoffRemaining'] ?? 0,};
 
       return returnData;
     } catch (e) {
