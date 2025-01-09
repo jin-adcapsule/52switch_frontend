@@ -44,7 +44,7 @@ class NavigationState extends State<Navigation> {
     }).toList();
   }
 
-  Widget _getSelectedScreen(String selectedKey, bool isAttendanceMarked) {
+  Widget _getSelectedScreen(String selectedKey, bool? isAttendanceMarked) {
     /*if (_screenCache.containsKey(selectedKey)) {
       return _screenCache[
           selectedKey]!(); // Call the cached function to create a fresh screen
@@ -85,7 +85,8 @@ class NavigationState extends State<Navigation> {
     return ValueListenableBuilder<String>(
         valueListenable: AppConfig.selectedKeyNotifier,
         builder: (context, selectedKey, child) {
-          return ValueListenableBuilder<bool>(
+          return ValueListenableBuilder<bool?>(
+              //can be null(isTodayOff)
               valueListenable: AppConfig.isAttendanceMarkedNotifier,
               builder: (context, isAttendanceMarked, child) {
                 final visibleTabs = getVisibleTabs();
@@ -96,11 +97,13 @@ class NavigationState extends State<Navigation> {
                   oldSelectedKey = selectedKey; // Save the new key as old
                 }
                 return Scaffold(
-                  backgroundColor: AppConfig.getColor(ColorType.background),
+                  backgroundColor: AppConfig.getColor(ColorType.background,
+                      isAttendanceMarked: isAttendanceMarked),
                   body: AnimatedContainer(
                     duration: isKeyChanged ? Duration.zero : animationDuration,
-                    color: AppConfig.getColor(
-                        ColorType.background), // Match with AnimatedContainer
+                    color: AppConfig.getColor(ColorType.background,
+                        isAttendanceMarked:
+                            isAttendanceMarked), // Match with AnimatedContainer
                     child: _getSelectedScreen(selectedKey, isAttendanceMarked),
                   ),
                   //bodyscreen load from each screen file
@@ -109,8 +112,9 @@ class NavigationState extends State<Navigation> {
                       // Only animate when the background color needs to change
                       duration:
                           isKeyChanged ? Duration.zero : animationDuration,
-                      color: AppConfig.getColor(
-                          ColorType.background), // Match with AnimatedContainer
+                      color: AppConfig.getColor(ColorType.background,
+                          isAttendanceMarked:
+                              isAttendanceMarked), // Match with AnimatedContainer
                       child: Theme(
                         // Wrap BottomNavigationBar with Theme to override splash effects
                         data: Theme.of(context).copyWith(

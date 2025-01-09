@@ -7,12 +7,12 @@ import '../widgets/check_in_button.dart';
 import '../services/attendance_service.dart';
 
 // Public create function
-Widget createAttendanceScreen(bool isAttendanceMarked) {
+Widget createAttendanceScreen(bool? isAttendanceMarked) {
   return _AttendanceScreen(isAttendanceMarked: isAttendanceMarked);
 }
 
 class _AttendanceScreen extends StatefulWidget {
-  final bool
+  final bool?
       isAttendanceMarked; //Make AttendanceScreen receive the isAttendanceMarked value and update its background color
 
   const _AttendanceScreen({required this.isAttendanceMarked});
@@ -23,7 +23,8 @@ class _AttendanceScreen extends StatefulWidget {
 class _AttendanceScreenState extends State<_AttendanceScreen>
     with SingleTickerProviderStateMixin {
   //bool isAttendanceMarked = AppConfig.isAttendanceMarkedNotifier.value;
-
+  bool isAttendanceMarked =
+      false; //when true is true else(null or false)then false
   final String? employeeOid =
       AppConfig.employeeOid; // Example: Use actual employee ID
   bool? oldIsAttendanceMarked;
@@ -32,6 +33,8 @@ class _AttendanceScreenState extends State<_AttendanceScreen>
   String locationName = '';
   String startTime = '';
   String endTime = '';
+  List<String> workTypeList = [];
+  bool isTodayOff = false;
   // List to hold notifications
   final List<String> _notifications = [];
   late AnimationController _animationController;
@@ -40,6 +43,7 @@ class _AttendanceScreenState extends State<_AttendanceScreen>
   @override
   void initState() {
     super.initState();
+    isAttendanceMarked = widget.isAttendanceMarked == true;
     _fetchAttedanceStatusAndDetails();
     _animationController = AnimationController(
       vsync: this,
@@ -75,9 +79,9 @@ class _AttendanceScreenState extends State<_AttendanceScreen>
   void didUpdateWidget(covariant _AttendanceScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     // Detect changes in isAttendanceMarked and trigger animation
-    if (widget.isAttendanceMarked != oldIsAttendanceMarked) {
-      oldIsAttendanceMarked = widget.isAttendanceMarked;
-      if (widget.isAttendanceMarked) {
+    if (isAttendanceMarked != oldIsAttendanceMarked) {
+      oldIsAttendanceMarked = isAttendanceMarked;
+      if (isAttendanceMarked) {
         _animationController.forward(from: 0.0); // Slide in
       } else {
         _animationController.forward(from: 0.0); // Slide out
@@ -172,10 +176,15 @@ class _AttendanceScreenState extends State<_AttendanceScreen>
         locationName = attendanceStatusAndDetails['locationName'];
         startTime = attendanceStatusAndDetails['startTime'];
         endTime = attendanceStatusAndDetails['endTime'];
+        workTypeList =
+            List<String>.from(attendanceStatusAndDetails['workTypeList'] ?? []);
+
+        AppConfig.isAttendanceMarkedNotifier.value =
+            attendanceStatusAndDetails['status'];
       });
     } catch (e) {
       setState(() {
-        locationName = "Error"; // Display error if fetching fails
+        //locationName = "Error"; // Display error if fetching fails
       });
       throw Exception('Failed to fetch attendanceStatusAndDetails: $e');
     }
@@ -251,6 +260,9 @@ class _AttendanceScreenState extends State<_AttendanceScreen>
             Center(
               child: CheckInButton(
                 employeeOid: employeeOid,
+                startTime: startTime,
+                endTime: endTime,
+                workTypeList: workTypeList,
               ),
             ),
             SizedBox(height: 80),

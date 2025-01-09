@@ -4,8 +4,17 @@ import '../screens/config_screen.dart';
 
 class CheckInButton extends StatefulWidget {
   final String? employeeOid;
+  final String startTime;
+  final String endTime;
+  final List<String> workTypeList;
 
-  const CheckInButton({super.key, required this.employeeOid});
+  const CheckInButton({
+    super.key,
+    required this.employeeOid,
+    required this.startTime,
+    required this.endTime,
+    required this.workTypeList,
+  });
 
   @override
   CheckInButtonState createState() => CheckInButtonState();
@@ -13,8 +22,10 @@ class CheckInButton extends StatefulWidget {
 
 class CheckInButtonState extends State<CheckInButton> {
 // To manage loading state
-  bool isAttendanceMarked = AppConfig.isAttendanceMarkedNotifier.value;
+  bool isAttendanceMarked = AppConfig.isAttendanceMarkedNotifier.value ==
+      true; //when true is true else(null or false)then false
   late String? employeeOid;
+  late bool isTodayOff;
   bool isToggling = false; // To track if toggle is in process
   double sliderHeight = 80.0;
   double sliderWidth = 200.0;
@@ -26,8 +37,11 @@ class CheckInButtonState extends State<CheckInButton> {
     super.initState();
 // Initialize loading as false
     employeeOid = widget.employeeOid;
-    // Fetch attendance status on init
-    _getAttendanceStatus();
+    isTodayOff = AppConfig.isAttendanceMarkedNotifier.value == null;
+    // Fetch attendance status on init only if not dayoff day
+    if (!isTodayOff) {
+      _getAttendanceStatus();
+    }
     // Set the initial drag offset based on attendance status
     _dragOffset = isAttendanceMarked ? (sliderWidth - sliderHeight) : 0.0;
   }
@@ -107,56 +121,59 @@ class CheckInButtonState extends State<CheckInButton> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      /*
-      onTap: () async {
-        if (!isToggling) { // Ensure it's not already toggling
-          setState(() => isToggling = true);
-          await _toggleAttendance(!isAttendanceMarked); // Call your toggle function
-          setState(() => isToggling = false);
-        }
-      },
-      */
-      onPanUpdate: (details) {
-        // Update the drag offset based on user's drag movement
-        setState(() {
-          _dragOffset =
-              details.localPosition.dx.clamp(0.0, sliderWidth - sliderHeight);
-        });
-      },
-      onPanEnd: (details) async {
-        // When the user stops dragging, toggle the attendance based on the final position
-        if (_dragOffset >= (sliderWidth - sliderHeight) / 2) {
-          await _toggleAttendance(true); // Mark attendance
-          // Set the drag offset to right
-          setState(() {
-            _dragOffset = (sliderWidth - sliderHeight);
-          });
-        } else {
-          await _toggleAttendance(false); // Unmark attendance
-          // Set the drag offset to left
-          setState(() {
-            _dragOffset = 0;
-          });
-        }
-      },
+      onPanUpdate: isTodayOff
+          ? null // Disable dragging if `isTodayOff` is true
+          : (details) {
+              // Update the drag offset based on user's drag movement
+              setState(() {
+                _dragOffset = details.localPosition.dx
+                    .clamp(0.0, sliderWidth - sliderHeight);
+              });
+            },
+      onPanEnd: isTodayOff
+          ? null // Disable drag-end handling if `isTodayOff` is true
+          : (details) async {
+              // When the user stops dragging, toggle the attendance based on the final position
+              if (_dragOffset >= (sliderWidth - sliderHeight) / 2) {
+                await _toggleAttendance(true); // Mark attendance
+                // Set the drag offset to right
+                setState(() {
+                  _dragOffset = (sliderWidth - sliderHeight);
+                });
+              } else {
+                await _toggleAttendance(false); // Unmark attendance
+                // Set the drag offset to left
+                setState(() {
+                  _dragOffset = 0;
+                });
+              }
+            },
       child: AnimatedContainer(
         duration: Duration(milliseconds: 300),
         height: sliderHeight,
         width: sliderWidth,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(sliderHeight),
-          color:
-              isAttendanceMarked ? Colors.grey.shade100 : Colors.grey.shade100,
+          color: isTodayOff
+              ? Colors.grey.shade300
+              : isAttendanceMarked
+                  ? Colors.grey.shade100
+                  : Colors.grey.shade100,
           gradient: LinearGradient(
-            colors: isAttendanceMarked
+            colors: isTodayOff
                 ? [
-                    Colors.green.shade500, // Darker green for depth
-                    Colors.green.shade400, // Lighter green for highlight
+                    Colors.grey.shade500,
+                    Colors.grey.shade400,
                   ]
-                : [
-                    Colors.red.shade500, // Darker red for depth
-                    Colors.redAccent.shade200, // Lighter red for highlight
-                  ],
+                : isAttendanceMarked
+                    ? [
+                        Colors.green.shade500, // Darker green for depth
+                        Colors.green.shade400, // Lighter green for highlight
+                      ]
+                    : [
+                        Colors.red.shade500, // Darker red for depth
+                        Colors.redAccent.shade200, // Lighter red for highlight
+                      ],
             begin: Alignment.topLeft, // Start of the gradient
             end: Alignment.bottomRight, // End of the gradient
           ),
@@ -232,7 +249,11 @@ class CheckInButtonState extends State<CheckInButton> {
                     size: buttonSizeRatio *
                         sliderHeight *
                         0.6, // Adjust icon size relative to button size
-                    color: isAttendanceMarked ? Colors.green : Colors.red,
+                    color: isTodayOff
+                        ? Colors.grey
+                        : isAttendanceMarked
+                            ? Colors.green
+                            : Colors.red,
                   ),
                 ),
               ),

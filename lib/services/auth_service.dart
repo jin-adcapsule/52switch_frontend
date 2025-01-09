@@ -1,11 +1,8 @@
-
 import 'package:flutter/material.dart';
 import '../services/graphql_service.dart';
 import '../logger_config.dart';
 
-
 class AuthService extends ChangeNotifier {
-
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
@@ -14,9 +11,9 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
   }
 
-
   // Validates the Firebase UID and phone number and retrieves the associated objectId.
-  Future<Map<String, dynamic>?> validateUidAndPhone(String uid, String phone) async {
+  Future<Map<String, dynamic>?> validateUidAndPhone(
+      String uid, String phone) async {
     const String query = '''
       query ValidateUidAndPhone(\$uid: String!, \$phone: String!) {
         validateUidAndPhone(uid: \$uid, phone: \$phone) {
@@ -34,7 +31,7 @@ class AuthService extends ChangeNotifier {
     };
 
     try {
-        // Indicate the start of a loading process
+      // Indicate the start of a loading process
       setLoading(true);
 
       // Perform the GraphQL query
@@ -52,6 +49,7 @@ class AuthService extends ChangeNotifier {
       // Extract and validate the data
       final data = result.data?['validateUidAndPhone'];
       if (data != null) {
+        print(data);
         return {
           'employeeOid': data['employeeOid'],
           'isSupervisor': data['isSupervisor'],
@@ -72,6 +70,4 @@ class AuthService extends ChangeNotifier {
       rethrow;
     }
   }
-
-  
 }

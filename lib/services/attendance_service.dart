@@ -155,6 +155,7 @@ class AttendanceService {
       }
 
       final data = result.data?['getAttendanceStatusAndDetails'];
+      LoggerConfig().logger.i('getAttendanceStatusAndDetails: $data');
       if (data != null) {
         return data; // Return both success and status
       } else {

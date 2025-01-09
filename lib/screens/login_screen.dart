@@ -36,7 +36,7 @@ class LoginScreenState extends State<LoginScreen> {
     if (uid != null && phone != null) {
       // Query backend to validate Firebase UID and retrieve objectId
       final success = await _validateUidAndFetchObjectId(uid, phone);
-      if (success)return;
+      if (success) return;
       // Clear storage if validation fails
       await _storage.deleteAll();
       setState(() {
@@ -45,18 +45,20 @@ class LoginScreenState extends State<LoginScreen> {
     }
   }
 
-
   Future<bool> _validateUidAndFetchObjectId(String uid, String phone) async {
     final AuthService authService = AuthService();
     try {
       final result = await authService.validateUidAndPhone(uid, phone);
 
-      if (result != null && result['employeeOid'] != null &&result['isSupervisor'] !=null &&
-          result['currentlyMarked'] != null) {
+      if (result != null &&
+          result['employeeOid'] != null &&
+          result['isSupervisor'] != null) {
+        //currentlymarked can be null if dayoff
         AppConfig.employeeOid = result['employeeOid'];
         AppConfig.employeeName = result['employeeName'];
         AppConfig.isSupervisor = result['isSupervisor'];
-        AppConfig.isAttendanceMarkedNotifier.value = result['currentlyMarked'];// Set the initial value of isAttendanceMarkedNotifier
+        AppConfig.isAttendanceMarkedNotifier.value = result[
+            'currentlyMarked']; // Set the initial value of isAttendanceMarkedNotifier
         if (mounted) {
           Navigator.pushReplacement(
             context,
@@ -91,7 +93,6 @@ class LoginScreenState extends State<LoginScreen> {
       verificationCompleted: (PhoneAuthCredential credential) async {
         await _auth.signInWithCredential(credential);
         await _fetchAndStoreUid(phoneNumber);
-
       },
       verificationFailed: (FirebaseAuthException e) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -113,7 +114,6 @@ class LoginScreenState extends State<LoginScreen> {
   Future<void> _fetchAndStoreUid(String phoneNumber) async {
     final User? user = _auth.currentUser;
     if (user != null) {
-
       await _storage.write(key: 'firebaseUid', value: user.uid);
       await _storage.write(key: 'phoneNumber', value: phoneNumber);
 
@@ -126,7 +126,7 @@ class LoginScreenState extends State<LoginScreen> {
         });
         Future.delayed(Duration(seconds: 2), () async {
           final retrySuccess =
-            await _validateUidAndFetchObjectId(user.uid, phoneNumber);
+              await _validateUidAndFetchObjectId(user.uid, phoneNumber);
           if (!retrySuccess) {
             setState(() {
               _authStatusMessage = 'Validation failed. Please log in again.';
@@ -135,24 +135,22 @@ class LoginScreenState extends State<LoginScreen> {
           }
         });
       }
-
     }
   }
-  Future<void> _saveFCMToken(String employeeOid) async {
-      // Query backend for objectId
-      try
-      {
-        final success = await PushService.saveFCMToken(employeeOid);
-        if (success) {
-          LoggerConfig().logger.i("FCM Token saved successfully!");
-        } else {
-          LoggerConfig().logger.e("Failed to save FCM token.");
-        }
-      } catch (e) {
-      LoggerConfig().logger.e("Error while saving FCM token: $e");
-      }
-    }
 
+  Future<void> _saveFCMToken(String employeeOid) async {
+    // Query backend for objectId
+    try {
+      final success = await PushService.saveFCMToken(employeeOid);
+      if (success) {
+        LoggerConfig().logger.i("FCM Token saved successfully!");
+      } else {
+        LoggerConfig().logger.e("Failed to save FCM token.");
+      }
+    } catch (e) {
+      LoggerConfig().logger.e("Error while saving FCM token: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -169,7 +167,7 @@ class LoginScreenState extends State<LoginScreen> {
                   labelText: 'Phone Number',
                   hintText: 'Enter phone number (e.g., 01012345678)',
                   errorText: _phoneController.text.isNotEmpty &&
-                      !_phoneController.text.startsWith('0')
+                          !_phoneController.text.startsWith('0')
                       ? 'Phone number must start with 0'
                       : null,
                 ),
