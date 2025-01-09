@@ -37,7 +37,7 @@ class _MyInfoScreenState extends State<_MyInfoScreen> {
   static const String statusAll = "전체";
   static const List<String> statusList = [
     "정상근무",
-    "휴가",
+    "정기휴가",
     "지각",
     "결근",
     "주말근무",
