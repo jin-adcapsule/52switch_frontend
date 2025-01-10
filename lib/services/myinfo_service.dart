@@ -11,7 +11,6 @@ class MyInfoService {
 // Fetch attendance history
   Future<List<Attendance>> fetchAttendanceHistory({
     required String employeeOid,
-    //required int employeeId,
     required String startDate,
     required String endDate,
     required List<String> workTypeList,

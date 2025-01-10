@@ -93,7 +93,10 @@ class DayoffRequestScreenState extends State<DayoffRequestScreen> {
   void _fetchData() {
     _futureData = _fetchDayoffInfo();
   }
-
+// Function to check if the day is a weekend (Saturday or Sunday)
+  bool _isWeekend(DateTime day) {
+    return day.weekday == DateTime.saturday || day.weekday == DateTime.sunday;
+  }
 
   @override
   void initState() {
@@ -200,18 +203,55 @@ class DayoffRequestScreenState extends State<DayoffRequestScreen> {
                                     titleCentered: true, // Center the title
                                     titleTextFormatter: (date, locale) => '${date.year}.${date.month.toString().padLeft(2, '0')}', // Custom format
                                     titleTextStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold), // Style the text
+                                    
                                   ),
+                                  daysOfWeekStyle: DaysOfWeekStyle(
+                                      weekdayStyle: TextStyle(color: Colors.black), // Default weekday text color (Mon-Fri)
+                                      weekendStyle: TextStyle(color: Colors.red), // Weekend text color (Sat-Sun)
+                                    ),
                                   calendarStyle: CalendarStyle(
+                                    
                                     isTodayHighlighted: true,
                                     selectedDecoration: BoxDecoration(
                                       color: Colors.blue,
                                       shape: BoxShape.circle,
                                     ),
                                     selectedTextStyle: const TextStyle(color: Colors.white),
-                                    outsideDaysVisible: false,
-                                    disabledTextStyle: TextStyle(color: Colors.grey),
+                                    outsideDaysVisible: false,                  
+                                    todayDecoration: BoxDecoration(
+                                      color: Colors.yellow.withOpacity(0.5), // Highlight today with a yellow background
+                                      shape: BoxShape.circle,
+                                    ),
+                                    weekendTextStyle: TextStyle(color: Colors.red), // Color weekend dates red,
+                                    //disabledTextStyle: TextStyle(color: Colors.grey),
+                                    
                                   ),
-                                  enabledDayPredicate: (day) => day.isAfter(DateTime.now()),
+                                    calendarBuilders: CalendarBuilders(//builder preventing from disabledTextStyle by enabledDayPredicate overriding weekendTextStyle
+                                      disabledBuilder: (context, day, focusedDay) {
+                                        // Reset the time of both 'day' and 'DateTime.now()' to midnight (00:00:00)
+                                        DateTime todayDate = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+
+                                        return Center(
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color:  Colors.transparent,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: Text(
+                                              '${day.day}',
+                                              style: TextStyle(
+                                                color: _isWeekend(day) 
+                                                    ? Colors.red.withOpacity(0.5)
+                                                    : day.isAtSameMomentAs(todayDate ) 
+                                                        ? Colors.blue.withOpacity(0.8) 
+                                                        : Colors.grey,
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  enabledDayPredicate: (day) => (!_isWeekend(day)&&day.isAfter(DateTime.now())),// Disable weekends and today
                                   selectedDayPredicate: (day) => _selectedDates.contains(day),
                                   onDaySelected: (selectedDay, newFocusedDay) {
                                     setState(() {
@@ -232,6 +272,7 @@ class DayoffRequestScreenState extends State<DayoffRequestScreen> {
                                   },
                                   firstDay: DateTime(DateTime.now().year, DateTime.now().month, 1), // First day of this month
                                   lastDay: DateTime(DateTime.now().year + 10, DateTime.now().month, DateTime.now().day), // 10 years later
+                                  
                                 
                             ),
 
