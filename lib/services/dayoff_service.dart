@@ -2,10 +2,13 @@ import 'graphql_service.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import '../models/dayoff.dart'; // Import the Attendance model
 import '../logger_config.dart';
+
 class DayoffService {
   // Request a day off for the employee
-  Future<List<String>> requestDayoff(String employeeOid, List<String> dateList, String dayoffType, String requestComment,int beforeDateRemaining) async {
-    String formattedDateList = dateList.map((date) => '"$date"').toList().toString();
+  Future<List<String>> requestDayoff(String employeeOid, List<String> dateList,
+      String dayoffType, String requestComment, int beforeDateRemaining) async {
+    String formattedDateList =
+        dateList.map((date) => '"$date"').toList().toString();
     String mutation = """
       mutation {
         requestDayoff(employeeOid: "$employeeOid",
@@ -21,8 +24,8 @@ class DayoffService {
       'dateList': formattedDateList,
       'dayoffType': dayoffType,
       'requestComment': requestComment,
-      'beforeDateRemaining':beforeDateRemaining,
-    };// Assuming dateList is already a properly formatted list of strings// No quotes for integers
+      'beforeDateRemaining': beforeDateRemaining,
+    }; // Assuming dateList is already a properly formatted list of strings// No quotes for integers
     try {
       // Execute the mutation
       var result = await GraphQLService.mutate(
@@ -32,7 +35,9 @@ class DayoffService {
 
       // Check for exceptions
       if (result.hasException) {
-        LoggerConfig().logger.e("Error requesting day off: ${result.exception}");
+        LoggerConfig()
+            .logger
+            .e("Error requesting day off: ${result.exception}");
         return ["Error: ${result.exception.toString()}"];
       }
 
@@ -65,6 +70,10 @@ class DayoffService {
         supervisorName
         supervisorOid
         dayoffRemaining
+        holidayList {
+          holidayName
+          holidayDate
+        }
       }
     }
     ''';
@@ -73,13 +82,15 @@ class DayoffService {
 
     try {
       final response = await GraphQLService.query(
-          query,
-          variables: variables,
-          fetchPolicy: FetchPolicy.networkOnly, // Force network fertch
-           );
+        query,
+        variables: variables,
+        fetchPolicy: FetchPolicy.networkOnly, // Force network fertch
+      );
 
       if (response.hasException) {
-        LoggerConfig().logger.e('Employee Query Exception: ${response.exception}');
+        LoggerConfig()
+            .logger
+            .e('Employee Query Exception: ${response.exception}');
         throw Exception('Failed to fetch getDayoffInfo data');
       }
 
@@ -87,10 +98,22 @@ class DayoffService {
       if (responseData == null) {
         throw Exception('Employee not found');
       }
-      final returnData={
+      // Map the data to Dart objects
+      final holidayList = (responseData['holidayList'] as List<dynamic>?)
+          ?.map((holiday) => {
+                'id': holiday['id'] ?? '',
+                'holidayName': holiday['holidayName'] ?? 'N/A',
+                'holidayDate': holiday['holidayDate'] ?? 'N/A',
+                'description': holiday['description'] ?? 'No description',
+              })
+          .toList();
+
+      final returnData = {
         'supervisorName': responseData['supervisorName'] ?? 'N/A',
         'supervisorOid': responseData['supervisorOid'] ?? 'N/A',
-        'dayoffRemaining': responseData['dayoffRemaining'] ?? 0,};
+        'dayoffRemaining': responseData['dayoffRemaining'] ?? 0,
+        'holidayList': holidayList ?? [],
+      };
 
       return returnData;
     } catch (e) {
@@ -98,6 +121,7 @@ class DayoffService {
       throw Exception('Failed to load getDayoffInfo data');
     }
   }
+
 // Fetch attendance history
   Future<List<Dayoff>> fetchDayoffHistory({
     required String employeeOid,
@@ -123,24 +147,25 @@ class DayoffService {
       //'employeeId': employeeId,
       'startDate': startDate,
       'endDate': endDate,
-      'requestStatusList': requestStatusList, // Include only if workType is not null
+      'requestStatusList':
+          requestStatusList, // Include only if workType is not null
     };
 
     try {
-
       final result = await GraphQLService.query(
         query,
         variables: variables,
         fetchPolicy: FetchPolicy.networkOnly, // Force network fetch
-
-      );// Ensure data is fetched from the server
+      ); // Ensure data is fetched from the server
       if (result.hasException) {
         LoggerConfig().logger.e("Query Exception: ${result.exception}");
         return [];
       }
 
       final data = result.data;
-      LoggerConfig().logger.i('API Response: $data');// Print the response for debugging
+      LoggerConfig()
+          .logger
+          .i('API Response: $data'); // Print the response for debugging
 
       if (data != null && data['getEmployeeDayoff'] != null) {
         final List<dynamic> dayoffList = data['getEmployeeDayoff'];

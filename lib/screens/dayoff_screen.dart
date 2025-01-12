@@ -26,8 +26,11 @@ class _DayoffScreenState extends State<_DayoffScreen>
   final DayoffService _dayoffService = DayoffService();
 
   // Filter State
-  DateTime _startDate = DateTime.now().subtract(const Duration(days: 30));
-  DateTime _endDate = DateTime.now();
+  DateTime _startDate =
+      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day)
+          .subtract(const Duration(days: 30));
+  DateTime _endDate =
+      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
   static const String statusAll = "전체";
   static const List<String> defaultRequestStatusList = ["대기중", "승인", "반려"];
   // Create a Map<String, bool> with all keys having a value of true
