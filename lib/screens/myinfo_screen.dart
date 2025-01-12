@@ -44,7 +44,8 @@ class _MyInfoScreenState extends State<_MyInfoScreen> {
     "오전반차",
     "오후반차",
     "경조휴가",
-    "휴직"
+    "휴직",
+    "공휴일"
   ];
   // Create a Map<String, bool> with all keys having a value of true
   static Map<String, bool> defaultWorkTypeSelection = {
@@ -67,7 +68,7 @@ class _MyInfoScreenState extends State<_MyInfoScreen> {
   //overlapping box
   int lateCount = 0; // initial count for overlapping box
   int absentCount = 0; // initial count for overlapping box
-  int dayoffCount = 0; // initial count for overlapping box
+  double dayoffCount = 0; // initial count for overlapping box
   bool isDataFetched = false; // Flag to control box visibility
   double maxExtentBox = 190;
   double minExtentBox = -100;
@@ -146,13 +147,20 @@ class _MyInfoScreenState extends State<_MyInfoScreen> {
           .where((attendance) => attendance.checkInStatus?.trim() == "지각")
           .length;
       absentCount = attendanceData
-          .where((attendance) => attendance.checkInStatus?.trim() == "결근")
+          .where((attendance) => attendance.workTypeList
+              .any((workType) => workType.trim() == '결근'))
           .length;
-      dayoffCount = attendanceData
-          .where((attendance) => attendance.workTypeList.any((workType) =>
-              workType.trim() == '오전반차' ||
-              workType.trim() == '오후반차' ||
-              workType.trim() == '정기휴가'))
+      // Counting for half-day off (오전반차 or 오후반차)
+      dayoffCount = 0.5 *
+          attendanceData
+              .where((attendance) => attendance.workTypeList.any((workType) =>
+                  workType.trim() == '오전반차' || workType.trim() == '오후반차'))
+              .length;
+
+      // Add full day off (정기휴가)
+      dayoffCount += attendanceData
+          .where((attendance) => attendance.workTypeList
+              .any((workType) => workType.trim() == '정기휴가'))
           .length;
     });
     return attendanceData;
@@ -329,7 +337,7 @@ class OverlappingBox extends StatelessWidget {
   final double scrollOffset;
   final int lateCount;
   final int absentCount;
-  final int dayoffCount;
+  final double dayoffCount;
   final bool isDataFetched; // Flag to control displaying count values
   final double maxExtentBox;
   final double minExtentBox;
@@ -412,7 +420,11 @@ class OverlappingBox extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      isDataFetched ? "$dayoffCount" : "",
+                      isDataFetched
+                          ? (dayoffCount == dayoffCount.toInt()
+                              ? dayoffCount.toInt().toString()
+                              : dayoffCount.toStringAsFixed(1))
+                          : "", // Display as integer if whole number, otherwise as 1 decimal point
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
