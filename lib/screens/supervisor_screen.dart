@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 
 import 'package:intl/intl.dart'; // For date formatting
-import 'config_screen.dart'; // Import AppConfig
+import '../utils/constants.dart'; // Import Constants
 import '../services/supervisor_service.dart';
 import '../models/request.dart' as rq;
 import '../widgets/request_history_filter.dart';
@@ -56,7 +56,7 @@ class _SupervisorScreenState extends State<_SupervisorScreen> with SingleTickerP
             entry.key
       ];
       final requestHistoryData = await _supervisorService.fetchRequestHistory(
-        employeeOid: AppConfig.employeeOid,
+        employeeOid: Constants.employeeOid,
         startDate: DateFormat('yyyy-MM-dd').format(_startDate),
         endDate: DateFormat('yyyy-MM-dd').format(_endDate),
         requestStatusList: requestStatusList //null directs get all regardless of status
@@ -70,7 +70,7 @@ class _SupervisorScreenState extends State<_SupervisorScreen> with SingleTickerP
   Future<List<rq.Request>> _fetchPendingRequests() async {
     try {
       final requestPendingData = await _supervisorService.fetchPendingRequests(
-        employeeOid: AppConfig.employeeOid,
+        employeeOid: Constants.employeeOid,
       );
       return requestPendingData;
     } catch (e) {
@@ -104,10 +104,10 @@ class _SupervisorScreenState extends State<_SupervisorScreen> with SingleTickerP
                 // Height when fully collapsed
                 maxHeight: 130.0,
                 // Height when fully expanded
-                text: AppConfig.getAppbarTitle(AppConfig.selectedKeyNotifier
+                text: Constants.getAppbarTitle(Constants.selectedKeyNotifier
                     .value),
-                backgroundColor: AppConfig.getColor(ColorType.background),
-                textColor: AppConfig.getColor(ColorType.text),
+                backgroundColor: Constants.getColor(ColorType.background),
+                textColor: Constants.getColor(ColorType.text),
                 tabController: _tabController, // Pass the TabController
               ),
             ),

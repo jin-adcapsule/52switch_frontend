@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/supervisor_service.dart';
 import '../services/push_service.dart';
-import '../screens/config_screen.dart';
+import '../utils/constants.dart';
 
 class AnswerRequestScreen extends StatefulWidget {
   final String? employeeOid;
@@ -211,7 +211,7 @@ class AnswerRequestScreenState extends State<AnswerRequestScreen> {
         );
       }
       //send Notification with employeeOid, title, message, redirect page key, redirect request key
-      PushService.sendPushToEmployeeOid(widget.employeeOid!, "${widget.requestType} $status", "${AppConfig.employeeName}님이 처리하였습니다.","dayoff");
+      PushService.sendPushToEmployeeOid(widget.employeeOid!, "${widget.requestType} $status", "${Constants.employeeName}님이 처리하였습니다.","dayoff");
 
       // Clear inputs and reset state
       clearForm();

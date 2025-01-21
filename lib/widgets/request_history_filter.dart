@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/cupertino.dart';
 
 class RequestHistoryFilter extends StatelessWidget {
   final DateTime startDate;
@@ -113,6 +114,7 @@ class _RequestFilterPopupState extends State<RequestFilterPopup> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           buildDateButton(
+                            context:context,
                             date: _tempStartDate,
                             onDatePicked: (pickedDate) {_tempStartDate = pickedDate;},
                             lastdate:_tempEndDate,
@@ -122,6 +124,7 @@ class _RequestFilterPopupState extends State<RequestFilterPopup> {
                             child: Text("~"), // Align `~` properly
                           ),
                           buildDateButton(
+                            context:context,
                             date: _tempEndDate,
                             onDatePicked: (pickedDate) {_tempStartDate = pickedDate;},
                             firstdate:_tempStartDate,
@@ -192,32 +195,164 @@ class _RequestFilterPopupState extends State<RequestFilterPopup> {
     });
   }
   Widget buildDateButton({
+    required BuildContext context, // Pass context explicitly as a parameter
     required DateTime date,
     required void Function(DateTime) onDatePicked,
     DateTime? firstdate,
     DateTime? lastdate,
+    
   }) {
     return TextButton(
-      onPressed: () async {
-        DateTime firstdate0;
-        DateTime lastdate0;
-        if (firstdate == null) {firstdate0=DateTime(2000);}else{firstdate0=firstdate;}
-        if (lastdate == null) {lastdate0=DateTime.now();}else{lastdate0=lastdate;}
-        DateTime? picked = await showDatePicker(
-          context: context,
-          initialDate: date,
-          firstDate: firstdate0,
-          lastDate: lastdate0,
-        );
-        if (picked != null) {
-          setState(() {
-            onDatePicked(picked);
-          });
-        }
-      },
-      child: Text(DateFormat('yyyy-MM-dd').format(date)),
-    );
+    onPressed: () {
+      int startYear = DateTime.now().year-3;
+      int endYear = DateTime.now().year;
+      // Get the initial month and year from the provided date
+      int initialDayIndex = date.day - 1; // Convert to 0-based index
+      int initialMonthIndex = date.month - 1; // Convert to 0-based index
+      int initialYearIndex = date.year - startYear; // Subtract starting year (2020) to get the index
+      // Initialize controllers with initial item
+      FixedExtentScrollController dayController = FixedExtentScrollController(initialItem: initialDayIndex);
+      FixedExtentScrollController  monthController = FixedExtentScrollController(initialItem: initialMonthIndex);
+      FixedExtentScrollController  yearController = FixedExtentScrollController(initialItem: initialYearIndex);
+      // Create the picker data
+      List<String> years = List.generate(endYear - startYear + 1, (index) => (startYear + index).toString());
+      List<String> months = List.generate(12, (index) => (index + 1).toString().padLeft(2, '0'));
+      List<String> days = List.generate(31, (index) => (index + 1).toString().padLeft(2, '0'));
+
+      showCupertinoModalPopup(
+        context: context,
+        builder: (context) {
+          return CupertinoActionSheet(
+            title: Padding(
+              padding: const EdgeInsets.only(top: 10, right: 10),
+              child: CupertinoActionSheetAction(
+                onPressed: () {
+                  // Map selected index to values
+                  int selectedYear = startYear + yearController.selectedItem; // Assuming starting year is 2020
+                  int selectedMonth = monthController.selectedItem + 1; // Convert 0-based index to 1-based month
+                  int selectedDay = dayController.selectedItem + 1; // Convert 0-based index to 1-based day
+
+                  // Create a DateTime object with the selected date
+                  DateTime selectedDate = DateTime(selectedYear, selectedMonth, selectedDay);
+                  // Check if selected date is within the valid range
+                  if ((firstdate != null && selectedDate.isBefore(firstdate)) ||
+                      (lastdate != null && selectedDate.isAfter(lastdate))) {
+                    // If the date is invalid, show an alert or handle the error
+                    showDialog(
+                      context: context,
+                      builder: (context) => CupertinoAlertDialog(
+                        content: Text('날짜 선택 오류'),
+                        actions: [
+                          CupertinoDialogAction(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: Text('OK'),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else {
+                    // Pass the selected date back to the onDatePicked callback
+                    setState(() {
+                      onDatePicked(selectedDate);
+                    });
+
+                    // Close the modal
+                    Navigator.pop(context);
+                  }
+                },
+                child: Align(
+                  alignment: Alignment.topRight,
+                  child:Text(
+                      '확인',
+                      style: TextStyle(color: CupertinoColors.activeBlue),
+                  ),
+                )
+              ),
+            ),
+            message: Column(
+              children: [
+                Divider(), // Thin divider
+                SizedBox(
+                  height: 200, // Height of the picker
+                  child: Stack(
+                    children: [
+                      // Unified overlay behind all pickers
+                      Center(
+                        child: Container(
+                          height: 32.0, // Match itemExtent
+                          margin: const EdgeInsets.symmetric(horizontal: 16.0), // Add padding around the pickers
+                          decoration: BoxDecoration(
+                            color: Colors.grey.withOpacity(0.2), // Light gray with transparency
+                            borderRadius: BorderRadius.circular(10), // Rounded corners
+                          ),
+                        ),
+                      ),
+                      // Pickers Row
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,  // Shrink the row's width to fit its children
+                        children: [
+                          
+                          // Year Picker
+                          Expanded(
+                            child:CupertinoPicker(
+                              selectionOverlay: null,
+                              scrollController: yearController,
+                              itemExtent: 32.0,
+                              onSelectedItemChanged: (int yearIndex) {
+                                // Handle year selection
+                              },
+                              children: List.generate(years.length, (index) {
+                                return Center(child: Text('${years[index]}년'));
+                              }),
+                            )
+                          ),
+                          // Month Picker
+                          Expanded(
+                            child: CupertinoPicker(
+                              selectionOverlay: null,
+                              scrollController: monthController,
+                              itemExtent: 32.0,
+                              onSelectedItemChanged: (int monthIndex) {
+                                // Handle month selection
+                              },
+                              children: List.generate(months.length, (index) {
+                                return Center(child: Text('${months[index]}월'));
+                              }),
+                            )
+                          ),
+                          // Day Picker
+                          Expanded(
+                            child:CupertinoPicker(
+                              selectionOverlay: null,
+                              itemExtent: 32.0,
+                              scrollController: dayController,
+                              onSelectedItemChanged: (int dayIndex) {
+                                // Handle day selection
+                              },
+                              children: List.generate(days.length, (index) {
+                                return Center(child: Text('${days[index]}일'));
+                              }),
+                            )
+                          ),
+                        ],
+                      ),
+                    ]
+                  )
+                )
+              ],
+            ),
+           
+          );
+        },
+      );
+    },
+    child: Text(DateFormat('yyyy-MM-dd').format(date)),
+  );
   }
+
   void _applyFilters() async {
     try {
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/dayoff_request.dart';
 import 'package:intl/intl.dart'; // For date formatting
-import 'config_screen.dart'; // Import AppConfig
+import '../utils/constants.dart'; // Import Constants
 import '../services/dayoff_service.dart';
 import '../models/dayoff.dart';
 import '../widgets/dayoff_history_filter.dart';
@@ -51,7 +51,7 @@ class _DayoffScreenState extends State<_DayoffScreen>
       ];
 
       final dayoffData = await _dayoffService.fetchDayoffHistory(
-        employeeOid: AppConfig.employeeOid,
+        employeeOid: Constants.employeeOid,
         startDate: DateFormat('yyyy-MM-dd').format(_startDate),
         endDate: DateFormat('yyyy-MM-dd').format(_endDate),
         requestStatusList:
@@ -90,10 +90,10 @@ class _DayoffScreenState extends State<_DayoffScreen>
                 // Height when fully collapsed
                 maxHeight: 150.0,
                 // Height when fully expanded
-                text: AppConfig.getAppbarTitle(
-                    AppConfig.selectedKeyNotifier.value),
-                backgroundColor: AppConfig.getColor(ColorType.background),
-                textColor: AppConfig.getColor(ColorType.text),
+                text: Constants.getAppbarTitle(
+                    Constants.selectedKeyNotifier.value),
+                backgroundColor: Constants.getColor(ColorType.background),
+                textColor: Constants.getColor(ColorType.text),
                 tabController: _tabController, // Pass the TabController
               ),
             ),

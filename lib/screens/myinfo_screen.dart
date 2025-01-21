@@ -6,7 +6,7 @@ import '../services/myinfo_service.dart'; // Import the service file
 import '../models/employee.dart'; // Import the Employee model
 import '../models/attendance.dart'; // Import Attendance model
 import '../widgets/show_myinfo_widget.dart';
-import 'config_screen.dart'; // Import AppConfig
+import '../utils/constants.dart'; // Import Constants
 
 import '../widgets/myinfo_filter.dart';
 import 'package:intl/intl.dart'; // For date formatting
@@ -35,18 +35,8 @@ class _MyInfoScreenState extends State<_MyInfoScreen> {
   double _scrollOffset = 0.0;
   // Filters
   static const String statusAll = "전체";
-  static const List<String> statusList = [
-    "정상근무",
-    "정기휴가",
-    "지각",
-    "결근",
-    "주말근무",
-    "오전반차",
-    "오후반차",
-    "경조휴가",
-    "휴직",
-    "공휴일"
-  ];
+
+  static const List<String> statusList = [...{...Constants.orDayoffHolidayList, ...Constants.attendanceStatusList}];
   // Create a Map<String, bool> with all keys having a value of true
   static Map<String, bool> defaultWorkTypeSelection = {
     for (String status in [statusAll, ...statusList]) status: true,
@@ -133,8 +123,7 @@ class _MyInfoScreenState extends State<_MyInfoScreen> {
   ///get a response for search from service
   Future<List<Attendance>> _fetchAttendanceHistory() async {
     final attendanceData = await MyInfoService().fetchAttendanceHistory(
-      //employeeId: AppConfig.employeeId!,
-      employeeOid: AppConfig.employeeOid,
+      employeeOid: Constants.employeeOid,
       startDate: DateFormat('yyyy-MM-dd').format(_startDate),
       endDate: DateFormat('yyyy-MM-dd').format(_endDate),
       workTypeList: workTypeList,
@@ -191,16 +180,16 @@ class _MyInfoScreenState extends State<_MyInfoScreen> {
               expandedHeight: expandedHeightAppBar, // Standard AppBar height
               pinned: false, // AppBar scrolls out of view
               floating: false,
-              backgroundColor: AppConfig.getColor(ColorType.background),
+              backgroundColor: Constants.getColor(ColorType.background),
               centerTitle: false, // Ensures left alignment on both platforms
               title: Text(
-                AppConfig.getAppbarTitle(AppConfig.selectedKeyNotifier.value),
-                style: TextStyle(color: AppConfig.getColor(ColorType.text)),
+                Constants.getAppbarTitle(Constants.selectedKeyNotifier.value),
+                style: TextStyle(color: Constants.getColor(ColorType.text)),
               ),
               actions: [
                 IconButton(
                   icon: const Icon(Icons.account_circle),
-                  color: AppConfig.getColor(ColorType.text),
+                  color: Constants.getColor(ColorType.text),
                   onPressed: () {
                     _showMyinfo(context);
                   },
@@ -216,6 +205,7 @@ class _MyInfoScreenState extends State<_MyInfoScreen> {
                 endDate: _endDate, // Pass endDate
                 workTypeSelection: _workTypeSelection,
                 onApplyFilters: _applyFilters,
+
               ),
             ),
           ];

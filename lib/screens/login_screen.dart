@@ -4,7 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../services/auth_service.dart';
 import '../services/push_service.dart';
 import 'navigation.dart';
-import 'config_screen.dart';
+import '../utils/constants.dart';
 import '../logger_config.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -54,10 +54,10 @@ class LoginScreenState extends State<LoginScreen> {
           result['employeeOid'] != null &&
           result['isSupervisor'] != null) {
         //currentlymarked can be null if dayoff
-        AppConfig.employeeOid = result['employeeOid'];
-        AppConfig.employeeName = result['employeeName'];
-        AppConfig.isSupervisor = result['isSupervisor'];
-        AppConfig.isAttendanceMarkedNotifier.value = result[
+        Constants.employeeOid = result['employeeOid'];
+        Constants.employeeName = result['employeeName'];
+        Constants.isSupervisor = result['isSupervisor'];
+        Constants.isAttendanceMarkedNotifier.value = result[
             'currentlyMarked']; // Set the initial value of isAttendanceMarkedNotifier
         if (mounted) {
           Navigator.pushReplacement(

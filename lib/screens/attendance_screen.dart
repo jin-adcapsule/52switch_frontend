@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'config_screen.dart'; // Import AppConfig
+import '../utils/constants.dart'; // Import Constants
 import 'package:firebase_messaging/firebase_messaging.dart'; // Import Firebase Messaging
 
 import '../widgets/check_in_button.dart';
@@ -22,13 +22,13 @@ class _AttendanceScreen extends StatefulWidget {
 
 class _AttendanceScreenState extends State<_AttendanceScreen>
     with SingleTickerProviderStateMixin {
-  //bool isAttendanceMarked = AppConfig.isAttendanceMarkedNotifier.value;
+  //bool isAttendanceMarked = Constants.isAttendanceMarkedNotifier.value;
   bool isAttendanceMarked =
       false; //when true is true else(null or false)then false
   final String? employeeOid =
-      AppConfig.employeeOid; // Example: Use actual employee ID
+      Constants.employeeOid; // Example: Use actual employee ID
   bool? oldIsAttendanceMarked;
-  //final int? employeeId = AppConfig.employeeId;
+  //final int? employeeId = Constants.employeeId;
   final AttendanceService _attendanceService = AttendanceService();
   String locationName = '';
   String startTime = '';
@@ -95,8 +95,8 @@ class _AttendanceScreenState extends State<_AttendanceScreen>
     super.dispose();
   }
 
-  String getMaintextHome() => AppConfig.getMaintextHome();
-  String getSubtextHome() => AppConfig.getSubtextHome();
+  String getMaintextHome() => Constants.getMaintextHome();
+  String getSubtextHome() => Constants.getSubtextHome();
 
   void _showNotifications() {
     showModalBottomSheet(
@@ -171,7 +171,7 @@ class _AttendanceScreenState extends State<_AttendanceScreen>
   Future<void> _fetchAttedanceStatusAndDetails() async {
     try {
       final attendanceStatusAndDetails = await _attendanceService
-          .fetchAttendanceStatusAndDetails(AppConfig.employeeOid);
+          .fetchAttendanceStatusAndDetails(Constants.employeeOid);
       setState(() {
         locationName = attendanceStatusAndDetails['locationName'];
         startTime = attendanceStatusAndDetails['startTime'];
@@ -179,7 +179,7 @@ class _AttendanceScreenState extends State<_AttendanceScreen>
         workTypeList =
             List<String>.from(attendanceStatusAndDetails['workTypeList'] ?? []);
 
-        AppConfig.isAttendanceMarkedNotifier.value =
+        Constants.isAttendanceMarkedNotifier.value =
             attendanceStatusAndDetails['status'];
       });
     } catch (e) {
@@ -194,18 +194,18 @@ class _AttendanceScreenState extends State<_AttendanceScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors
-          .transparent, //getBackgroundColor(AppConfig.selectedIndexNotifier.value, isAttendanceMarked),
+          .transparent, //getBackgroundColor(Constants.selectedIndexNotifier.value, isAttendanceMarked),
       appBar: AppBar(
         title: Text(
-            AppConfig.getAppbarTitle(AppConfig.selectedKeyNotifier.value),
-            style: TextStyle(color: AppConfig.getColor(ColorType.text))),
+            Constants.getAppbarTitle(Constants.selectedKeyNotifier.value),
+            style: TextStyle(color: Constants.getColor(ColorType.text))),
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: false, // Forces left alignment on both Android and iOS
         actions: [
           IconButton(
             icon: Icon(Icons.notifications),
-            color: AppConfig.getColor(ColorType.text),
+            color: Constants.getColor(ColorType.text),
             onPressed: _showNotifications,
           ),
         ],
@@ -233,7 +233,7 @@ class _AttendanceScreenState extends State<_AttendanceScreen>
               child: Padding(
                 padding: const EdgeInsets.only(top: 8),
                 child: Text(
-                  AppConfig.getMaintextHome(),
+                  Constants.getMaintextHome(),
                   style: TextStyle(
                     fontSize: 60,
                     fontWeight: FontWeight.bold,
@@ -248,7 +248,7 @@ class _AttendanceScreenState extends State<_AttendanceScreen>
               child: Padding(
                 padding: const EdgeInsets.only(top: 8),
                 child: Text(
-                  AppConfig.getSubtextHome(),
+                  Constants.getSubtextHome(),
                   style: TextStyle(
                     fontSize: 18,
                     color: Colors.white,

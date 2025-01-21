@@ -7,7 +7,7 @@ import 'services/auth_service.dart';
 import 'services/local_notification_service.dart';
 import 'services/notification_handler.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:app52switch/screens/config_screen.dart';
+import 'package:app52switch/utils/constants.dart';
 
 import "firebase_config.dart";
 
@@ -22,7 +22,7 @@ void main() async {
       LoggerConfig()
           .logger
           .i("User tapped notification with payload: $payload");
-      AppConfig.selectedKeyNotifier.value = payload;
+      Constants.selectedKeyNotifier.value = payload;
     }
   });
   // Listen for foreground & background notifications with requesting permission

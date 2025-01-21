@@ -1,4 +1,4 @@
-import 'package:app52switch/screens/config_screen.dart';
+import 'package:app52switch/utils/constants.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'local_notification_service.dart'; // Import the helper class
 import '../logger_config.dart';
@@ -67,10 +67,10 @@ class NotificationHandler {
 
   // Function to handle navigation based on the notification data
   static void _handleNotificationNavigation(String? pageKey) {
-    // Check if the page is valid and change the selected key in AppConfig
+    // Check if the page is valid and change the selected key in Constants
     if (pageKey != null) {
       // For example, navigate to the "attendance" screen when "attendance" is passed
-      AppConfig.selectedKeyNotifier.value = pageKey;
+      Constants.selectedKeyNotifier.value = pageKey;
       LoggerConfig().logger.i('Navigated to page: $pageKey');
     }
   }

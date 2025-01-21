@@ -4,7 +4,7 @@ import 'dayoff_screen.dart';
 import 'supervisor_screen.dart';
 import 'myinfo_screen.dart';
 import 'more_screen.dart';
-import 'config_screen.dart'; // For app configuration
+import '../utils/constants.dart'; // For app configuration
 
 class Navigation extends StatefulWidget {
   const Navigation({super.key});
@@ -14,8 +14,8 @@ class Navigation extends StatefulWidget {
 }
 
 class NavigationState extends State<Navigation> {
-  final String employeeOid = AppConfig.employeeOid; // Use from config
-  final bool isSupervisor = AppConfig.isSupervisor; // Use from config
+  final String employeeOid = Constants.employeeOid; // Use from config
+  final bool isSupervisor = Constants.isSupervisor; // Use from config
   final Duration animationDuration = const Duration(milliseconds: 300);
   String? oldSelectedKey; // Variable to hold the previous selectedKey
   // Cache for storing created screens
@@ -31,12 +31,12 @@ class NavigationState extends State<Navigation> {
     }
 
     setState(() {
-      AppConfig.selectedKeyNotifier.value = key; // Update the notifier
+      Constants.selectedKeyNotifier.value = key; // Update the notifier
     });
   }
 
   List<Map<String, dynamic>> getVisibleTabs() {
-    return AppConfig.tabConfig.where((tab) {
+    return Constants.tabConfig.where((tab) {
       if (tab['key'] == 'supervisor' && !isSupervisor) {
         return false; // Exclude '관리자' if the user is not a supervisor
       }
@@ -83,11 +83,11 @@ class NavigationState extends State<Navigation> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<String>(
-        valueListenable: AppConfig.selectedKeyNotifier,
+        valueListenable: Constants.selectedKeyNotifier,
         builder: (context, selectedKey, child) {
           return ValueListenableBuilder<bool?>(
               //can be null(isTodayOff)
-              valueListenable: AppConfig.isAttendanceMarkedNotifier,
+              valueListenable: Constants.isAttendanceMarkedNotifier,
               builder: (context, isAttendanceMarked, child) {
                 final visibleTabs = getVisibleTabs();
                 // Whether the selected key has changed, for example
@@ -97,11 +97,11 @@ class NavigationState extends State<Navigation> {
                   oldSelectedKey = selectedKey; // Save the new key as old
                 }
                 return Scaffold(
-                  backgroundColor: AppConfig.getColor(ColorType.background,
+                  backgroundColor: Constants.getColor(ColorType.background,
                       isAttendanceMarked: isAttendanceMarked),
                   body: AnimatedContainer(
                     duration: isKeyChanged ? Duration.zero : animationDuration,
-                    color: AppConfig.getColor(ColorType.background,
+                    color: Constants.getColor(ColorType.background,
                         isAttendanceMarked:
                             isAttendanceMarked), // Match with AnimatedContainer
                     child: _getSelectedScreen(selectedKey, isAttendanceMarked),
@@ -112,7 +112,7 @@ class NavigationState extends State<Navigation> {
                       // Only animate when the background color needs to change
                       duration:
                           isKeyChanged ? Duration.zero : animationDuration,
-                      color: AppConfig.getColor(ColorType.background,
+                      color: Constants.getColor(ColorType.background,
                           isAttendanceMarked:
                               isAttendanceMarked), // Match with AnimatedContainer
                       child: Theme(
@@ -138,9 +138,9 @@ class NavigationState extends State<Navigation> {
                           onTap: (index) =>
                               _onItemTapped(visibleTabs[index]['key']),
                           selectedItemColor:
-                              AppConfig.getColor(ColorType.selectedItem),
+                              Constants.getColor(ColorType.selectedItem),
                           unselectedItemColor:
-                              AppConfig.getColor(ColorType.unselectedItem),
+                              Constants.getColor(ColorType.unselectedItem),
                           showUnselectedLabels: true,
                         ),
                       )),

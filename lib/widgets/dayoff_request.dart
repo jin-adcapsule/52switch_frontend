@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../services/dayoff_service.dart';
 import 'package:flutter/foundation.dart';
-import '../screens/config_screen.dart';
+import '../utils/constants.dart';
 import '../services/push_service.dart';
 import '../toast_config.dart';
+import 'package:flutter/cupertino.dart';
 
 class DayoffRequestScreen extends StatefulWidget {
   final String? employeeOid;
@@ -75,7 +76,7 @@ class DayoffRequestScreenState extends State<DayoffRequestScreen> {
     if (listEquals(response, ["Success"])) {
       ToastConfig.showToast('휴가 신청 완료');
       PushService.sendPushToSupervisor(widget.employeeOid!, "휴가 신청",
-          "${AppConfig.employeeName} $_selectedDayoffType 신청", "supervisor");
+          "${Constants.employeeName} $_selectedDayoffType 신청", "supervisor");
       setState(() {
         _selectedDates.clear();
         _selectedDayoffType = null;
@@ -414,163 +415,18 @@ class DayoffRequestScreenState extends State<DayoffRequestScreen> {
                       const Icon(Icons.luggage,
                           color: Colors.black), // Luggage Icon
                       const SizedBox(width: 5),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () async {
-                            String? selected =
-                                await showModalBottomSheet<String>(
-                              context: context,
-                              isScrollControlled: true,
-                              builder: (context) {
-                                int initialIndex = _dayoffTypes
-                                    .indexOf(_selectedDayoffType ?? '정기휴가');
-
-                                return StatefulBuilder(
-                                  builder: (context, setState) {
-                                    int selectedIndex =
-                                        initialIndex >= 0 ? initialIndex : 0;
-
-                                    return Container(
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.3, // Adjustable height
-                                      decoration: const BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.vertical(
-                                            top: Radius.circular(16)),
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          // Top bar with Confirm button
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 16, vertical: 8),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                const Spacer(),
-                                                TextButton(
-                                                  onPressed: () {
-                                                    Navigator.pop(
-                                                        context,
-                                                        _dayoffTypes[
-                                                            selectedIndex]);
-                                                  },
-                                                  child: const Text(
-                                                    '확인',
-                                                    style: TextStyle(
-                                                        color: Colors.blue),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          const Divider(
-                                              thickness: 1,
-                                              height:
-                                                  1), // Divider below the top bar
-
-                                          // ListWheelScrollView with minimized empty space
-                                          Expanded(
-                                            child: Stack(
-                                              alignment: Alignment
-                                                  .center, // Aligns the box in the middle
-                                              children: [
-                                                // Fixed Highlight Box
-                                                Positioned(
-                                                  child: Container(
-                                                    height:
-                                                        40, // Match itemExtent
-                                                    margin: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 16),
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.grey[
-                                                          300], // Highlight color
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8),
-                                                    ),
-                                                  ),
-                                                ),
-                                                // ListWheelScrollView
-                                                ListWheelScrollView.useDelegate(
-                                                  controller:
-                                                      FixedExtentScrollController(
-                                                          initialItem:
-                                                              selectedIndex), // Start at selectedIndex
-                                                  itemExtent:
-                                                      40, // Height of each item
-                                                  physics:
-                                                      const FixedExtentScrollPhysics(),
-                                                  onSelectedItemChanged:
-                                                      (index) {
-                                                    selectedIndex =
-                                                        index; // Update selected index
-                                                  },
-                                                  childDelegate:
-                                                      ListWheelChildBuilderDelegate(
-                                                    builder: (context, index) {
-                                                      final bool isSelected =
-                                                          index ==
-                                                              selectedIndex;
-
-                                                      return Container(
-                                                        alignment:
-                                                            Alignment.center,
-                                                        child: Text(
-                                                          _dayoffTypes[index],
-                                                          style: TextStyle(
-                                                            fontSize: 16,
-                                                            color: isSelected
-                                                                ? Colors.black
-                                                                : Colors.grey,
-                                                            fontWeight:
-                                                                isSelected
-                                                                    ? FontWeight
-                                                                        .bold
-                                                                    : FontWeight
-                                                                        .normal,
-                                                          ),
-                                                        ),
-                                                      );
-                                                    },
-                                                    childCount:
-                                                        _dayoffTypes.length,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                );
-                              },
-                            );
-
-                            if (selected != null) {
-                              setState(() {
-                                _selectedDayoffType =
-                                    selected; // Update selected value
-                              });
-                            }
-                          },
-                          child: Text(
-                            _selectedDayoffType ?? '정기휴가', // Default value
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                        ),
-                      ),
-                    ],
+                      selectDayoffTypeButton(
+                            context: context,
+                            dayofftypes: _dayoffTypes,
+                            selectedDayoffType: _selectedDayoffType,      
+                      )
+                    ]
                   ),
 
-                  const SizedBox(height: 10),
+
+                  const SizedBox(height: 5),
                   const Divider(thickness: 1, color: Colors.grey),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 5),
                   //comment type
                   Row(
                     children: [
@@ -652,4 +508,92 @@ class DayoffRequestScreenState extends State<DayoffRequestScreen> {
                 ),
         ]));
   }
+  
+  Widget selectDayoffTypeButton({
+    required BuildContext context, // Pass context explicitly as a parameter
+    required List<String> dayofftypes,
+    String? selectedDayoffType,
+    
+  }) {
+    return TextButton(
+    onPressed: () {
+      // Get initial index based on the current selected value
+      int initialIndex = dayofftypes.indexOf(selectedDayoffType ?? '정기휴가');
+      // Initialize controllers with initial item
+      FixedExtentScrollController controller = FixedExtentScrollController(initialItem: initialIndex);
+      // Create the picker data
+      //List<String> dayofftypes = List.generate(endYear - startYear + 1, (index) => (startYear + index).toString());
+
+      showCupertinoModalPopup(
+        context: context,
+        builder: (context) {
+          return CupertinoActionSheet(
+            title: Padding(
+              padding: const EdgeInsets.only(top: 10, right: 10),
+              child: CupertinoActionSheetAction(
+                
+                onPressed: () {
+                  // Map selected index to values
+                  int selectedIdx = controller.selectedItem; // Assuming starting year is 2020
+
+                  // Create a DateTime object with the selected date
+                  String selectedDayoffType = dayofftypes[selectedIdx];
+                 
+                  // Pass the selected date back to the onDatePicked callback
+                  setState((){
+                    _selectedDayoffType = selectedDayoffType; // Update selected value
+                  });
+
+                  // Close the modal
+                  Navigator.pop(context);
+                  
+                },
+                child: Align(
+                  alignment: Alignment.topRight,
+                  child:Text(
+                      '확인',
+                      style: TextStyle(color: CupertinoColors.activeBlue),
+                  ),
+                )
+              ),
+            ),
+            message: Column(
+              children: [
+                Divider(), // Thin divider
+                SizedBox(
+                  height: 200, // Height of the picker
+                  child: CupertinoPicker(
+                              scrollController: controller,
+                              itemExtent: 32.0,
+                              onSelectedItemChanged: (int selectedIdx) {
+                                // Handle year selection
+                              },
+                              children: dayofftypes.map((type) {
+                                return Center(
+                                  child: Text(type, style: TextStyle(fontSize: 16)),
+                                );
+                              }).toList(),
+                              ),
+                            
+                          ),
+                          
+                      
+                      
+                    ]
+                  )
+
+
+
+           
+          );
+        },
+      );
+    },
+    child: Text(
+      selectedDayoffType ?? '정기휴가', // Default value
+      style: const TextStyle(fontSize: 16),
+    ),
+  );
+  }
+
 }

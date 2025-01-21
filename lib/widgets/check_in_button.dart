@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/attendance_service.dart';
-import '../screens/config_screen.dart';
+import '../utils/constants.dart';
 
 class CheckInButton extends StatefulWidget {
   final String? employeeOid;
@@ -22,7 +22,7 @@ class CheckInButton extends StatefulWidget {
 
 class CheckInButtonState extends State<CheckInButton> {
 // To manage loading state
-  bool isAttendanceMarked = AppConfig.isAttendanceMarkedNotifier.value ==
+  bool isAttendanceMarked = Constants.isAttendanceMarkedNotifier.value ==
       true; //when true is true else(null or false)then false
   late String? employeeOid;
   late bool isTodayOff;
@@ -37,7 +37,7 @@ class CheckInButtonState extends State<CheckInButton> {
     super.initState();
 // Initialize loading as false
     employeeOid = widget.employeeOid;
-    isTodayOff = AppConfig.isAttendanceMarkedNotifier.value == null;
+    isTodayOff = Constants.isAttendanceMarkedNotifier.value == null;
     // Fetch attendance status on init only if not dayoff day
     if (!isTodayOff) {
       _getAttendanceStatus();
@@ -61,7 +61,7 @@ class CheckInButtonState extends State<CheckInButton> {
         setState(() {
           isAttendanceMarked = result['status']; // Update the attendance status
           // Directly update the ValueNotifier
-          AppConfig.isAttendanceMarkedNotifier.value = isAttendanceMarked;
+          Constants.isAttendanceMarkedNotifier.value = isAttendanceMarked;
         });
       } else {
         _showErrorSnackBar('Failed to fetch attendance status.');
@@ -92,7 +92,7 @@ class CheckInButtonState extends State<CheckInButton> {
         setState(() {
           isAttendanceMarked = result['status']; // Update status on success
           // Directly update the ValueNotifier
-          AppConfig.isAttendanceMarkedNotifier.value = isAttendanceMarked;
+          Constants.isAttendanceMarkedNotifier.value = isAttendanceMarked;
         });
       } else {
         _showErrorSnackBar('Failed to mark attendance.');
