@@ -35,23 +35,51 @@ class _MyInfoScreenState extends State<_MyInfoScreen> {
   double _scrollOffset = 0.0;
   // Filters
   static const String statusAll = "전체";
-
-  static const List<String> statusList = [...{...Constants.orDayoffHolidayList, ...Constants.attendanceStatusList}];
   // Create a Map<String, bool> with all keys having a value of true
-  static Map<String, bool> defaultWorkTypeSelection = {
-    for (String status in [statusAll, ...statusList]) status: true,
+  static Map<String, bool> defaultOrDayoffHolidaySelection = {
+    for (String status in [statusAll, ...Constants.orDayoffHolidayList])
+      status: true,
   };
-  Map<String, bool> _workTypeSelection =
-      Map<String, bool>.from(defaultWorkTypeSelection); // make mutable Map
+  static Map<String, bool> defaultAttendanceStatusSelection = {
+    for (String status in [statusAll, ...Constants.attendanceStatusList])
+      status: true,
+  };
+  Map<String, bool> _orDayoffHolidaySelection = Map<String, bool>.from(
+      defaultOrDayoffHolidaySelection); // make mutable Map
+  Map<String, bool> _attendanceStatusSelection = Map<String, bool>.from(
+      defaultAttendanceStatusSelection); // make mutable Map
+
+  static const List<String> statusList = [
+    ...{...Constants.orDayoffHolidayList, ...Constants.attendanceStatusList}
+  ];
+
+  // Create a Map<String, bool> with all keys having a value of true
+  // static Map<String, bool> defaultWorkTypeSelection = {
+  //   for (String status in [statusAll, ...statusList]) status: true,
+  // };
+  // Map<String, bool> _workTypeSelection =
+  //     Map<String, bool>.from(defaultWorkTypeSelection); // make mutable Map
   DateTime _startDate = DateTime.now().subtract(Duration(days: 7));
   DateTime _endDate = DateTime.now();
-
   List<String> get workTypeList {
-    return [
-      for (var entry in _workTypeSelection.entries)
-        if (entry.value && statusList.contains(entry.key)) entry.key
-    ];
+    // Combine the two maps: defaultOrDayoffHolidaySelection and defaultAttendanceStatusSelection
+    final combinedSelection = {
+      ..._orDayoffHolidaySelection,
+      ..._attendanceStatusSelection,
+    };
+
+    // Filter the combined selection and return the keys that meet the condition
+    return combinedSelection.entries
+        .where((entry) => entry.value && statusList.contains(entry.key))
+        .map((entry) => entry.key)
+        .toList();
   }
+  // List<String> get workTypeList {
+  //   return [
+  //     for (var entry in _workTypeSelection.entries)
+  //       if (entry.value && statusList.contains(entry.key)) entry.key
+  //   ];
+  // }
 
   //appbar
   double expandedHeightAppBar = 60.0;
@@ -156,12 +184,16 @@ class _MyInfoScreenState extends State<_MyInfoScreen> {
   }
 
   ///when filter changed then get a response again
-  void _applyFilters(DateTime startDate, DateTime endDate,
-      Map<String, bool> workTypeSelection) {
+  void _applyFilters(
+      DateTime startDate,
+      DateTime endDate,
+      Map<String, bool> orDayoffHolidaySelection,
+      Map<String, bool> attendanceStatusSelection) {
     setState(() {
       _startDate = startDate;
       _endDate = endDate;
-      _workTypeSelection = workTypeSelection;
+      _orDayoffHolidaySelection = orDayoffHolidaySelection;
+      _attendanceStatusSelection = attendanceStatusSelection;
       _attendanceHistoryFuture = _fetchAttendanceHistory();
     });
   }
@@ -203,9 +235,9 @@ class _MyInfoScreenState extends State<_MyInfoScreen> {
               delegate: FilterBarDelegate(
                 startDate: _startDate, // Pass startDate
                 endDate: _endDate, // Pass endDate
-                workTypeSelection: _workTypeSelection,
+                orDayoffHolidaySelection: _orDayoffHolidaySelection,
+                attendanceStatusSelection: _attendanceStatusSelection,
                 onApplyFilters: _applyFilters,
-
               ),
             ),
           ];

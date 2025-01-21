@@ -2,20 +2,22 @@ import 'package:app52switch/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/cupertino.dart';
+
 class MyinfoFilterPopup extends StatefulWidget {
   final DateTime startDate;
   final DateTime endDate;
-  final Map<String, bool> workTypeSelection;
+  final Map<String, bool> orDayoffHolidaySelection;
+  final Map<String, bool> attendanceStatusSelection;
 
-
-  final Function(DateTime, DateTime, Map<String, bool>) onApplyFilters;
+  final Function(DateTime, DateTime, Map<String, bool>, Map<String, bool>)
+      onApplyFilters;
 
   const MyinfoFilterPopup({
     required this.startDate,
     required this.endDate,
-    required this.workTypeSelection,
+    required this.orDayoffHolidaySelection,
+    required this.attendanceStatusSelection,
     required this.onApplyFilters,
-
     super.key,
   });
 
@@ -26,9 +28,8 @@ class MyinfoFilterPopup extends StatefulWidget {
 class _MyinfoFilterPopupState extends State<MyinfoFilterPopup> {
   late DateTime _tempStartDate;
   late DateTime _tempEndDate;
-  late Map<String, bool> _tempWorkTypeSelection;
-  List<String> orDayoffHolidayList = Constants.orDayoffHolidayList;
-  List<String> attendanceStatusList = Constants.attendanceStatusList;
+  late Map<String, bool> _tempOrDayoffHolidaySelection;
+  late Map<String, bool> _tempAttendanceStatusSelection;
 
   static const String workTypeAll = "전체";
   @override
@@ -38,7 +39,8 @@ class _MyinfoFilterPopupState extends State<MyinfoFilterPopup> {
     _tempStartDate = widget.startDate;
     _tempEndDate = widget.endDate;
     // Initialize status selection
-    _tempWorkTypeSelection = widget.workTypeSelection; // this is map by merged keyset in orDayoffHolidayList or attendanceStatusList
+    _tempOrDayoffHolidaySelection = widget.orDayoffHolidaySelection;
+    _tempAttendanceStatusSelection = widget.attendanceStatusSelection;
   }
 
   @override
@@ -59,7 +61,7 @@ class _MyinfoFilterPopupState extends State<MyinfoFilterPopup> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       buildDateButton(
-                        context:context,
+                        context: context,
                         date: _tempStartDate,
                         onDatePicked: (pickedDate) {
                           _tempStartDate = pickedDate;
@@ -72,7 +74,7 @@ class _MyinfoFilterPopupState extends State<MyinfoFilterPopup> {
                         child: Text("~"), // Align `~` properly
                       ),
                       buildDateButton(
-                        context:context,
+                        context: context,
                         date: _tempEndDate,
                         onDatePicked: (pickedDate) {
                           _tempEndDate = pickedDate;
@@ -82,17 +84,17 @@ class _MyinfoFilterPopupState extends State<MyinfoFilterPopup> {
                     ])),
             const Divider(),
             ListTile(
-              title: const Text("근태 상태 선택"),
+              title: const Text("근무 상태 선택"),
               subtitle: Wrap(
-                children: _tempWorkTypeSelection.keys.map((status) {
+                children: _tempOrDayoffHolidaySelection.keys.map((status) {
                   return SizedBox(
                       width:
                           150, // Adjust the width to fit multiple items in one row
                       child: CheckboxListTile(
                         title: Text(status),
-                        value: _tempWorkTypeSelection[status],
-                        onChanged: (bool? value) =>
-                            selectStatuses(value, status,_tempWorkTypeSelection),
+                        value: _tempOrDayoffHolidaySelection[status],
+                        onChanged: (bool? value) => selectStatuses(
+                            value, status, _tempOrDayoffHolidaySelection),
                         controlAffinity: ListTileControlAffinity
                             .leading, // Checkbox on the left
                         dense: true, // Compact layout
@@ -104,17 +106,17 @@ class _MyinfoFilterPopupState extends State<MyinfoFilterPopup> {
             ),
             const Divider(),
             ListTile(
-              title: const Text("근무 상태 선택"),
+              title: const Text("근태 상태 선택"),
               subtitle: Wrap(
-                children: _tempWorkTypeSelection.keys.map((status) {
+                children: _tempAttendanceStatusSelection.keys.map((status) {
                   return SizedBox(
                       width:
                           150, // Adjust the width to fit multiple items in one row
                       child: CheckboxListTile(
                         title: Text(status),
-                        value: _tempWorkTypeSelection[status],
-                        onChanged: (bool? value) =>
-                            selectStatuses(value, status,_tempWorkTypeSelection),
+                        value: _tempAttendanceStatusSelection[status],
+                        onChanged: (bool? value) => selectStatuses(
+                            value, status, _tempAttendanceStatusSelection),
                         controlAffinity: ListTileControlAffinity
                             .leading, // Checkbox on the left
                         dense: true, // Compact layout
@@ -150,7 +152,7 @@ class _MyinfoFilterPopupState extends State<MyinfoFilterPopup> {
     ]);
   }
 
-  void selectStatuses(bool? value, String key, Map<String,bool> selection) {
+  void selectStatuses(bool? value, String key, Map<String, bool> selection) {
     setState(() {
       if (key == workTypeAll) {
         // Update all statuses based on "Toggle All"
@@ -174,104 +176,119 @@ class _MyinfoFilterPopupState extends State<MyinfoFilterPopup> {
     required void Function(DateTime) onDatePicked,
     DateTime? firstdate,
     DateTime? lastdate,
-    
   }) {
     return TextButton(
-    onPressed: () {
-      int startYear = DateTime.now().year-3;
-      int endYear = DateTime.now().year;
-      // Get the initial month and year from the provided date
-      int initialDayIndex = date.day - 1; // Convert to 0-based index
-      int initialMonthIndex = date.month - 1; // Convert to 0-based index
-      int initialYearIndex = date.year - startYear; // Subtract starting year (2020) to get the index
-      // Initialize controllers with initial item
-      FixedExtentScrollController dayController = FixedExtentScrollController(initialItem: initialDayIndex);
-      FixedExtentScrollController  monthController = FixedExtentScrollController(initialItem: initialMonthIndex);
-      FixedExtentScrollController  yearController = FixedExtentScrollController(initialItem: initialYearIndex);
-      // Create the picker data
-      List<String> years = List.generate(endYear - startYear + 1, (index) => (startYear + index).toString());
-      List<String> months = List.generate(12, (index) => (index + 1).toString().padLeft(2, '0'));
-      List<String> days = List.generate(31, (index) => (index + 1).toString().padLeft(2, '0'));
+      onPressed: () {
+        int startYear = DateTime.now().year - 3;
+        int endYear = DateTime.now().year;
+        // Get the initial month and year from the provided date
+        int initialDayIndex = date.day - 1; // Convert to 0-based index
+        int initialMonthIndex = date.month - 1; // Convert to 0-based index
+        int initialYearIndex = date.year -
+            startYear; // Subtract starting year (2020) to get the index
+        // Initialize controllers with initial item
+        FixedExtentScrollController dayController =
+            FixedExtentScrollController(initialItem: initialDayIndex);
+        FixedExtentScrollController monthController =
+            FixedExtentScrollController(initialItem: initialMonthIndex);
+        FixedExtentScrollController yearController =
+            FixedExtentScrollController(initialItem: initialYearIndex);
+        // Create the picker data
+        List<String> years = List.generate(
+            endYear - startYear + 1, (index) => (startYear + index).toString());
+        List<String> months = List.generate(
+            12, (index) => (index + 1).toString().padLeft(2, '0'));
+        List<String> days = List.generate(
+            31, (index) => (index + 1).toString().padLeft(2, '0'));
 
-      showCupertinoModalPopup(
-        context: context,
-        builder: (context) {
-          return CupertinoActionSheet(
-            title: Padding(
-              padding: const EdgeInsets.only(top: 10, right: 10),
-              child: CupertinoActionSheetAction(
-                onPressed: () {
-                  // Map selected index to values
-                  int selectedYear = startYear + yearController.selectedItem; // Assuming starting year is 2020
-                  int selectedMonth = monthController.selectedItem + 1; // Convert 0-based index to 1-based month
-                  int selectedDay = dayController.selectedItem + 1; // Convert 0-based index to 1-based day
+        showCupertinoModalPopup(
+          context: context,
+          builder: (context) {
+            return CupertinoActionSheet(
+              title: Padding(
+                padding: const EdgeInsets.only(top: 10, right: 10),
+                child: CupertinoActionSheetAction(
+                    onPressed: () {
+                      // Map selected index to values
+                      int selectedYear = startYear +
+                          yearController
+                              .selectedItem; // Assuming starting year is 2020
+                      int selectedMonth = monthController.selectedItem +
+                          1; // Convert 0-based index to 1-based month
+                      int selectedDay = dayController.selectedItem +
+                          1; // Convert 0-based index to 1-based day
 
-                  // Create a DateTime object with the selected date
-                  DateTime selectedDate = DateTime(selectedYear, selectedMonth, selectedDay);
-                  // Check if selected date is within the valid range
-                  if ((firstdate != null && selectedDate.isBefore(firstdate)) ||
-                      (lastdate != null && selectedDate.isAfter(lastdate))) {
-                    // If the date is invalid, show an alert or handle the error
-                    showDialog(
-                      context: context,
-                      builder: (context) => CupertinoAlertDialog(
-                        content: Text('날짜 선택 오류'),
-                        actions: [
-                          CupertinoDialogAction(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: Text('OK'),
+                      // Create a DateTime object with the selected date
+                      DateTime selectedDate =
+                          DateTime(selectedYear, selectedMonth, selectedDay);
+                      // Check if selected date is within the valid range
+                      if ((firstdate != null &&
+                              selectedDate.isBefore(firstdate)) ||
+                          (lastdate != null &&
+                              selectedDate.isAfter(lastdate))) {
+                        // If the date is invalid, show an alert or handle the error
+                        showDialog(
+                          context: context,
+                          builder: (context) => CupertinoAlertDialog(
+                            content: Text('날짜 선택 오류'),
+                            actions: [
+                              CupertinoDialogAction(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Text('OK'),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    );
-                  } else {
-                    // Pass the selected date back to the onDatePicked callback
-                    setState(() {
-                      onDatePicked(selectedDate);
-                    });
+                        );
+                      } else {
+                        // Pass the selected date back to the onDatePicked callback
+                        setState(() {
+                          onDatePicked(selectedDate);
+                        });
 
-                    // Close the modal
-                    Navigator.pop(context);
-                  }
-                },
-                child: Align(
-                  alignment: Alignment.topRight,
-                  child:Text(
-                      '확인',
-                      style: TextStyle(color: CupertinoColors.activeBlue),
-                  ),
-                )
+                        // Close the modal
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: Align(
+                      alignment: Alignment.topRight,
+                      child: Text(
+                        '확인',
+                        style: TextStyle(color: CupertinoColors.activeBlue),
+                      ),
+                    )),
               ),
-            ),
-            message: Column(
-              children: [
-                Divider(), // Thin divider
-                SizedBox(
-                  height: 200, // Height of the picker
-                  child: Stack(
-                    children: [
-                      // Unified overlay behind all pickers
-                      Center(
-                        child: Container(
-                          height: 32.0, // Match itemExtent
-                          margin: const EdgeInsets.symmetric(horizontal: 16.0), // Add padding around the pickers
-                          decoration: BoxDecoration(
-                            color: Colors.grey.withOpacity(0.2), // Light gray with transparency
-                            borderRadius: BorderRadius.circular(10), // Rounded corners
+              message: Column(
+                children: [
+                  Divider(), // Thin divider
+                  SizedBox(
+                      height: 200, // Height of the picker
+                      child: Stack(children: [
+                        // Unified overlay behind all pickers
+                        Center(
+                          child: Container(
+                            height: 32.0, // Match itemExtent
+                            margin: const EdgeInsets.symmetric(
+                                horizontal:
+                                    16.0), // Add padding around the pickers
+                            decoration: BoxDecoration(
+                              color: Colors.grey.withOpacity(
+                                  0.2), // Light gray with transparency
+                              borderRadius:
+                                  BorderRadius.circular(10), // Rounded corners
+                            ),
                           ),
                         ),
-                      ),
-                      // Pickers Row
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,  // Shrink the row's width to fit its children
-                        children: [
-                          
-                          // Year Picker
-                          Expanded(
-                            child:CupertinoPicker(
+                        // Pickers Row
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize
+                              .min, // Shrink the row's width to fit its children
+                          children: [
+                            // Year Picker
+                            Expanded(
+                                child: CupertinoPicker(
                               selectionOverlay: null,
                               scrollController: yearController,
                               itemExtent: 32.0,
@@ -281,11 +298,10 @@ class _MyinfoFilterPopupState extends State<MyinfoFilterPopup> {
                               children: List.generate(years.length, (index) {
                                 return Center(child: Text('${years[index]}년'));
                               }),
-                            )
-                          ),
-                          // Month Picker
-                          Expanded(
-                            child: CupertinoPicker(
+                            )),
+                            // Month Picker
+                            Expanded(
+                                child: CupertinoPicker(
                               selectionOverlay: null,
                               scrollController: monthController,
                               itemExtent: 32.0,
@@ -295,11 +311,10 @@ class _MyinfoFilterPopupState extends State<MyinfoFilterPopup> {
                               children: List.generate(months.length, (index) {
                                 return Center(child: Text('${months[index]}월'));
                               }),
-                            )
-                          ),
-                          // Day Picker
-                          Expanded(
-                            child:CupertinoPicker(
+                            )),
+                            // Day Picker
+                            Expanded(
+                                child: CupertinoPicker(
                               selectionOverlay: null,
                               itemExtent: 32.0,
                               scrollController: dayController,
@@ -309,30 +324,25 @@ class _MyinfoFilterPopupState extends State<MyinfoFilterPopup> {
                               children: List.generate(days.length, (index) {
                                 return Center(child: Text('${days[index]}일'));
                               }),
-                            )
-                          ),
-                        ],
-                      ),
-                    ]
-                  )
-                )
-              ],
-            ),
-           
-          );
-        },
-      );
-    },
-    child: Text(DateFormat('yyyy-MM-dd').format(date)),
-  );
+                            )),
+                          ],
+                        ),
+                      ]))
+                ],
+              ),
+            );
+          },
+        );
+      },
+      child: Text(DateFormat('yyyy-MM-dd').format(date)),
+    );
   }
-
 
   void _applyFilters() async {
     try {
       // Extract selected statuses
-      widget.onApplyFilters(
-          _tempStartDate, _tempEndDate, _tempWorkTypeSelection);
+      widget.onApplyFilters(_tempStartDate, _tempEndDate,
+          _tempOrDayoffHolidaySelection, _tempAttendanceStatusSelection);
       Navigator.pop(context); // Close the modal
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -345,16 +355,18 @@ class _MyinfoFilterPopupState extends State<MyinfoFilterPopup> {
 class FilterBarDelegate extends SliverPersistentHeaderDelegate {
   final DateTime startDate; // Add startDate field
   final DateTime endDate; // Add endDate field
-  final Map<String, bool> workTypeSelection;
-  final Function(DateTime, DateTime, Map<String, bool>) onApplyFilters;
-
+  final Map<String, bool> orDayoffHolidaySelection;
+  final Map<String, bool> attendanceStatusSelection;
+  //final Map<String, bool> workTypeSelection;
+  final Function(DateTime, DateTime, Map<String, bool>, Map<String, bool>)
+      onApplyFilters;
 
   FilterBarDelegate({
     required this.startDate, // Initialize startDate
     required this.endDate, // Initialize endDate
-    required this.workTypeSelection,
+    required this.orDayoffHolidaySelection,
+    required this.attendanceStatusSelection,
     required this.onApplyFilters,
-
   });
 
   @override
@@ -402,8 +414,8 @@ class FilterBarDelegate extends SliverPersistentHeaderDelegate {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               IconButton(
-                onPressed: () =>
-                    onApplyFilters(startDate, endDate, workTypeSelection),
+                onPressed: () => onApplyFilters(startDate, endDate,
+                    orDayoffHolidaySelection, attendanceStatusSelection),
                 icon: const Icon(Icons.refresh, color: Colors.white),
               ),
               IconButton(
@@ -415,10 +427,9 @@ class FilterBarDelegate extends SliverPersistentHeaderDelegate {
                       return MyinfoFilterPopup(
                         startDate: startDate,
                         endDate: endDate,
-                        workTypeSelection: workTypeSelection,
+                        orDayoffHolidaySelection: orDayoffHolidaySelection,
+                        attendanceStatusSelection: attendanceStatusSelection,
                         onApplyFilters: onApplyFilters,
-
-                        
                       );
                     },
                   );

@@ -192,6 +192,9 @@ class _AttendanceScreenState extends State<_AttendanceScreen>
 
   @override
   Widget build(BuildContext context) {
+    // Get the screen size using MediaQuery
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: Colors
           .transparent, //getBackgroundColor(Constants.selectedIndexNotifier.value, isAttendanceMarked),
@@ -211,19 +214,23 @@ class _AttendanceScreenState extends State<_AttendanceScreen>
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(
+            screenWidth * 0.04), // 4% of the screen width for padding
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 30),
+            SizedBox(
+                height: screenHeight * 0.03), // 3% of screen height for spacing
             DateWidget(locationName: locationName),
-            SizedBox(height: 50),
+            SizedBox(
+                height: screenHeight * 0.05), // 5% of screen height for spacing
             // Slide animation for main text
             SlideTransition(
                 position: _slideAnimation, child: const ClockWidget()),
             Container(
               margin: EdgeInsets.only(top: 0),
-              width: 100,
+              width: screenWidth *
+                  0.25, // 25% of the screen width for the container width
               height: 4,
               color: Colors.white,
             ),
@@ -231,11 +238,14 @@ class _AttendanceScreenState extends State<_AttendanceScreen>
             SlideTransition(
               position: _slideAnimation,
               child: Padding(
-                padding: const EdgeInsets.only(top: 8),
+                padding: EdgeInsets.only(
+                    top:
+                        screenHeight * 0.01), // 1% of screen height for spacing
                 child: Text(
                   Constants.getMaintextHome(),
                   style: TextStyle(
-                    fontSize: 60,
+                    fontSize:
+                        screenWidth * 0.15, // 15% of screen width for text size
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -246,11 +256,14 @@ class _AttendanceScreenState extends State<_AttendanceScreen>
             SlideTransition(
               position: _slideAnimation,
               child: Padding(
-                padding: const EdgeInsets.only(top: 8),
+                padding: EdgeInsets.only(
+                    top:
+                        screenHeight * 0.01), // 1% of screen height for spacing
                 child: Text(
                   Constants.getSubtextHome(),
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: screenWidth *
+                        0.05, // 5% of screen width for subtext size
                     color: Colors.white,
                   ),
                 ),
@@ -265,7 +278,9 @@ class _AttendanceScreenState extends State<_AttendanceScreen>
                 workTypeList: workTypeList,
               ),
             ),
-            SizedBox(height: 80),
+            SizedBox(
+                height: screenHeight *
+                    0.1), // 10% of screen height for spacing at the bottom
           ],
         ),
       ),

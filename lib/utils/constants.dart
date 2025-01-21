@@ -212,19 +212,23 @@ class Constants {
     // Return the color based on the type
     return palette[colorIndex];
   }
-      
-    static const List<String> orDayoffHolidayList = [
+
+  static const List<String> orDayoffHolidayList = [
+    "정상근무",
+    "정기휴가",
     "오전반차",
     "오후반차",
     "경조휴가",
     "휴직",
-    "공휴일"
-    ];
-    static const List<String> attendanceStatusList  = [
-      "정상근무",
-      "정기휴가",
-      "지각",
-      "결근",
-      "주말근무",
-    ];
+    "공휴일",
+    "예비군",
+  ];
+  static const List<String> attendanceStatusList = [
+    "정상출근",
+    "정상퇴근",
+    "지각",
+    "조기퇴근",
+    "결근",
+    "주말근무",
+  ];
 }
