@@ -250,7 +250,7 @@ class _MyInfoScreenState extends State<_MyInfoScreen> {
             } else if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const Center(child: Text('No attendance records found.'));
+              return const Center(child: Text('검색 결과가 없습니다.'));
             } else {
               return Padding(
                 padding: EdgeInsets.only(top: 70),

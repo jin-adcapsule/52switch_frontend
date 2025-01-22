@@ -49,7 +49,6 @@ class AuthService extends ChangeNotifier {
       // Extract and validate the data
       final data = result.data?['validateUidAndPhone'];
       if (data != null) {
-        print(data);
         return {
           'employeeOid': data['employeeOid'],
           'isSupervisor': data['isSupervisor'],

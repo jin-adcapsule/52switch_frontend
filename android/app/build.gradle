@@ -48,9 +48,9 @@ android {
     }
 }
 dependencies {
-    implementation platform('com.google.firebase:firebase-bom:33.6.0') // Use the latest BOM version
-    implementation 'com.google.firebase:firebase-auth' // Ensure this is present
-    implementation 'com.google.firebase:firebase-messaging'
+    implementation platform('com.google.firebase:firebase-bom:33.6.0') // Firebase BOM for version management
+    implementation 'com.google.firebase:firebase-auth' // Firebase Authentication
+    implementation 'com.google.firebase:firebase-messaging' // Firebase Messaging
     
 }
 flutter {

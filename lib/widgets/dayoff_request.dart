@@ -38,7 +38,6 @@ class DayoffRequestScreenState extends State<DayoffRequestScreen> {
     // Simulate fetching data
     final dayoffInfoData =
         await _dayoffService.fetchDayoffInfo(widget.employeeOid!);
-    print(dayoffInfoData['holidayList']);
     return {
       'supervisorName': dayoffInfoData['supervisorName'],
       'dayoffRemaining': dayoffInfoData['dayoffRemaining'],
@@ -205,6 +204,7 @@ class DayoffRequestScreenState extends State<DayoffRequestScreen> {
               controller: _scrollController,
               padding: const EdgeInsets.all(16.0),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start, // Ensure alignment for all children
                 children: [
                   TableCalendar(
                     locale: 'ko_KR',
@@ -357,7 +357,7 @@ class DayoffRequestScreenState extends State<DayoffRequestScreen> {
                     children: [
                       const Icon(Icons.calendar_today,
                           color: Colors.black), // Date icon
-                      const SizedBox(width: 5),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: _selectedDates.isNotEmpty
                             ? Text(
@@ -368,8 +368,8 @@ class DayoffRequestScreenState extends State<DayoffRequestScreen> {
                                 style: const TextStyle(fontSize: 16),
                               )
                             : Text(
-                                '휴가일을 선택해주세요(남은휴가:$dayoffRemaining일)',
-                                style: TextStyle(color: Colors.grey),
+                                '휴가일을 선택해주세요 (잔여 휴가: $dayoffRemaining일)',
+                                style: TextStyle(fontSize: 16, color: Colors.grey),
                               ),
                       ),
                     ],
@@ -384,7 +384,7 @@ class DayoffRequestScreenState extends State<DayoffRequestScreen> {
                         child: Text(
                           '${_selectedDates.length}일', // Text showing the count of selected dates
                           style:
-                              const TextStyle(fontSize: 14, color: Colors.blue),
+                              const TextStyle(fontSize: 16, color: Colors.blue),
                         ),
                       ),
                     ),
@@ -409,16 +409,18 @@ class DayoffRequestScreenState extends State<DayoffRequestScreen> {
                   const SizedBox(height: 5),
                   const Divider(thickness: 1, color: Colors.grey),
                   const SizedBox(height: 5),
-                  //dropdown select for dayoffType
+                  // Dayoff Type Selection
                   Row(
                     children: [
                       const Icon(Icons.luggage,
                           color: Colors.black), // Luggage Icon
-                      const SizedBox(width: 5),
-                      selectDayoffTypeButton(
-                            context: context,
-                            dayofftypes: _dayoffTypes,
-                            selectedDayoffType: _selectedDayoffType,      
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child:selectDayoffTypeButton(
+                              context: context,
+                              dayofftypes: _dayoffTypes,
+                              selectedDayoffType: _selectedDayoffType,      
+                        ),
                       )
                     ]
                   ),
@@ -438,11 +440,11 @@ class DayoffRequestScreenState extends State<DayoffRequestScreen> {
                           maxLines: null, // Allow multi-line input
                           decoration: InputDecoration(
                             contentPadding: const EdgeInsets.only(
-                                left: 7.0), // Adjust horizontal alignment
+                                left:10.0), // Adjust horizontal alignment
                             hintText:
                                 '위와 같이 휴가를 신청합니다.\n재가하여 주시기 바랍니다.', // Default input displayed as gray
                             hintStyle: const TextStyle(
-                                color: Colors.grey, fontSize: 14),
+                                color: Colors.grey, fontSize: 16),
                             border: InputBorder.none, // Remove default border
                           ),
                           style: const TextStyle(
@@ -516,84 +518,79 @@ class DayoffRequestScreenState extends State<DayoffRequestScreen> {
     
   }) {
     return TextButton(
-    onPressed: () {
-      // Get initial index based on the current selected value
-      int initialIndex = dayofftypes.indexOf(selectedDayoffType ?? '정기휴가');
-      // Initialize controllers with initial item
-      FixedExtentScrollController controller = FixedExtentScrollController(initialItem: initialIndex);
-      // Create the picker data
-      //List<String> dayofftypes = List.generate(endYear - startYear + 1, (index) => (startYear + index).toString());
+      style: TextButton.styleFrom(
+        alignment: Alignment.centerLeft, // Align text to the start
+        padding: EdgeInsets.zero, // Remove extra padding if any
+        minimumSize: Size(0, 0), // Reduces the minimum size
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap, // shrink default padding for 48x48 to minimum to minimumSize 
+      ),
+      onPressed: () {
+        // Get initial index based on the current selected value
+        int initialIndex = dayofftypes.indexOf(selectedDayoffType ?? '정기휴가');
+        // Initialize controllers with initial item
+        FixedExtentScrollController controller = FixedExtentScrollController(initialItem: initialIndex);
+        // Create the picker data
+        //List<String> dayofftypes = List.generate(endYear - startYear + 1, (index) => (startYear + index).toString());
 
-      showCupertinoModalPopup(
-        context: context,
-        builder: (context) {
-          return CupertinoActionSheet(
-            title: Padding(
-              padding: const EdgeInsets.only(top: 10, right: 10),
-              child: CupertinoActionSheetAction(
-                
-                onPressed: () {
-                  // Map selected index to values
-                  int selectedIdx = controller.selectedItem; // Assuming starting year is 2020
+        showCupertinoModalPopup(
+          context: context,
+          builder: (context) {
+            return CupertinoActionSheet(
+              title: Padding(
+                padding: const EdgeInsets.only(top: 10, right: 10),
+                child: CupertinoActionSheetAction(
+                  onPressed: () {
+                    // Map selected index to values
+                    int selectedIdx = controller.selectedItem; // Assuming starting year is 2020
 
-                  // Create a DateTime object with the selected date
-                  String selectedDayoffType = dayofftypes[selectedIdx];
-                 
-                  // Pass the selected date back to the onDatePicked callback
-                  setState((){
-                    _selectedDayoffType = selectedDayoffType; // Update selected value
-                  });
-
-                  // Close the modal
-                  Navigator.pop(context);
+                    // Create a DateTime object with the selected date
+                    String selectedDayoffType = dayofftypes[selectedIdx];
                   
-                },
-                child: Align(
-                  alignment: Alignment.topRight,
-                  child:Text(
-                      '확인',
-                      style: TextStyle(color: CupertinoColors.activeBlue),
-                  ),
-                )
-              ),
-            ),
-            message: Column(
-              children: [
-                Divider(), // Thin divider
-                SizedBox(
-                  height: 200, // Height of the picker
-                  child: CupertinoPicker(
-                              scrollController: controller,
-                              itemExtent: 32.0,
-                              onSelectedItemChanged: (int selectedIdx) {
-                                // Handle year selection
-                              },
-                              children: dayofftypes.map((type) {
-                                return Center(
-                                  child: Text(type, style: TextStyle(fontSize: 16)),
-                                );
-                              }).toList(),
-                              ),
-                            
-                          ),
-                          
-                      
-                      
-                    ]
+                    // Pass the selected date back to the onDatePicked callback
+                    setState((){
+                      _selectedDayoffType = selectedDayoffType; // Update selected value
+                    });
+                    // Close the modal
+                    Navigator.pop(context);
+                  },
+                  child: Align(
+                    alignment: Alignment.topRight,
+                    child:Text(
+                        '확인',
+                        style: TextStyle(color: CupertinoColors.activeBlue),
+                    ),
                   )
-
-
-
-           
-          );
-        },
-      );
-    },
-    child: Text(
-      selectedDayoffType ?? '정기휴가', // Default value
-      style: const TextStyle(fontSize: 16),
-    ),
-  );
+                ),
+              ),
+              message: Column(
+                children: [
+                  Divider(), // Thin divider
+                  SizedBox(
+                    height: 200, // Height of the picker
+                    child: CupertinoPicker(
+                      scrollController: controller,
+                      itemExtent: 32.0,
+                      onSelectedItemChanged: (int selectedIdx) {
+                        // Handle year selection
+                      },
+                      children: dayofftypes.map((type) {
+                        return Center(
+                          child: Text(type, style: TextStyle(fontSize: 16)),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ]
+              )    
+            );
+          },
+        );
+      },
+      child: Text(
+        selectedDayoffType ?? '정기휴가', // Default value
+        style: const TextStyle(fontSize: 16, color: Colors.black),
+      ),
+    );
   }
 
 }

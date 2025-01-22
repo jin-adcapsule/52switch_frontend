@@ -31,30 +31,31 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_localizations:
-    sdk: flutter
-  fixnum: ^1.0.0
-  http: ^0.13.6
-  flutter_dotenv: ^5.0.2  # Add this line to your dependencies
-  flutter_switch: ^0.3.2  # Add this line
-  graphql_flutter: ^5.2.0-beta.3
-  firebase_core: ^3.7.0
-  firebase_messaging: ^15.1.4
-  provider: ^6.0.5
-  shared_preferences: ^2.0.15
-  flutter_local_notifications: ^18.0.1
-  connectivity_plus: ^3.0.6
-  firebase_auth: ^5.3.2
-  intl: ^0.19.0
+    sdk: flutter #localize your app (support multiple languages)
+  fixnum: ^1.0.0 #handling large integers if required by your app(Long type support)
+  http: ^0.13.6 #HTTP requests
+  flutter_dotenv: ^5.0.2 #loading environment variables, so if you're using environment-based configuration
+  flutter_switch: ^0.3.2 #toggle switch widget
+  graphql_flutter: ^5.2.0-beta.3 
+  firebase_core: ^3.7.0 #Essential for Firebase services
+  firebase_messaging: ^15.1.4 #push notifications
+  firebase_auth: ^5.3.2 #Firebase authentication
+  provider: ^6.0.5 #state management in Flutter
+  #shared_preferences: ^2.0.15 #storing simple data locally on the device
+  flutter_local_notifications: ^18.0.1 #show local notifications in your app
+  connectivity_plus: ^3.0.6 #checking network connectivity
+
+  intl: ^0.19.0 #internationalization and formatting (dates, numbers, etc.)
   table_calendar: ^3.0.9
-  plugin_platform_interface: ^2.1.8
-  gql_websocket_link: ^2.0.0 #switch websocket protocal between graphql-ws or graphql-transparent-ws
+  plugin_platform_interface: ^2.1.8 #platform-specific APIs
+ # gql_websocket_link: ^2.0.0 #switch websocket protocal between graphql-ws or graphql-transparent-ws
   flutter_secure_storage: ^9.0.0 #securely saving data on both Android and iOS.
   flutter_launcher_icons: ^0.9.3
   logger: ^1.4.0
   fluttertoast: ^8.0.9
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.8
+
+  
+  cupertino_icons: ^1.0.8   # The following adds the Cupertino Icons font to your application.
 
 
 dev_dependencies:
