@@ -1,9 +1,9 @@
 plugins {
     id "com.android.application"
-    // START: FlutterFire Configuration
-    id 'com.google.gms.google-services'
-    // END: FlutterFire Configuration
-    id "kotlin-android"
+
+    id 'com.google.gms.google-services'// Firebase services plugin
+
+    id "kotlin-android"// Required for Kotlin support
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id "dev.flutter.flutter-gradle-plugin"
 }
@@ -31,7 +31,7 @@ android {
         minSdkVersion 23//minSdk = 23//flutter.minSdkVersion
         targetSdkVersion 34//targetSdk = flutter.targetSdkVersion
         versionCode 1//versionCode = flutter.versionCode
-        versionName "1.0"//versionName = flutter.versionName
+        versionName "1.0"//versionName = flutter.versionName/
     }
 
     buildTypes {

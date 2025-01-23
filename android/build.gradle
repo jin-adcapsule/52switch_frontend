@@ -10,8 +10,9 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.1.0'  // Use a compatible AGP version
+        classpath 'com.android.tools.build:gradle:8.8.0'  // Use a compatible AGP version
         classpath 'com.google.gms:google-services:4.4.2' // Ensure Google Services plugin is included
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.0" // kotlin gp 
     }
 
 
