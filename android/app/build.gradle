@@ -5,7 +5,12 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
     id 'com.google.gms.google-services'// Firebase services plugin this plugin should be applied last to ensure it configures correctly
 }
+def keystorePropertiesFile = rootProject.file("key.properties")
+def keystoreProperties = new Properties()
 
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
 android {
     namespace  "com.adcapsule.app52switch"
     ndkVersion "27.0.12077973" // Replace with the installed NDK version//ndkVersion = flutter.ndkVersion
@@ -43,7 +48,14 @@ android {
         versionCode 1//versionCode = flutter.versionCode
         versionName "1.0"//versionName = flutter.versionName/
     }
-
+    signingConfigs {
+        release {
+            storeFile file(keystoreProperties["storeFile"])
+            storePassword keystoreProperties["storePassword"]
+            keyAlias keystoreProperties["keyAlias"]
+            keyPassword keystoreProperties["keyPassword"]
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false  //minifyEnabled true
@@ -51,7 +63,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.debug // Note: Use signingConfigs.release instead signingConfigs.debug to build a apk or appbundle
+            signingConfig = signingConfigs.release // Note: Use signingConfigs.release instead signingConfigs.debug to build a apk or appbundle
         }
     }
     compileSdk 35

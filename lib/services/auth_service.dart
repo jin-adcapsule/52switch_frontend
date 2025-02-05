@@ -58,12 +58,12 @@ class AuthService extends ChangeNotifier {
       } else {
         throw Exception('Invalid UID or phone number.');
       }
-    } catch (e, stackTrace) {
+    } catch (e) {
       // Ensure loading is stopped even if an exception occurs
       setLoading(false);
 
       // Log the error with stack trace for debugging purposes
-      LoggerConfig().logger.e('Error in validateUidAndPhone: $e', stackTrace);
+      LoggerConfig().logger.e('Error in validateUidAndPhone: $e');
 
       // Rethrow the error for higher-level handling
       rethrow;

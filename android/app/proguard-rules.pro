@@ -27,3 +27,7 @@
 
 # Disable obfuscation for specific methods or classes
 -dontobfuscate
+# Keep Play Core classes to prevent R8 from removing them
+-keep class com.google.android.play.** { *; }
+-keep class io.flutter.embedding.engine.deferredcomponents.** { *; }
+-keep class io.flutter.app.FlutterPlayStoreSplitApplication { *; }

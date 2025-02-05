@@ -22,17 +22,17 @@ dependencies:
   flutter_localizations:
     sdk: flutter #localize your app (support multiple languages)
   fixnum: ^1.0.0 #handling large integers if required by your app(Long type support)
-  http: ^0.13.6 #HTTP requests
+  http: ^1.3.0 #HTTP requests
   flutter_dotenv: ^5.0.2 #loading environment variables, so if you're using environment-based configuration
   flutter_switch: ^0.3.2 #toggle switch widget
-  graphql_flutter: ^5.2.0-beta.3 
+  graphql_flutter: ^5.2.0-beta.6
   firebase_core: ^3.7.0 #Essential for Firebase services
   firebase_messaging: ^15.1.4 #push notifications
   firebase_auth: ^5.3.2 #Firebase authentication
   provider: ^6.0.5 #state management in Flutter
   #shared_preferences: ^2.0.15 #storing simple data locally on the device
   flutter_local_notifications: ^18.0.1 #show local notifications in your app
-  connectivity_plus: ^5.0.0 #checking network connectivity
+  connectivity_plus: ^5.0.2 #checking network connectivity
 
   intl: ^0.19.0 #internationalization and formatting (dates, numbers, etc.)
   table_calendar: ^3.0.9

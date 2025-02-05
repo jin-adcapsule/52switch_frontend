@@ -50,3 +50,6 @@ macos/
 
 # Linux platform files
 linux/
+
+#keyConfig
+android/key.properties
