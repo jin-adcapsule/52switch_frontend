@@ -5,13 +5,15 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
     id 'com.google.gms.google-services'// Firebase services plugin this plugin should be applied last to ensure it configures correctly
 }
-def keystorePropertiesFile = rootProject.file("key.properties")
-def keystoreProperties = new Properties()
+// def keystorePropertiesFile = rootProject.file("key.properties")
+// def keystoreProperties = new Properties()
 
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-}
+// if (keystorePropertiesFile.exists()) {
+//     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+// }
 android {
+    // Set custom output directory
+    //buildDir = rootProject.projectDir.parentFile.toPath().resolve("build").toString()
     namespace  "com.adcapsule.app52switch"
     ndkVersion "27.0.12077973" // Replace with the installed NDK version//ndkVersion = flutter.ndkVersion
 
@@ -37,6 +39,7 @@ android {
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.adcapsule.app52switch"
+        
         multiDexEnabled true
         compileSdk 35
         minSdk 33
@@ -50,20 +53,29 @@ android {
     }
     signingConfigs {
         release {
-            storeFile file(keystoreProperties["storeFile"])
+            def keystorePropertiesFile = rootProject.file("key.properties")
+            def keystoreProperties = new Properties()
+            keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+            storeFile file(rootProject.file(keystoreProperties["storeFile"])) // Ensure absolute path
             storePassword keystoreProperties["storePassword"]
             keyAlias keystoreProperties["keyAlias"]
             keyPassword keystoreProperties["keyPassword"]
         }
     }
     buildTypes {
+        
         release {
+            debuggable false
             minifyEnabled false  //minifyEnabled true
             shrinkResources false // Enables resource shrinking
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.release // Note: Use signingConfigs.release instead signingConfigs.debug to build a apk or appbundle
+            signingConfig = signingConfigs.debug
+             // Note: Use signingConfigs.release instead signingConfigs.debug to build a apk or appbundle
+             // Specify output directory for APK
+            
         }
     }
     compileSdk 35

@@ -12,23 +12,41 @@ buildscript {
     dependencies {
         classpath "com.android.tools.build:gradle:8.8.0"  // Use a compatible AGP version
         classpath "com.google.gms:google-services:4.4.2" // Ensure Google Services plugin is included
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.20" // kotlin gp 
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.24" // kotlin gp 
     }
 
 
 }
-
-rootProject.layout.buildDirectory.dir('../build')
-subprojects {
-    project.layout.buildDirectory.dir("$rootProject.layout.buildDirectory/$project.name")
+buildscript {
+    // Set custom build directory for the root project ****using this automatically add /android/ at the end. to avoid this use path directly in projects not using rootproject.builddir 
+//rootProject.buildDir = file("$rootProject.projectDir/../build")
+rootProject.buildDir = rootProject.projectDir.parentFile.toPath().resolve("build").toString()
 }
+
+allprojects {
+    // Set the buildDir based on the subproject's name
+    buildDir = "${rootProject.projectDir.parentFile.toPath().resolve("build").toString()}/${project.name}"
+    //buildDir = "${rootProject.buildDir}/${project.name}" ****this adds android btw build and projectname
+
+}
+
 subprojects {
     project.evaluationDependsOn(':app')
 }
-tasks.register("clean", Delete) {
-    delete rootProject.layout.buildDirectory
 
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
 }
+// rootProject.layout.buildDirectory.dir('../build')
+// subprojects {
+//     project.layout.buildDirectory.dir("$rootProject.layout.buildDirectory/$project.name")
+// }
+// subprojects {
+//     project.evaluationDependsOn(':app')
+// }
+// tasks.register("clean", Delete) {
+//     delete rootProject.layout.buildDirectory
+// }
 ext {
     FirebaseSDKVersion = '33.8.0'
     
