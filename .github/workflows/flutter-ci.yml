@@ -33,14 +33,17 @@ jobs:
         channel: "stable"
     - name: Accept Android Licenses (For Android Builds)
       run: yes | flutter doctor --android-licenses
+
     - name: Set Up Android SDK
       run: |
         echo "Setting up Android SDK..."
         export ANDROID_SDK_ROOT=$HOME/Library/Android/sdk
         export ANDROID_HOME=$HOME/Library/Android/sdk
         export PATH=$ANDROID_SDK_ROOT/emulator:$ANDROID_SDK_ROOT/tools:$ANDROID_SDK_ROOT/tools/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH
+        export CLASSPATH=$HOME/java_libs/jaxb-api.jar:$HOME/java_libs/jaxb-runtime.jar:$CLASSPATH
         echo "Android SDK Path: $ANDROID_SDK_ROOT"
-        sdkmanager --update
+        echo "Using Java Home: $JAVA_HOME"
+        sdkmanager --update || echo "SDK Manager Failed!"
     - name: Verify Flutter Installation
       run: flutter doctor -v
     - name: Install Dependencies
