@@ -14,26 +14,24 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Set up Flutter
-      run: |
-        if ! command -v flutter &> /dev/null; then
-          echo "Flutter not found, installing..."
-          git clone https://github.com/flutter/flutter.git --depth 1
-          cd flutter
-          git fetch --tags
-          git checkout 3.27.3
-          export PATH="$PATH:`pwd`/bin"
-          flutter doctor
-          flutter --version
-        else
-          echo "Flutter is already installed"
-          flutter --version
-        fi
+    - name: Install Flutter (Stable Channel)
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: "3.27.3"  # Make sure to use the correct version
+        channel: "stable"
 
-    - name: Install dependencies
-      run: |
-        flutter pub get
-        flutter pub upgrade --major-versions
+    - name: Verify Flutter Installation
+      run: flutter doctor -v
+
+    - name: Accept Android Licenses (For Android Builds)
+      run: yes | flutter doctor --android-licenses
+
+    - name: Install Dependencies
+      run: flutter pub get
+
+    - name: Upgrade Dependencies (Optional)
+      run: flutter pub upgrade --major-versions
+
 
     # Android APK Build
     # - name: Build Android APK
