@@ -102,7 +102,20 @@ jobs:
         echo "::add-mask::${{ secrets.ANDROID_KEYSTORE_BASE64 }}"
         echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks
         chmod 600 android/app/keystore.jks
-
+    - name: Create Fake google-services.json (if missing)
+      run: |
+        echo '{
+          "project_info": {
+            "project_id": "fake-project",
+            "storage_bucket": "fake-project.appspot.com",
+            "project_number": "123456789"
+          },
+          "client": [{
+            "client_info": {
+              "mobilesdk_app_id": "1:123456789:android:fakeappid"
+            }
+          }]
+        }' > android/app/google-services.json
     - name: Build APK Securely
       run: |
         export JAVA_HOME=$(/usr/libexec/java_home -v 17)
