@@ -52,79 +52,62 @@ jobs:
     - name: Upgrade Dependencies (Optional)
       run: flutter pub upgrade --major-versions
 
-
-    # Android APK Build
-    # - name: Build Android APK
-    #   run: |
-    #     echo "${{ secrets.FIREBASE_OPTIONS_DART_DEV }}" > lib/firebase_options.dart
-    #     dart analyze lib/firebase_options.dart
-    #     flutter build apk --release --dart-define=HOST_ADDRESS=${{ secrets.EC2_HOST }} --dart-define=SERVER_PORT=${{ secrets.SERVER_PORT }} --dart-define=USE_EMULATOR=false
-    #     rm -f lib/firebase_options.dart
     - name: Accept Android Licenses & Install Dependencies
       run: |
         yes | flutter doctor --android-licenses
         flutter pub get
         flutter pub upgrade --major-versions
 
-    - name: Decode Firebase Secrets Securely
-      run: |
-        echo "Decoding Firebase secrets..."
-        TEMP_FILE=$(mktemp)
+    # - name: Decode Firebase Secrets Securely
+    #   run: |
+    #     echo "Decoding Firebase secrets..."
+    #     TEMP_FILE=$(mktemp)
 
-        echo "::add-mask::${{ secrets.FIREBASE_ANDROID_API_KEY_B64 }}"
-        echo "::add-mask::${{ secrets.FIREBASE_ANDROID_APP_ID_B64 }}"
-        echo "::add-mask::${{ secrets.FIREBASE_MESSAGING_SENDER_ID_B64 }}"
-        echo "::add-mask::${{ secrets.FIREBASE_PROJECT_ID_B64 }}"
-        echo "::add-mask::${{ secrets.FIREBASE_STORAGE_BUCKET_B64 }}"
-        echo "::add-mask::${{ secrets.FIREBASE_IOS_API_KEY_B64 }}"
-        echo "::add-mask::${{ secrets.FIREBASE_IOS_APP_ID_B64 }}"
-        echo "::add-mask::${{ secrets.FIREBASE_IOS_BUNDLE_ID_B64 }}"
+    #     echo "::add-mask::${{ secrets.FIREBASE_ANDROID_API_KEY_B64 }}"
+    #     echo "::add-mask::${{ secrets.FIREBASE_ANDROID_APP_ID_B64 }}"
+    #     echo "::add-mask::${{ secrets.FIREBASE_MESSAGING_SENDER_ID_B64 }}"
+    #     echo "::add-mask::${{ secrets.FIREBASE_PROJECT_ID_B64 }}"
+    #     echo "::add-mask::${{ secrets.FIREBASE_STORAGE_BUCKET_B64 }}"
+    #     echo "::add-mask::${{ secrets.FIREBASE_IOS_API_KEY_B64 }}"
+    #     echo "::add-mask::${{ secrets.FIREBASE_IOS_APP_ID_B64 }}"
+    #     echo "::add-mask::${{ secrets.FIREBASE_IOS_BUNDLE_ID_B64 }}"
 
-        # Only decode and write if secret is not empty
-        [[ -n "${{ secrets.FIREBASE_ANDROID_API_KEY_B64 }}" ]] && echo "--dart-define=FIREBASE_ANDROID_API_KEY=$(echo ${{ secrets.FIREBASE_ANDROID_API_KEY_B64 }} | base64 --decode)" >> $TEMP_FILE
-        [[ -n "${{ secrets.FIREBASE_ANDROID_APP_ID_B64 }}" ]] && echo "--dart-define=FIREBASE_ANDROID_APP_ID=$(echo ${{ secrets.FIREBASE_ANDROID_APP_ID_B64 }} | base64 --decode)" >> $TEMP_FILE
-        [[ -n "${{ secrets.FIREBASE_MESSAGING_SENDER_ID_B64 }}" ]] && echo "--dart-define=FIREBASE_MESSAGING_SENDER_ID=$(echo ${{ secrets.FIREBASE_MESSAGING_SENDER_ID_B64 }} | base64 --decode)" >> $TEMP_FILE
-        [[ -n "${{ secrets.FIREBASE_PROJECT_ID_B64 }}" ]] && echo "--dart-define=FIREBASE_PROJECT_ID=$(echo ${{ secrets.FIREBASE_PROJECT_ID_B64 }} | base64 --decode)" >> $TEMP_FILE
-        [[ -n "${{ secrets.FIREBASE_STORAGE_BUCKET_B64 }}" ]] && echo "--dart-define=FIREBASE_STORAGE_BUCKET=$(echo ${{ secrets.FIREBASE_STORAGE_BUCKET_B64 }} | base64 --decode)" >> $TEMP_FILE
-        [[ -n "${{ secrets.FIREBASE_IOS_API_KEY_B64 }}" ]] && echo "--dart-define=FIREBASE_IOS_API_KEY=$(echo ${{ secrets.FIREBASE_IOS_API_KEY_B64 }} | base64 --decode)" >> $TEMP_FILE
-        [[ -n "${{ secrets.FIREBASE_IOS_APP_ID_B64 }}" ]] && echo "--dart-define=FIREBASE_IOS_APP_ID=$(echo ${{ secrets.FIREBASE_IOS_APP_ID_B64 }} | base64 --decode)" >> $TEMP_FILE
-        [[ -n "${{ secrets.FIREBASE_IOS_BUNDLE_ID_B64 }}" ]] && echo "--dart-define=FIREBASE_IOS_BUNDLE_ID=$(echo ${{ secrets.FIREBASE_IOS_BUNDLE_ID_B64 }} | base64 --decode)" >> $TEMP_FILE
+    #     # Only decode and write if secret is not empty
+    #     [[ -n "${{ secrets.FIREBASE_ANDROID_API_KEY_B64 }}" ]] && echo "--dart-define=FIREBASE_ANDROID_API_KEY=$(echo ${{ secrets.FIREBASE_ANDROID_API_KEY_B64 }} | base64 --decode)" >> $TEMP_FILE
+    #     [[ -n "${{ secrets.FIREBASE_ANDROID_APP_ID_B64 }}" ]] && echo "--dart-define=FIREBASE_ANDROID_APP_ID=$(echo ${{ secrets.FIREBASE_ANDROID_APP_ID_B64 }} | base64 --decode)" >> $TEMP_FILE
+    #     [[ -n "${{ secrets.FIREBASE_MESSAGING_SENDER_ID_B64 }}" ]] && echo "--dart-define=FIREBASE_MESSAGING_SENDER_ID=$(echo ${{ secrets.FIREBASE_MESSAGING_SENDER_ID_B64 }} | base64 --decode)" >> $TEMP_FILE
+    #     [[ -n "${{ secrets.FIREBASE_PROJECT_ID_B64 }}" ]] && echo "--dart-define=FIREBASE_PROJECT_ID=$(echo ${{ secrets.FIREBASE_PROJECT_ID_B64 }} | base64 --decode)" >> $TEMP_FILE
+    #     [[ -n "${{ secrets.FIREBASE_STORAGE_BUCKET_B64 }}" ]] && echo "--dart-define=FIREBASE_STORAGE_BUCKET=$(echo ${{ secrets.FIREBASE_STORAGE_BUCKET_B64 }} | base64 --decode)" >> $TEMP_FILE
+    #     [[ -n "${{ secrets.FIREBASE_IOS_API_KEY_B64 }}" ]] && echo "--dart-define=FIREBASE_IOS_API_KEY=$(echo ${{ secrets.FIREBASE_IOS_API_KEY_B64 }} | base64 --decode)" >> $TEMP_FILE
+    #     [[ -n "${{ secrets.FIREBASE_IOS_APP_ID_B64 }}" ]] && echo "--dart-define=FIREBASE_IOS_APP_ID=$(echo ${{ secrets.FIREBASE_IOS_APP_ID_B64 }} | base64 --decode)" >> $TEMP_FILE
+    #     [[ -n "${{ secrets.FIREBASE_IOS_BUNDLE_ID_B64 }}" ]] && echo "--dart-define=FIREBASE_IOS_BUNDLE_ID=$(echo ${{ secrets.FIREBASE_IOS_BUNDLE_ID_B64 }} | base64 --decode)" >> $TEMP_FILE
 
-        # Mask the entire TEMP_FILE to prevent leaks
-        while IFS= read -r line; do
-          echo "::add-mask::$line"
-        done < $TEMP_FILE
+    #     # Mask the entire TEMP_FILE to prevent leaks
+    #     while IFS= read -r line; do
+    #       echo "::add-mask::$line"
+    #     done < $TEMP_FILE
 
-        echo "Firebase secrets processed securely."
+    #     echo "Firebase secrets processed securely."
 
     - name: Decode & Store Keystore File Securely
       run: |
         echo "::add-mask::${{ secrets.ANDROID_KEYSTORE_BASE64 }}"
         echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks
         chmod 600 android/app/keystore.jks
-    - name: Create Fake google-services.json (if missing)
-      run: |
-        echo '{
-          "project_info": {
-            "project_id": "fake-project",
-            "storage_bucket": "fake-project.appspot.com",
-            "project_number": "123456789"
-          },
-          "client": [{
-            "client_info": {
-              "mobilesdk_app_id": "1:123456789:android:fakeappid"
-            }
-          }]
-        }' > android/app/google-services.json
+    
     - name: Build APK Securely
       run: |
+        echo "${{ secrets.FIREBASE_OPTIONS_DART_DEV }}" > lib/firebase_options.dart
+        dart analyze lib/firebase_options.dart
+
         export JAVA_HOME=$(/usr/libexec/java_home -v 17)
         echo "Using Java Home: $JAVA_HOME"
 
-        flutter build apk --release $(cat $TEMP_FILE)
+        flutter build apk --release --dart-define=HOST_ADDRESS=${{ secrets.EC2_HOST }} --dart-define=SERVER_PORT=${{ secrets.SERVER_PORT }} --dart-define=USE_EMULATOR=false
+        #flutter build apk --release $(cat $TEMP_FILE)
 
-        rm -f $TEMP_FILE android/app/keystore.jks  # Securely delete temp files
-
+        #rm -f $TEMP_FILE android/app/keystore.jks  # Securely delete temp files
+        rm -f lib/firebase_options.dart android/app/keystore.jks
 
     - name: Upload Android APK artifact
       uses: actions/upload-artifact@v4
