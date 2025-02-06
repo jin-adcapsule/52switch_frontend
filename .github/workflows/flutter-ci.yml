@@ -18,6 +18,14 @@ jobs:
       with:
         distribution: 'temurin'  # Use Eclipse Temurin (compatible with Android)
         java-version: '17'
+    - name: Install JAXB for Java 17 (Fix NoClassDefFoundError)
+      run: |
+        echo "Installing JAXB for Java 17..."
+        mkdir -p $HOME/java_libs
+        curl -L -o $HOME/java_libs/jaxb-api.jar https://repo1.maven.org/maven2/javax/xml/bind/jaxb-api/2.3.1/jaxb-api-2.3.1.jar
+        curl -L -o $HOME/java_libs/jaxb-runtime.jar https://repo1.maven.org/maven2/org/glassfish/jaxb/jaxb-runtime/2.3.1/jaxb-runtime-2.3.1.jar
+        export CLASSPATH=$HOME/java_libs/jaxb-api.jar:$HOME/java_libs/jaxb-runtime.jar:$CLASSPATH
+        echo "JAXB installed successfully."
     - name: Install Flutter (Stable Channel)
       uses: subosito/flutter-action@v2
       with:
