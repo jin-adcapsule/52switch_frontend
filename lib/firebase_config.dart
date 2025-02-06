@@ -7,7 +7,6 @@ import 'package:firebase_core/firebase_core.dart';
 //import 'dart:convert'; // For JSON parsing
 import 'env_config.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'firebase_loader.dart'; // Import the fallback loader
 import 'logger_config.dart';
 
 class FirebaseConfig {
@@ -17,41 +16,34 @@ class FirebaseConfig {
     // await Firebase.initializeApp(
     //     options: DefaultFirebaseOptions.currentPlatform);
     FirebaseOptions firebaseOptions;
-    try {
-      // First, try using `firebase_options.dart` if available
-      firebaseOptions = DefaultFirebaseOptions.currentPlatform;
-          LoggerConfig()
-        .logger
-        .i("Firebase initialized with DefaultFirebaseOptions.");
-    } catch (e) {
-      print("firebase_options.dart not found, falling back to environment variables.");
 
-      // Fallback to environment variables if `firebase_options.dart` is missing
-      if (Platform.isAndroid) {
-        firebaseOptions = FirebaseOptions(
-          apiKey: const String.fromEnvironment('FIREBASE_ANDROID_API_KEY'),
-          appId: const String.fromEnvironment('FIREBASE_ANDROID_APP_ID'),
-          messagingSenderId: const String.fromEnvironment('FIREBASE_MESSAGING_SENDER_ID'),
-          projectId: const String.fromEnvironment('FIREBASE_PROJECT_ID'),
-          storageBucket: const String.fromEnvironment('FIREBASE_STORAGE_BUCKET'),
-        );
-      } else if (Platform.isIOS) {
-        firebaseOptions = FirebaseOptions(
-          apiKey: const String.fromEnvironment('FIREBASE_IOS_API_KEY'),
-          appId: const String.fromEnvironment('FIREBASE_IOS_APP_ID'),
-          messagingSenderId: const String.fromEnvironment('FIREBASE_MESSAGING_SENDER_ID'),
-          projectId: const String.fromEnvironment('FIREBASE_PROJECT_ID'),
-          storageBucket: const String.fromEnvironment('FIREBASE_STORAGE_BUCKET'),
-          iosClientId: const String.fromEnvironment('FIREBASE_IOS_CLIENT_ID'),
-          iosBundleId: const String.fromEnvironment('FIREBASE_IOS_BUNDLE_ID'),
-        );
-      } else {
-        throw UnsupportedError("Unsupported platform");
-      }
-        LoggerConfig()
-        .logger
-        .i("Firebase initialized with injected values.");
+    print("firebase_options.dart not found, falling back to environment variables.");
+
+    // Fallback to environment variables if `firebase_options.dart` is missing
+    if (Platform.isAndroid) {
+      firebaseOptions = FirebaseOptions(
+        apiKey: const String.fromEnvironment('FIREBASE_ANDROID_API_KEY'),
+        appId: const String.fromEnvironment('FIREBASE_ANDROID_APP_ID'),
+        messagingSenderId: const String.fromEnvironment('FIREBASE_MESSAGING_SENDER_ID'),
+        projectId: const String.fromEnvironment('FIREBASE_PROJECT_ID'),
+        storageBucket: const String.fromEnvironment('FIREBASE_STORAGE_BUCKET'),
+      );
+    } else if (Platform.isIOS) {
+      firebaseOptions = FirebaseOptions(
+        apiKey: const String.fromEnvironment('FIREBASE_IOS_API_KEY'),
+        appId: const String.fromEnvironment('FIREBASE_IOS_APP_ID'),
+        messagingSenderId: const String.fromEnvironment('FIREBASE_MESSAGING_SENDER_ID'),
+        projectId: const String.fromEnvironment('FIREBASE_PROJECT_ID'),
+        storageBucket: const String.fromEnvironment('FIREBASE_STORAGE_BUCKET'),
+        iosBundleId: const String.fromEnvironment('FIREBASE_IOS_BUNDLE_ID'),
+      );
+    } else {
+      throw UnsupportedError("Unsupported platform");
     }
+      LoggerConfig()
+      .logger
+      .i("Firebase initialized with injected values.");
+    
 
     await Firebase.initializeApp(options: firebaseOptions);
 
