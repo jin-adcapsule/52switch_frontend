@@ -13,19 +13,28 @@ jobs:
 
     - name: Checkout code
       uses: actions/checkout@v3
-
+    - name: Install Java 17 (For Gradle)
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'  # Use Eclipse Temurin (compatible with Android)
+        java-version: '17'
     - name: Install Flutter (Stable Channel)
       uses: subosito/flutter-action@v2
       with:
         flutter-version: "3.27.3"  # Make sure to use the correct version
         channel: "stable"
-
-    - name: Verify Flutter Installation
-      run: flutter doctor -v
-
     - name: Accept Android Licenses (For Android Builds)
       run: yes | flutter doctor --android-licenses
-
+    - name: Set Up Android SDK
+      run: |
+        echo "Setting up Android SDK..."
+        export ANDROID_SDK_ROOT=$HOME/Library/Android/sdk
+        export ANDROID_HOME=$HOME/Library/Android/sdk
+        export PATH=$ANDROID_SDK_ROOT/emulator:$ANDROID_SDK_ROOT/tools:$ANDROID_SDK_ROOT/tools/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH
+        echo "Android SDK Path: $ANDROID_SDK_ROOT"
+        sdkmanager --update
+    - name: Verify Flutter Installation
+      run: flutter doctor -v
     - name: Install Dependencies
       run: flutter pub get
 
@@ -55,6 +64,8 @@ jobs:
 
     - name: Build APK (Android)
       run: |
+        export JAVA_HOME=$(/usr/libexec/java_home -v 17)
+        echo "Using Java Home: $JAVA_HOME"
         flutter build apk --release \
           --dart-define=FIREBASE_ANDROID_API_KEY="$FIREBASE_ANDROID_API_KEY" \
           --dart-define=FIREBASE_ANDROID_APP_ID="$FIREBASE_ANDROID_APP_ID" \
