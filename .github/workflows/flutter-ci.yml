@@ -60,29 +60,110 @@ jobs:
     #     dart analyze lib/firebase_options.dart
     #     flutter build apk --release --dart-define=HOST_ADDRESS=${{ secrets.EC2_HOST }} --dart-define=SERVER_PORT=${{ secrets.SERVER_PORT }} --dart-define=USE_EMULATOR=false
     #     rm -f lib/firebase_options.dart
-    - name: Decode Firebase Secrets
+    - name: Decode and Store Firebase Secrets Securely
       run: |
         echo "Decoding Firebase secrets..."
-        echo "FIREBASE_ANDROID_API_KEY=$(echo ${{ secrets.FIREBASE_ANDROID_API_KEY_B64 }} | base64 --decode)" >> $GITHUB_ENV
-        echo "FIREBASE_ANDROID_APP_ID=$(echo ${{ secrets.FIREBASE_ANDROID_APP_ID_B64 }} | base64 --decode)" >> $GITHUB_ENV
-        echo "FIREBASE_MESSAGING_SENDER_ID=$(echo ${{ secrets.FIREBASE_MESSAGING_SENDER_ID_B64 }} | base64 --decode)" >> $GITHUB_ENV
-        echo "FIREBASE_PROJECT_ID=$(echo ${{ secrets.FIREBASE_PROJECT_ID_B64 }} | base64 --decode)" >> $GITHUB_ENV
-        echo "FIREBASE_STORAGE_BUCKET=$(echo ${{ secrets.FIREBASE_STORAGE_BUCKET_B64 }} | base64 --decode)" >> $GITHUB_ENV
-        echo "FIREBASE_IOS_API_KEY=$(echo ${{ secrets.FIREBASE_IOS_API_KEY_B64 }} | base64 --decode)" >> $GITHUB_ENV
-        echo "FIREBASE_IOS_APP_ID=$(echo ${{ secrets.FIREBASE_IOS_APP_ID_B64 }} | base64 --decode)" >> $GITHUB_ENV
-        echo "FIREBASE_IOS_CLIENT_ID=$(echo ${{ secrets.FIREBASE_IOS_CLIENT_ID_B64 }} | base64 --decode)" >> $GITHUB_ENV
-        echo "FIREBASE_IOS_BUNDLE_ID=$(echo ${{ secrets.FIREBASE_IOS_BUNDLE_ID_B64 }} | base64 --decode)" >> $GITHUB_ENV
 
+        # Mask all secrets before processing
+        echo "::add-mask::${{ secrets.FIREBASE_ANDROID_API_KEY_B64 }}"
+        echo "::add-mask::${{ secrets.FIREBASE_ANDROID_APP_ID_B64 }}"
+        echo "::add-mask::${{ secrets.FIREBASE_MESSAGING_SENDER_ID_B64 }}"
+        echo "::add-mask::${{ secrets.FIREBASE_PROJECT_ID_B64 }}"
+        echo "::add-mask::${{ secrets.FIREBASE_STORAGE_BUCKET_B64 }}"
+        echo "::add-mask::${{ secrets.FIREBASE_IOS_API_KEY_B64 }}"
+        echo "::add-mask::${{ secrets.FIREBASE_IOS_APP_ID_B64 }}"
+        echo "::add-mask::${{ secrets.FIREBASE_IOS_CLIENT_ID_B64 }}"
+        echo "::add-mask::${{ secrets.FIREBASE_IOS_BUNDLE_ID_B64 }}"
+
+        # Use a temporary file to decode secrets securely
+        TEMP_FILE=$(mktemp)
+
+        echo "${{ secrets.FIREBASE_ANDROID_API_KEY_B64 }}" | base64 --decode > $TEMP_FILE
+        echo "FIREBASE_ANDROID_API_KEY=$(cat $TEMP_FILE)" >> $GITHUB_ENV
+
+        echo "${{ secrets.FIREBASE_ANDROID_APP_ID_B64 }}" | base64 --decode > $TEMP_FILE
+        echo "FIREBASE_ANDROID_APP_ID=$(cat $TEMP_FILE)" >> $GITHUB_ENV
+
+        echo "${{ secrets.FIREBASE_MESSAGING_SENDER_ID_B64 }}" | base64 --decode > $TEMP_FILE
+        echo "FIREBASE_MESSAGING_SENDER_ID=$(cat $TEMP_FILE)" >> $GITHUB_ENV
+
+        echo "${{ secrets.FIREBASE_PROJECT_ID_B64 }}" | base64 --decode > $TEMP_FILE
+        echo "FIREBASE_PROJECT_ID=$(cat $TEMP_FILE)" >> $GITHUB_ENV
+
+        echo "${{ secrets.FIREBASE_STORAGE_BUCKET_B64 }}" | base64 --decode > $TEMP_FILE
+        echo "FIREBASE_STORAGE_BUCKET=$(cat $TEMP_FILE)" >> $GITHUB_ENV
+
+        echo "${{ secrets.FIREBASE_IOS_API_KEY_B64 }}" | base64 --decode > $TEMP_FILE
+        echo "FIREBASE_IOS_API_KEY=$(cat $TEMP_FILE)" >> $GITHUB_ENV
+
+        echo "${{ secrets.FIREBASE_IOS_APP_ID_B64 }}" | base64 --decode > $TEMP_FILE
+        echo "FIREBASE_IOS_APP_ID=$(cat $TEMP_FILE)" >> $GITHUB_ENV
+
+        echo "${{ secrets.FIREBASE_IOS_CLIENT_ID_B64 }}" | base64 --decode > $TEMP_FILE
+        echo "FIREBASE_IOS_CLIENT_ID=$(cat $TEMP_FILE)" >> $GITHUB_ENV
+
+        echo "${{ secrets.FIREBASE_IOS_BUNDLE_ID_B64 }}" | base64 --decode > $TEMP_FILE
+        echo "FIREBASE_IOS_BUNDLE_ID=$(cat $TEMP_FILE)" >> $GITHUB_ENV
+
+        # Securely delete the temporary file
+        rm -f $TEMP_FILE
+
+        echo "Firebase secrets decoded and stored securely."
+    - name: Decode and Create Keystore File
+      run: |
+        echo "Creating Keystore File..."
+        echo "::add-mask::${{ secrets.ANDROID_KEYSTORE_BASE64 }}"  # Mask Secret
+        echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > $GITHUB_WORKSPACE/android/app/keystore.jks
+        chmod 600 $GITHUB_WORKSPACE/android/app/keystore.jks  # Secure file
+        echo "Keystore file created."
+
+    - name: Set Up Signing Environment Variables
+      run: |
+        echo "::add-mask::${{ secrets.ANDROID_KEYSTORE_PASSWORD }}"  # Mask Secret
+        echo "::add-mask::${{ secrets.ANDROID_KEY_ALIAS }}"  # Mask Secret
+        echo "::add-mask::${{ secrets.ANDROID_KEY_PASSWORD }}"  # Mask Secret
+        echo "ANDROID_KEYSTORE_FILE=$GITHUB_WORKSPACE/android/app/keystore.jks" >> $GITHUB_ENV
+        echo "ANDROID_KEYSTORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
+        echo "ANDROID_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }}" >> $GITHUB_ENV
+        echo "ANDROID_KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }}" >> $GITHUB_ENV
+        echo "Keystore environment variables set."
+      
     - name: Build APK (Android)
       run: |
         export JAVA_HOME=$(/usr/libexec/java_home -v 17)
         echo "Using Java Home: $JAVA_HOME"
-        flutter build apk --release \
-          --dart-define=FIREBASE_ANDROID_API_KEY="$FIREBASE_ANDROID_API_KEY" \
-          --dart-define=FIREBASE_ANDROID_APP_ID="$FIREBASE_ANDROID_APP_ID" \
-          --dart-define=FIREBASE_MESSAGING_SENDER_ID="$FIREBASE_MESSAGING_SENDER_ID" \
-          --dart-define=FIREBASE_PROJECT_ID="$FIREBASE_PROJECT_ID" \
-          --dart-define=FIREBASE_STORAGE_BUCKET="$FIREBASE_STORAGE_BUCKET"
+        # Mask Firebase secrets to prevent leaks
+        echo "::add-mask::$FIREBASE_ANDROID_API_KEY"
+        echo "::add-mask::$FIREBASE_ANDROID_APP_ID"
+        echo "::add-mask::$FIREBASE_MESSAGING_SENDER_ID"
+        echo "::add-mask::$FIREBASE_PROJECT_ID"
+        echo "::add-mask::$FIREBASE_STORAGE_BUCKET"
+        echo "::add-mask::$FIREBASE_IOS_API_KEY"
+        echo "::add-mask::$FIREBASE_IOS_APP_ID"
+        echo "::add-mask::$FIREBASE_IOS_CLIENT_ID"
+        echo "::add-mask::$FIREBASE_IOS_BUNDLE_ID"
+
+        # Create a secure temporary file for dart-define arguments
+        DART_DEFINE_FILE=$(mktemp)
+
+        echo "--dart-define=FIREBASE_ANDROID_API_KEY=$FIREBASE_ANDROID_API_KEY" >> $DART_DEFINE_FILE
+        echo "--dart-define=FIREBASE_ANDROID_APP_ID=$FIREBASE_ANDROID_APP_ID" >> $DART_DEFINE_FILE
+        echo "--dart-define=FIREBASE_MESSAGING_SENDER_ID=$FIREBASE_MESSAGING_SENDER_ID" >> $DART_DEFINE_FILE
+        echo "--dart-define=FIREBASE_PROJECT_ID=$FIREBASE_PROJECT_ID" >> $DART_DEFINE_FILE
+        echo "--dart-define=FIREBASE_STORAGE_BUCKET=$FIREBASE_STORAGE_BUCKET" >> $DART_DEFINE_FILE
+        echo "--dart-define=FIREBASE_IOS_API_KEY=$FIREBASE_IOS_API_KEY" >> $DART_DEFINE_FILE
+        echo "--dart-define=FIREBASE_IOS_APP_ID=$FIREBASE_IOS_APP_ID" >> $DART_DEFINE_FILE
+        echo "--dart-define=FIREBASE_IOS_CLIENT_ID=$FIREBASE_IOS_CLIENT_ID" >> $DART_DEFINE_FILE
+        echo "--dart-define=FIREBASE_IOS_BUNDLE_ID=$FIREBASE_IOS_BUNDLE_ID" >> $DART_DEFINE_FILE
+
+        # Mask all dart-define arguments before executing the command
+        echo "::add-mask::$(cat $DART_DEFINE_FILE)"
+
+        # Run Flutter build using arguments from the file
+        flutter build apk --release $(cat $DART_DEFINE_FILE)
+
+        # Securely delete the temp file to prevent leaks
+        rm -f $DART_DEFINE_FILE
 
     - name: Upload Android APK artifact
       uses: actions/upload-artifact@v4
