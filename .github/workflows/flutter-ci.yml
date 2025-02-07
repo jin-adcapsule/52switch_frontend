@@ -113,7 +113,7 @@ jobs:
         export ANDROID_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }}
         export ANDROID_KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }}
         
-        flutter build apk --release --dart-define=HOST_ADDRESS=${{ secrets.EC2_HOST }} --dart-define=SERVER_PORT=${{ secrets.SERVER_PORT }} --dart-define=USE_EMULATOR=false
+        flutter build apk --release --split-per-abi --dart-define=HOST_ADDRESS=${{ secrets.EC2_HOST }} --dart-define=SERVER_PORT=${{ secrets.SERVER_PORT }} --dart-define=USE_EMULATOR=false
 
         # Secure cleanup: remove sensitive files after use
         rm -f android/app/keystore.jks android/app/google-services.json
