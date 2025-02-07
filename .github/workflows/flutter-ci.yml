@@ -87,7 +87,11 @@ jobs:
         echo "::add-mask::${{ secrets.FIREBASE_GOOGLE_SERVICE_INFO_PLIST_BASE64 }}"
         echo "${{ secrets.FIREBASE_GOOGLE_SERVICE_INFO_PLIST_BASE64 }}" | base64 --decode > ios/Runner/GoogleService-Info.plist
         chmod 600 ios/Runner/GoogleService-Info.plist
-
+    - name: Install CocoaPods dependencies
+      run: |
+        cd ios
+        pod install --repo-update
+        cd ../
     - name: Build iOS App
       run: |
         flutter build ios --release --dart-define=HOST_ADDRESS=${{ secrets.EC2_HOST }} --dart-define=SERVER_PORT=${{ secrets.SERVER_PORT }} --dart-define=USE_EMULATOR=false
