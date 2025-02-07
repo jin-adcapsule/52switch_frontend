@@ -72,7 +72,7 @@ android {
         release {
             debuggable false
             minifyEnabled false // Enable minification (R8)
-            shrinkResources true // Enable resource shrinking to remove unused resources
+            shrinkResources false // Enable resource shrinking to remove unused resources
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig = signingConfigs.release
 
