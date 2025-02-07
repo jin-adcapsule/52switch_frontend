@@ -12,8 +12,10 @@ class FirebaseConfig {
   // Method to load Firebase configuration dynamically
   static Future<void> loadFirebaseConfig() async {
     // Initialize Firebase with the dynamically generated DefaultFirebaseOptions
-    await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform);
+    // await Firebase.initializeApp(
+    //     options: DefaultFirebaseOptions.currentPlatform);
+    // Initialize Firebase with the default options from the google-services.json (Android) or GoogleService-Info.plist (iOS)
+    await Firebase.initializeApp();
     LoggerConfig()
       .logger
       .i("Firebase initialized with default file.");

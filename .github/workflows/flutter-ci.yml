@@ -95,25 +95,36 @@ jobs:
         echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks
         chmod 600 android/app/keystore.jks
     
+    # Decode & Store google-services.json Securely (Firebase config)
+    - name: Decode & Store Firebase config (google-services.json)
+      run: |
+        echo "::add-mask::${{ secrets.FIREBASE_GOOGLE_SERVICES_JSON_BASE64 }}"
+        echo "${{ secrets.FIREBASE_GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > android/app/google-services.json
+        chmod 600 android/app/google-services.json
+
+    # Build APK Securely
     - name: Build APK Securely
       run: |
-        echo "${{ secrets.FIREBASE_OPTIONS_DART_DEV }}" > lib/firebase_options.dart
-        dart analyze lib/firebase_options.dart
-
         export JAVA_HOME=$(/usr/libexec/java_home -v 17)
         echo "Using Java Home: $JAVA_HOME"
 
         flutter build apk --release --dart-define=HOST_ADDRESS=${{ secrets.EC2_HOST }} --dart-define=SERVER_PORT=${{ secrets.SERVER_PORT }} --dart-define=USE_EMULATOR=false
-        #flutter build apk --release $(cat $TEMP_FILE)
 
-        #rm -f $TEMP_FILE android/app/keystore.jks  # Securely delete temp files
-        rm -f lib/firebase_options.dart android/app/keystore.jks
+        # Secure cleanup: remove sensitive files after use
+        rm -f lib/firebase_options.dart android/app/keystore.jks android/app/google-services.json
 
+    # Upload Android APK artifact
     - name: Upload Android APK artifact
       uses: actions/upload-artifact@v4
       with:
         name: android-apk
         path: build/app/outputs/flutter-apk/app-release.apk
+
+    # Ensure files are deleted after the run regardless of success or failure
+    - name: Ensure Cleanup
+      if: always()
+      run: |
+        rm -f lib/firebase_options.dart android/app/keystore.jks android/app/google-services.json
 
     # # iOS Build (Only if necessary, macOS runner is required for iOS builds)
     # - name: Build iOS App
