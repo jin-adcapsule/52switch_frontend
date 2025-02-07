@@ -61,7 +61,7 @@ android {
             // storePassword keystoreProperties["storePassword"]
             // keyAlias keystoreProperties["keyAlias"]
             // keyPassword keystoreProperties["keyPassword"]
-            storeFile file("android/app/keystore.jks") 
+            storeFile file("keystore.jks") 
             storePassword System.getenv("ANDROID_KEYSTORE_PASSWORD")
             keyAlias System.getenv("ANDROID_KEY_ALIAS")
             keyPassword System.getenv("ANDROID_KEY_PASSWORD")
