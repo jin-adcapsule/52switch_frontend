@@ -19,8 +19,11 @@
 
 # Keep Play Core SplitInstall classes to prevent R8 from removing them (if using dynamic features)
 -keep class com.google.android.play.core.splitinstall.** { *; }
+-keep class com.google.android.play.core.splitcompat.** { *; }  # Add the SplitCompat classes that were missing
 -keep class io.flutter.embedding.engine.deferredcomponents.** { *; }
 -keep class io.flutter.app.FlutterPlayStoreSplitApplication { *; }
+
+# Additional Play Core SplitInstall keep rules for specific classes
 -keep class com.google.android.play.core.splitinstall.SplitInstallException { *; }
 -keep class com.google.android.play.core.splitinstall.SplitInstallManager { *; }
 -keep class com.google.android.play.core.splitinstall.SplitInstallManagerFactory { *; }
