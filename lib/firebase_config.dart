@@ -1,6 +1,3 @@
-import 'package:app52switch/firebase_options.dart';
-
-
 import 'package:firebase_core/firebase_core.dart';
 //import 'dart:io';
 //import 'dart:convert'; // For JSON parsing
