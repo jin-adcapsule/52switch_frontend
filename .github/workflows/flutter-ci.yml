@@ -107,11 +107,16 @@ jobs:
       run: |
         export JAVA_HOME=$(/usr/libexec/java_home -v 17)
         echo "Using Java Home: $JAVA_HOME"
-
+  
+        #Set Env Variables for Signing
+        export ANDROID_KEYSTORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        export ANDROID_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }}
+        export ANDROID_KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }}
+        
         flutter build apk --release --dart-define=HOST_ADDRESS=${{ secrets.EC2_HOST }} --dart-define=SERVER_PORT=${{ secrets.SERVER_PORT }} --dart-define=USE_EMULATOR=false
 
         # Secure cleanup: remove sensitive files after use
-        rm -f lib/firebase_options.dart android/app/keystore.jks android/app/google-services.json
+        rm -f android/app/keystore.jks android/app/google-services.json
 
     # Upload Android APK artifact
     - name: Upload Android APK artifact
