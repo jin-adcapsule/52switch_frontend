@@ -1,6 +1,6 @@
 ***
 
-<h1>52Switch: Attendance and Day-Off Management Application</h1>
+**52Switch: Attendance and Day-Off Management Application**
 
 ***
 **52Switch** is a comprehensive attendance and day-off management application designed to streamline employee attendance tracking and day-off requests/approvals.<br>The project is built using **Flutter** for the frontend, **Spring Boot** with **GraphQL** for the backend, and **MongoDB** as the database.
@@ -20,7 +20,7 @@
 
 ***
 
-<h1>52Switch Client Application</h1>
+**52Switch Client Application**
 
 ***
 
