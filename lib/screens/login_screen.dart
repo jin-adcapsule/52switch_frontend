@@ -30,7 +30,7 @@ class LoginScreenState extends State<LoginScreen> {
     _checkStoredFirebaseUid();
   }
 
-  Future<void> _checkStoredFirebaseUid() async {
+  Future<void> _checkStoredFirebaseUid() async {//match bool of credentials stored in device with by using validate function 
     String? uid = await _storage.read(key: 'firebaseUid');
     String? phone = await _storage.read(key: 'phoneNumber');
     if (uid != null && phone != null) {
@@ -45,7 +45,7 @@ class LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<bool> _validateUidAndFetchObjectId(String uid, String phone) async {
+  Future<bool> _validateUidAndFetchObjectId(String uid, String phone) async { // 
     final AuthService authService = AuthService();
     try {
       final result = await authService.validateUidAndPhone(uid, phone);
@@ -67,13 +67,15 @@ class LoginScreenState extends State<LoginScreen> {
         }
         await _saveFCMToken(result['employeeOid']);
         return true;
-      }
+      } else {return false;}
+      
     } catch (e) {
       setState(() {
         _authStatusMessage = 'Validation error: $e';
       });
+      return false;
     }
-    return false;
+    
   }
 
   Future<void> _verifyPhoneNumber(String phoneNumber) async {

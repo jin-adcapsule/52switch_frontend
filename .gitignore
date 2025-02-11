@@ -44,3 +44,12 @@ node_modules/
 .env
 .env.local
 .env.*.local
+
+# macOS platform files
+macos/
+
+# Linux platform files
+linux/
+
+#keyConfig
+android/key.properties

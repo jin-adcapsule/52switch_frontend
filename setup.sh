@@ -11,7 +11,7 @@ else
 fi
 
 # Install Flutter dependencies
-echo "Installing Flutter dependencies..."
+echo "Installing Flutter dependencies...."
 if command -v flutter &> /dev/null; then
   flutter pub get
 else

@@ -26,7 +26,7 @@ class CheckInButtonState extends State<CheckInButton> {
       true; //when true is true else(null or false)then false
   late String? employeeOid;
   late bool isTodayOff;
-  bool isToggling = false; // To track if toggle is in process
+  bool isToggling = false; // To track if toggle is in process /
   double sliderHeight = 80.0;
   double sliderWidth = 200.0;
   double buttonSizeRatio = 0.8; // Size of the inside button

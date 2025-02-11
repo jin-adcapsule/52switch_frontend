@@ -3,151 +3,108 @@ name: Flutter CI
 on:
   push:
     branches:
-      - dev
-  pull_request:
-    branches:
-      - dev
+      - wip
+
 
 jobs:
   build_ios:
-    runs-on: [self-hosted]
+    runs-on: [macos-latest]
     steps:
+
     - name: Checkout code
       uses: actions/checkout@v3
-
-    - name: Check OS for iOS Build
-      run: |
-        if [[ $(uname) == "Darwin" ]]; then
-          echo "RUNNER_OS=macOS" >> $GITHUB_ENV
-        elif [[ "$(uname)" == "CYGWIN"* || "$(uname)" == "MINGW"* ]]; then
-          echo "Self Host OS is Windows. IOS job will be skipped..."
-          echo "RUNNER_OS=Windows" >> $GITHUB_ENV
-        else
-          echo "Self Host OS is Linux. IOS job will be skipped..."
-          echo "RUNNER_OS=Linux" >> $GITHUB_ENV
-        fi
-        
-    - name: Install jq (required by flutter-action)
-      if: ${{ env.RUNNER_OS == 'macOS' }}
-      run: |
-        if ! command -v jq &> /dev/null; then
-          echo "jq not found, installing..."
-          brew install jq
-        else
-          echo "jq is already installed"
-        fi
-
-    - name: Set up Flutter
-      if: ${{ env.RUNNER_OS == 'macOS' }}
-      run: |
-        if ! command -v flutter &> /dev/null; then
-          echo "Flutter not found, installing..."
-          # Install Flutter manually to ensure we get the correct version
-          git clone https://github.com/flutter/flutter.git --depth 1
-          cd flutter
-          git fetch -- tags
-          git checkout 3.5.4
-          export PATH="$PATH:`pwd`/bin"
-          flutter doctor
-        else
-          echo "Flutter is already installed"
-        flutter --version
-        flutter clean
-        fi
-  
-    - name: Install dependencies
-      if: ${{ env.RUNNER_OS == 'macOS' }}
-      run: flutter pub get
-
-    - name: DEV Build iOS App 
-      if: ${{ env.RUNNER_OS == 'macOS' }}
-      run: |
-        # Write Firebase options to a Dart file (firebase_options.dart)
-        echo "${{ secrets.FIREBASE_OPTIONS_DART_DEV}}" > lib/firebase_options.dart
-        dart analyze lib/firebase_options.dart
-      
-        flutter build ios --release --dart-define=HOST_ADDRESS=10.0.0.176 --dart-define=SERVER_PORT=8080 --dart-define=USE_EMULATOR=true --dart-define=EMULATOR_PORT=9099 
-        # Cleanup: Delete sensitive files after build
-        rm -f lib/firebase_options.dart
-        rm -f ios/Runner/GoogleService-Info.plist
-      shell: bash
-
-    - name: Upload build artifacts (iOS)
-      if: ${{ env.RUNNER_OS == 'macOS' }}
-      uses: actions/upload-artifact@v4
+    - name: Install Java 17 (For Gradle)
+      uses: actions/setup-java@v3
       with:
-        name: ios-app
-        path: build/ios/iphoneos/Runner.app
+        distribution: 'temurin'  # Use Eclipse Temurin (compatible with Android)
+        java-version: '17'
+    - name: Install JAXB for Java 17 (Fix NoClassDefFoundError)
+      run: |
+        echo "Installing JAXB for Java 17..."
+        mkdir -p $HOME/java_libs
+        curl -L -o $HOME/java_libs/jaxb-api.jar https://repo1.maven.org/maven2/javax/xml/bind/jaxb-api/2.3.1/jaxb-api-2.3.1.jar
+        curl -L -o $HOME/java_libs/jaxb-runtime.jar https://repo1.maven.org/maven2/org/glassfish/jaxb/jaxb-runtime/2.3.1/jaxb-runtime-2.3.1.jar
+        export CLASSPATH=$HOME/java_libs/jaxb-api.jar:$HOME/java_libs/jaxb-runtime.jar:$CLASSPATH
+        echo "JAXB installed successfully."
+    - name: Install Flutter (Stable Channel)
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: "3.27.3"  # Make sure to use the correct version
+        channel: "stable"
+    - name: Accept Android Licenses (For Android Builds)
+      run: yes | flutter doctor --android-licenses
 
-  build_android:
-    runs-on: [self-hosted]
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-    - name: Check OS for Windows Build
-      run: |
-        if [[ $(uname) == "Darwin" ]]; then
-          echo "Self Host OS is IOS. Windows job will be skipped..."
-          echo "RUNNER_OS=macOS" >> $GITHUB_ENV
-        elif [[ "$(uname)" == "CYGWIN"* || "$(uname)" == "MINGW"* ]]; then
-          echo "RUNNER_OS=Windows" >> $GITHUB_ENV
-        else
-          echo "Self Host OS is Linux. Windows job will be skipped..."
-          echo "RUNNER_OS=Linux" >> $GITHUB_ENV
-        fi
-    - name: Install jq (required by flutter-action)
-      if: ${{ env.RUNNER_OS == 'Windows' }}
-      run: |
-        if ! command -v jq &> /dev/null; then
-          echo "jq not found, installing..."
-          brew install jq
-        else
-          echo "jq is already installed"
-        fi
-
-    - name: Set up Flutter
-      if: ${{ env.RUNNER_OS == 'Windows' }}
-      run: |
-        if ! command -v flutter &> /dev/null; then
-          echo "Flutter not found, installing..."
-          # Install Flutter manually to ensure we get the correct version
-          git clone https://github.com/flutter/flutter.git --depth 1
-          cd flutter
-          git fetch -- tags
-          git checkout 3.5.4
-          export PATH="$PATH:`pwd`/bin"
-          flutter doctor
-          flutter --version
-        else
-          echo "Flutter is already installed"
-          flutter --version
-        fi
-    
-    - name: Install dependencies
-      if: ${{ env.RUNNER_OS == 'Windows' }}
+    - name: Verify Flutter Installation
+      run: flutter doctor -v
+    - name: Install Dependencies
       run: flutter pub get
-    
 
-    - name: DEV Build Android APK
-      if: ${{ env.RUNNER_OS == 'Windows' }}
+    - name: Upgrade Dependencies (Optional)
+      run: flutter pub upgrade --major-versions
+
+    - name: Accept Android Licenses & Install Dependencies
       run: |
-        # Write Firebase options to a Dart file (firebase_options.dart)
-        echo "${{ secrets.FIREBASE_OPTIONS_DART_DEV}}" > lib/firebase_options.dart
-        dart analyze lib/firebase_options.dart
+        yes | flutter doctor --android-licenses
+        flutter pub get
+        flutter pub upgrade --major-versions
+    ##Android Build - Secure Firebase and Signing for iOS
+    - name: Decode & Store Keystore File Securely
+      run: |
+        echo "::add-mask::${{ secrets.ANDROID_KEYSTORE_BASE64 }}"
+        echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks
+        chmod 600 android/app/keystore.jks
 
-        # Write the GOOGLESERVICE_INFO_PLIST_DEV secret to a file
-        echo "${{ secrets.GOOGLESERVICE_INFO_PLIST_DEV }}" > ios/Runner/GoogleService-Info.plist
-      
-        flutter build apk --release --dart-define=HOST_ADDRESS=10.0.0.176 --dart-define=SERVER_PORT=8080 --dart-define=USE_EMULATOR=true --dart-define=EMULATOR_PORT=9099
-        # Cleanup: Delete sensitive files after build
-        rm -f lib/firebase_options.dart
-        rm -f ios/Runner/GoogleService-Info.plist
-        # Remove sensitive plist from the built .app bundle
-        rm -f build/ios/iphoneos/Runner.app/GoogleService-Info.plist
+    - name: Decode & Store Firebase config (google-services.json)
+      run: |
+        echo "::add-mask::${{ secrets.FIREBASE_GOOGLE_SERVICES_JSON_BASE64 }}"
+        echo "${{ secrets.FIREBASE_GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > android/app/google-services.json
+        chmod 600 android/app/google-services.json
 
-    - name: Upload build artifacts (APK)
-      if: ${{ env.RUNNER_OS == 'Windows' }}
+    - name: Build APK Securely
+      run: |
+        export JAVA_HOME=$(/usr/libexec/java_home -v 17)
+        echo "Using Java Home: $JAVA_HOME"
+  
+        #Set Env Variables for Signing
+        export ANDROID_KEYSTORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        export ANDROID_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }}
+        export ANDROID_KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }}
+        
+        flutter build apk --release --dart-define=HOST_ADDRESS=${{ secrets.EC2_HOST }} --dart-define=SERVER_PORT=${{ secrets.SERVER_PORT }} --dart-define=USE_EMULATOR=false
+
+        # Secure cleanup: remove sensitive files after use
+        rm -f android/app/keystore.jks android/app/google-services.json
+
+    - name: Upload Android APK artifact
       uses: actions/upload-artifact@v4
       with:
         name: android-apk
         path: build/app/outputs/flutter-apk/app-release.apk
+
+    # # iOS Build - Secure Firebase and Signing for iOS
+    # - name: Decode & Store iOS Firebase config (GoogleService-Info.plist)
+    #   run: |
+    #     echo "::add-mask::${{ secrets.FIREBASE_GOOGLE_SERVICE_INFO_PLIST_BASE64 }}"
+    #     echo "${{ secrets.FIREBASE_GOOGLE_SERVICE_INFO_PLIST_BASE64 }}" | base64 --decode > ios/Runner/GoogleService-Info.plist
+    #     chmod 600 ios/Runner/GoogleService-Info.plist
+    # - name: Install CocoaPods dependencies
+    #   run: |
+    #     cd ios
+    #     pod install --repo-update
+    #     pod update
+    #     cd ../
+    # - name: Build iOS App
+    #   run: |
+    #     flutter build ios --release --dart-define=HOST_ADDRESS=${{ secrets.EC2_HOST }} --dart-define=SERVER_PORT=${{ secrets.SERVER_PORT }} --dart-define=USE_EMULATOR=false
+   
+    # - name: Upload iOS Build artifact
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: ios-app
+    #     path: build/ios/iphoneos/Runner.app
+    
+    #Ensure files are deleted after the run regardless of success or failure
+    - name: Ensure Cleanup
+      if: always()
+      run: |
+        rm -f ios/Runner/GoogleService-Info.plist android/app/keystore.jks android/app/google-services.json

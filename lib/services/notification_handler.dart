@@ -3,6 +3,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'local_notification_service.dart'; // Import the helper class
 import '../logger_config.dart';
 
+
+
 class NotificationHandler {
   static void initialize() {
     //Listen for foreground messages
@@ -25,7 +27,7 @@ class NotificationHandler {
         'Handling a background noti message: ${message.notification?.title}, ${message.notification?.body}');
     // Show the notification only if it's not already being handled
     if (message.notification != null) {
-      LocalNotificationService.showNotification(message);
+      LocalNotificationService.checkAndRequestNotificationPermission(message);
     }
   }
 
@@ -37,7 +39,7 @@ class NotificationHandler {
     LoggerConfig().logger.i(
         'Handling a foreground noti message: ${message.notification?.title}, ${message.notification?.body}');
     // Show the notification and when tabbed then navigate using flutter_local_nostifications
-    LocalNotificationService.showNotification(message);
+    LocalNotificationService.checkAndRequestNotificationPermission(message);
   }
 
   // Handler for when the app is opened from the background (user tapped on the notification)

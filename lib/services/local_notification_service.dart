@@ -1,5 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
+
 
 class LocalNotificationService {
   static final FlutterLocalNotificationsPlugin _notificationsPlugin =
@@ -66,6 +68,33 @@ class LocalNotificationService {
             notificationDetails,
             payload: payload ?? message.data['pageKey'], // Optional payload
         );
+      }
+    }
+  }
+
+
+  static Future<void> checkAndRequestNotificationPermission(RemoteMessage message,{String? payload}) async {
+    // Check the status of notification permission
+    PermissionStatus status = await Permission.notification.status;
+
+    if (status.isGranted) {
+      // Permission is already granted
+      print("Notification permission granted!");
+      // Proceed with showing notifications
+      showNotification(message, payload: payload);
+    } else {
+      // Permission is not granted, request it
+      PermissionStatus newStatus = await Permission.notification.request();
+
+      if (newStatus.isGranted) {
+        // Permission granted after request
+        print("Notification permission granted!");
+        // Proceed with showing notifications
+        showNotification(message, payload: payload);
+      } else {
+        // Permission denied, show a dialog or a message
+        print('Permission denied. Please enable it from settings.');
+        openAppSettings(); // Opens app settings to allow the user to enable permissions manually
       }
     }
   }
