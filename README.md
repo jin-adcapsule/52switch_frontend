@@ -1,80 +1,55 @@
+***
 # 52Switch: Attendance and Day-Off Management Application
+***
+**52Switch** is a comprehensive attendance and day-off management application designed to streamline employee attendance tracking and day-off requests/approvals.<br>The project is built using **Flutter** for the frontend, **Spring Boot** with **GraphQL** for the backend, and **MongoDB** as the database.
 
-**52Switch** is a comprehensive attendance and day-off management application designed to streamline employee attendance tracking and day-off requests/approvals. The project is built using **Flutter** for the frontend, **Spring Boot** with **GraphQL** for the backend, and **MongoDB** as the database.
+[52SWITCH Project Documentation KR](https://gilded-brush-9bc.notion.site/52SWITCH-2025-01-09-151fbe5a819680628769e0db7e4aace6?pvs=4)
 
-[Software Specification Doc](docs/software_spec_doc.md) \
-[Software Design Technical Doc](docs/software_design_tech_doc.md) \
-[Screen Definition Doc](docs/screen_def_doc.md) \
-[Functional Definition Doc](docs/func_def_doc.md) \
-[Database Table Definition Doc](docs/db_table_def_doc.md) \
-[Database Table relationship Doc](docs/db_table_rel_def_doc.md) \
-
-
-
-## Features
-- **Real-Time Attendance Tracking:** Employees can check in and out seamlessly.
-- **Day-Off Requests:** Employees can request time off directly from the app.
-- **Admin Panel:** Manage attendance and approve/reject day-off requests.
+## Basic Features
+- **Day-Off Requests:** Employees can request day-off directly from the app.
+- **Supervisor Panel:** Manage approve/reject day-off requests from supervisee.
 - **User-Friendly Interface:** Mobile-friendly interface with customizable themes.
-- **Secure Authentication:** Phone number-based login system with session persistence.
-- **Real-Time Updates:** Leverages GraphQL subscriptions for dynamic updates.
+- **Secure Authentication:** Multi step phone number-based login system.<br>1. deviced stored token<br>2. device phone number authentication<br>3. db stored token and phone number
 
----
-## Continuous Integration
-
-Every push or pull request to the `dev` branch automatically triggers a build for either Android or iOS, depending on the self-hosted CI runner’s OS. The generated artifacts (APK for Android or APP for iOS) are available for download from the CI workflow's artifact section.
-
----
-
+## Enhancement beyond current Application
+- **Holiday:** Calendar now disables holidays.
+- **Background Notification:** Notification now activated also in background both for IOS and Android.
+- **Work Start Toggle Nofification:** each employee's work start time is computed by location / day off (half) / holiday. Toggle Notification is sent to each employee.    
+***
+# 52Switch Client Application
+***
 ## Prerequisites
-- **Frontend**: Flutter, Dart ver.5.3.4
-- **Authentication**: Firebase(depends on server)
+- **Frontend**: Flutter, Dart LTS
+- **Authentication**: Firebase Authentication, Secured Storage
+- **Notification**: Firebase Cloud Messaging(FCM), Local Notification Service
 
-## Setup Instructions
-### Step 1: Clone the repository:
-   ```bash
-   git clone https://github.com/jin-adcapsule/52switch-frontend.git
-   cd 52switch-frontend
-   ```
-### Step 2: Run the setup script in root:
-   On Linux/Mac:
-   ```bash
-      bash setup.sh 
-   ```
-   On Windows:
-   ```bash
-      setup.bat
-   ```
-### Step 3. Configure environment files:
-   Update the following file with your frontend environment variables:
-   ```plaintext
-   dummy/lib/env_config.dart
-   ```
+## CI/CD Artifact
+Every push or pull trigger automated build in Github Action<br>
+The generated artifacts (APK for Android or APP for iOS) are available in artifact section.
 
-### Step 4. Save required files in correct directories:
+## Local Setup Instructions
+### Step 1. Configure required parameters and file:
+   (contact the project owner for target os google key, host server address)<br>
    Ensure these files are placed in the correct directories (contact the project owner if unsure):
    1. **Android:**
-   ```plaintext
-   dummy/android/app/google-services.json 
+   ```bash
+   $root/android/app/google-services.json 
    ``` 
    2. **IOS:**
-   ```plaintext
-   dummy/ios/Runner/GoogleService-Info.plist
+   ```bash
+   $root/ios/Runner/GoogleService-Info.plist
    ```  
    3. **(optional)Firebase:**  
    Own firebase option is to be generated using Firebase CLI
-   ```plaintext
-   dummy/lib/firebase_options.dart
+   ```bash
+   $root/lib/firebase_options.dart
+   ```
+### Step 2. Run flutter on simulator:  
+   Before running the Flutter app, ensure simulator or phone available.:
+   ```bash
+   flutter run --debug --dart-define=HOST_ADDRESS={{hostaddress}} --dart-define=SERVER_PORT={{serverport}} 
    ```
 
-### Step 5. Run flutter on simulator:  
-   Before running the Flutter app, configure the use of the Firebase emulator in the following file:
-   ```plaintext
-   dummy/config_env.dart
-   flutter run --dart-define=HOST_ADDRESS=10.0.0.176 --dart-define=SERVER_PORT=8080 --dart-define=USE_EMULATOR=true --dart-define=EMULATOR_PORT=9099 
-   ```
-
-      
 For further assistance or refinements, feel free to reach out:
 
 **Contact:**  

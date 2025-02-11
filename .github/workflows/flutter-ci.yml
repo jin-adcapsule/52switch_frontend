@@ -48,60 +48,60 @@ jobs:
         flutter pub get
         flutter pub upgrade --major-versions
     ##Android Build - Secure Firebase and Signing for iOS
-    # - name: Decode & Store Keystore File Securely
-    #   run: |
-    #     echo "::add-mask::${{ secrets.ANDROID_KEYSTORE_BASE64 }}"
-    #     echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks
-    #     chmod 600 android/app/keystore.jks
+    - name: Decode & Store Keystore File Securely
+      run: |
+        echo "::add-mask::${{ secrets.ANDROID_KEYSTORE_BASE64 }}"
+        echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks
+        chmod 600 android/app/keystore.jks
 
-    # - name: Decode & Store Firebase config (google-services.json)
-    #   run: |
-    #     echo "::add-mask::${{ secrets.FIREBASE_GOOGLE_SERVICES_JSON_BASE64 }}"
-    #     echo "${{ secrets.FIREBASE_GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > android/app/google-services.json
-    #     chmod 600 android/app/google-services.json
+    - name: Decode & Store Firebase config (google-services.json)
+      run: |
+        echo "::add-mask::${{ secrets.FIREBASE_GOOGLE_SERVICES_JSON_BASE64 }}"
+        echo "${{ secrets.FIREBASE_GOOGLE_SERVICES_JSON_BASE64 }}" | base64 --decode > android/app/google-services.json
+        chmod 600 android/app/google-services.json
 
-    # - name: Build APK Securely
-    #   run: |
-    #     export JAVA_HOME=$(/usr/libexec/java_home -v 17)
-    #     echo "Using Java Home: $JAVA_HOME"
+    - name: Build APK Securely
+      run: |
+        export JAVA_HOME=$(/usr/libexec/java_home -v 17)
+        echo "Using Java Home: $JAVA_HOME"
   
-    #     #Set Env Variables for Signing
-    #     export ANDROID_KEYSTORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-    #     export ANDROID_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }}
-    #     export ANDROID_KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }}
+        #Set Env Variables for Signing
+        export ANDROID_KEYSTORE_PASSWORD=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        export ANDROID_KEY_ALIAS=${{ secrets.ANDROID_KEY_ALIAS }}
+        export ANDROID_KEY_PASSWORD=${{ secrets.ANDROID_KEY_PASSWORD }}
         
-    #     flutter build apk --release --dart-define=HOST_ADDRESS=${{ secrets.EC2_HOST }} --dart-define=SERVER_PORT=${{ secrets.SERVER_PORT }} --dart-define=USE_EMULATOR=false
+        flutter build apk --release --dart-define=HOST_ADDRESS=${{ secrets.EC2_HOST }} --dart-define=SERVER_PORT=${{ secrets.SERVER_PORT }} --dart-define=USE_EMULATOR=false
 
-    #     # Secure cleanup: remove sensitive files after use
-    #     rm -f android/app/keystore.jks android/app/google-services.json
+        # Secure cleanup: remove sensitive files after use
+        rm -f android/app/keystore.jks android/app/google-services.json
 
-    # - name: Upload Android APK artifact
-    #   uses: actions/upload-artifact@v4
-    #   with:
-    #     name: android-apk
-    #     path: build/app/outputs/flutter-apk/app-release.apk
-
-    # iOS Build - Secure Firebase and Signing for iOS
-    - name: Decode & Store iOS Firebase config (GoogleService-Info.plist)
-      run: |
-        echo "::add-mask::${{ secrets.FIREBASE_GOOGLE_SERVICE_INFO_PLIST_BASE64 }}"
-        echo "${{ secrets.FIREBASE_GOOGLE_SERVICE_INFO_PLIST_BASE64 }}" | base64 --decode > ios/Runner/GoogleService-Info.plist
-        chmod 600 ios/Runner/GoogleService-Info.plist
-    - name: Install CocoaPods dependencies
-      run: |
-        cd ios
-        pod install --repo-update
-        pod update
-        cd ../
-    - name: Build iOS App
-      run: |
-        flutter build ios --release --dart-define=HOST_ADDRESS=${{ secrets.EC2_HOST }} --dart-define=SERVER_PORT=${{ secrets.SERVER_PORT }} --dart-define=USE_EMULATOR=false
-   
-    - name: Upload iOS Build artifact
+    - name: Upload Android APK artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ios-app
-        path: build/ios/iphoneos/Runner.app
+        name: android-apk
+        path: build/app/outputs/flutter-apk/app-release.apk
+
+    # # iOS Build - Secure Firebase and Signing for iOS
+    # - name: Decode & Store iOS Firebase config (GoogleService-Info.plist)
+    #   run: |
+    #     echo "::add-mask::${{ secrets.FIREBASE_GOOGLE_SERVICE_INFO_PLIST_BASE64 }}"
+    #     echo "${{ secrets.FIREBASE_GOOGLE_SERVICE_INFO_PLIST_BASE64 }}" | base64 --decode > ios/Runner/GoogleService-Info.plist
+    #     chmod 600 ios/Runner/GoogleService-Info.plist
+    # - name: Install CocoaPods dependencies
+    #   run: |
+    #     cd ios
+    #     pod install --repo-update
+    #     pod update
+    #     cd ../
+    # - name: Build iOS App
+    #   run: |
+    #     flutter build ios --release --dart-define=HOST_ADDRESS=${{ secrets.EC2_HOST }} --dart-define=SERVER_PORT=${{ secrets.SERVER_PORT }} --dart-define=USE_EMULATOR=false
+   
+    # - name: Upload iOS Build artifact
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: ios-app
+    #     path: build/ios/iphoneos/Runner.app
     
     #Ensure files are deleted after the run regardless of success or failure
     - name: Ensure Cleanup
