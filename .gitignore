@@ -6,7 +6,7 @@ build/
 .env
 .idea/
 .vscode/
-
+.DS_Store
 # IDE-specific
 .idea/
 .vscode/
@@ -50,6 +50,3 @@ macos/
 
 # Linux platform files
 linux/
-
-#keyConfig
-android/key.properties
